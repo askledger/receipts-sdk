@@ -1,0 +1,30 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# Build outputs
+dist/
+*.tsbuildinfo
+
+# Local Ledger state (never commit keys or chain state)
+.ledger/
+*.key
+*.pem
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Editor
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Test coverage
+coverage/
+.nyc_output/

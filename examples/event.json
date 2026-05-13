@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "tenant_id": "demo-tenant",
+  "event_type": "ide.completion",
+  "source_system": "vs-code-plugin",
+  "event_id": "evt-2026-001",
+  "captured_at": "2026-05-13T10:30:00.000Z",
+  "context": {
+    "user_id": "alice@example-bank.com",
+    "session_id": "sess-abc-123",
+    "service_id": "spiffe://demo.local/ide/vs-code",
+    "environment": "production",
+    "region": "us-east-1",
+    "correlation_id": "trace-xyz-789"
+  },
+  "subject": {
+    "ai_vendor": "anthropic",
+    "ai_model": "claude-sonnet-4-6",
+    "ai_provider": "direct",
+    "ai_capability": "code-completion"
+  },
+  "payload": {
+    "input_hash": "9a4f8e0c2b1d3a6c5e7f9b8d2a4c6e8f0a1b3c5d7e9f1a3b5c7d9e1f3a5c7e9b",
+    "input_classification": "internal",
+    "input_size_bytes": 1280,
+    "input_token_count": 245,
+    "output_hash": "1b3c5d7e9f1a3b5c7d9e1f3a5c7e9b9a4f8e0c2b1d3a6c5e7f9b8d2a4c6e8f0a",
+    "output_classification": "internal",
+    "output_token_count": 380,
+    "metadata": {
+      "file_path": "src/services/payment.ts",
+      "language": "typescript",
+      "accepted_by_developer": true
+    }
+  },
+  "lineage": {
+    "workflow_id": "wf-pr-456",
+    "trace_id": "otel-trace-abc123"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "name": "@projectledger/receipts-sdk",
+  "version": "0.1.0",
+  "description": "Cryptographic AI Decision Receipts — RFC 8785 canonical JSON, JWS Ed25519, hash-chained, regulator-verifiable",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "ledger-cli": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "demo": "npm run build && node dist/cli.js sign examples/event.json && node dist/cli.js verify .ledger/last-receipt.json",
+    "keygen": "npm run build && node dist/cli.js keygen",
+    "lint": "tsc --noEmit",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "keywords": [
+    "ai",
+    "governance",
+    "receipts",
+    "rfc-8785",
+    "jws",
+    "ed25519",
+    "hash-chain",
+    "cryptographic-accountability",
+    "audit",
+    "regulator",
+    "compliance"
+  ],
+  "author": "Rashed Ali Khan & Mahamed Arif — Project Ledger",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@noble/ed25519": "^2.1.0",
+    "@noble/hashes": "^1.4.0",
+    "canonicalize": "^2.0.0",
+    "commander": "^12.0.0",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/uuid": "^10.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/projectledger/receipts-sdk-ts"
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ]
+}
