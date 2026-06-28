@@ -15,33 +15,33 @@ Open-source, vendor-neutral cryptographic trust substrate for enterprise AI. Eve
 
 ## Project status
 
-**v0.6.0 · pre-launch.** The cryptographic substrate is production-grade
-and tested. SDK, integrations, browser extension, console, public
-verifier, specification, and conformance program are complete. Hosted
-SaaS, third-party penetration test, and SOC 2 Type II report are
-scoped for Q4 2026 - Q1 2027. We are at the **design-partner stage**
-and welcome architectural review, pilot interest, and standards-body
-co-authorship.
+**v0.6.0 · live on npm.** The cryptographic substrate is production-
+grade and tested. SDK, integrations, browser extension, console,
+public verifier, specification, and conformance program are complete
+and publicly available. Hosted SaaS, third-party penetration test,
+and SOC 2 Type II report are scoped for Q4 2026 - Q1 2027. We are at
+the **design-partner stage** and welcome architectural review, pilot
+interest, and standards-body co-authorship.
+
+- Package: [npm install @askledger/receipts-sdk](https://www.npmjs.com/package/@askledger/receipts-sdk)
+- Site: [askledger.github.io/receipts-sdk](https://askledger.github.io/receipts-sdk/)
+- Source: [github.com/askledger/receipts-sdk](https://github.com/askledger/receipts-sdk)
 
 ---
 
 ## Install
 
-> The v0.6.0 npm package publishes alongside the public repository
-> launch. Until then, install from source:
+```bash
+npm install @askledger/receipts-sdk
+```
+
+Or install from source:
 
 ```bash
 git clone https://github.com/askledger/receipts-sdk
 cd receipts-sdk
 npm install
 npm run build
-npm link
-```
-
-Once published, the standard install applies:
-
-```bash
-npm install @askledger/receipts-sdk
 ```
 
 ## Sign your first receipt
@@ -299,9 +299,8 @@ A browser-based playground and verifier ship in this repository at
 to generate a keypair, sign a sample event, and verify the resulting
 receipt — entirely client-side, no server, no install.
 
-A hosted version will be available at
-`askledger.github.io/receipts-sdk/playground.html` once the
-repository is public.
+A hosted version is live at
+[askledger.github.io/receipts-sdk/playground.html](https://askledger.github.io/receipts-sdk/playground.html).
 
 ---
 
