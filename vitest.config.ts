@@ -4,5 +4,6 @@ export default defineConfig({
   test: {
     include: ["test/**/*.test.ts"],
     exclude: ["console/**", "node_modules/**", "dist/**", "go-sdk/**", "rust-sdk/**", "java-sdk/**", "python-sdk/**"],
+    setupFiles: ["./test/vitest.setup.ts"],
   },
 });

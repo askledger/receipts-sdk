@@ -75,7 +75,11 @@ export class SoftwareSigningProvider implements SigningProvider {
    * never leaves this process's memory.
    */
   static async generate(opts: { kid?: string } = {}): Promise<SoftwareSigningProvider> {
-    const priv = ed.utils.randomPrivateKey();
+    // Use Node's crypto.randomBytes directly. ed.utils.randomPrivateKey() depends
+    // on globalThis.crypto.getRandomValues which is inconsistently available
+    // across Node 18/20/22 and vitest worker contexts on Linux. An Ed25519
+    // private key is 32 cryptographically random bytes.
+    const priv = new Uint8Array(randomBytes(32));
     const pub = await ed.getPublicKeyAsync(priv);
     const kid = opts.kid ?? `sw-${Buffer.from(randomBytes(6)).toString("hex")}`;
     return new SoftwareSigningProvider(kid, priv, pub);
