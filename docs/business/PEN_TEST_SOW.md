@@ -37,7 +37,7 @@ that would block enterprise customer adoption.
    - Identity binding (`identity.js`) and OIDC PKCE flow.
    - Receipt ingest to the relay endpoint.
 
-4. **Deployed staging environment** (`staging.projectledger.io`)
+4. **Deployed staging environment** (`staging.github.com/askledger/receipts-sdk`)
    - Same image + Helm chart as production.
    - Postgres with RLS active, Trillian log, OTel collector.
    - Synthetic tenants seeded with realistic data.

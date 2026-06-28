@@ -113,7 +113,7 @@ import {
   AI_AGENCY_FRAMEWORK,
   applyAuthorContribution,
   frameworkAlignment,
-} from "@projectledger/receipts-sdk";
+} from "@askledger/receipts-sdk";
 
 // Today — verified outer structure with awaiting pillar text
 console.log(QAG_FRAMEWORK.components.length);   // 5

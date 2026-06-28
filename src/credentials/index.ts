@@ -39,7 +39,7 @@ export interface CredentialPayload {
   effective_from: string;           // RFC 3339
   effective_to?: string | null;
   statement: Record<string, string | number | boolean>;
-  schema_id: string;                // pkg:projectledger/credential-schema/...
+  schema_id: string;                // pkg:askledger/credential-schema/...
 }
 
 export interface SalarySlip {
@@ -104,7 +104,7 @@ export function buildSalarySlipEvent(opts: {
             deductions: opts.slip.deductions,
             jurisdiction: opts.slip.jurisdiction,
           },
-          schema_id: "pkg:projectledger/credential-schema/salary-slip@1",
+          schema_id: "pkg:askledger/credential-schema/salary-slip@1",
           data_subject_id: createHash("sha256").update(opts.slip.employee_id).digest("hex"),
           data_subject_name_hash: hashName(opts.slip.employee_name),
         },

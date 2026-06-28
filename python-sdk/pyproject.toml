@@ -3,7 +3,7 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "projectledger-receipts"
+name = "askledger-receipts"
 version = "0.1.0"
 description = "Cryptographic AI Decision Receipts — wire-format compatible Python SDK"
 readme = "README.md"
@@ -33,8 +33,8 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/projectledger/receipts-sdk-ts"
-Spec = "https://github.com/projectledger/receipts-sdk-ts/blob/main/docs/RECEIPTS_PROTOCOL.md"
+Homepage = "https://github.com/askledger/receipts-sdk"
+Spec = "https://github.com/askledger/receipts-sdk/blob/main/docs/RECEIPTS_PROTOCOL.md"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -31,7 +31,7 @@ co-authorship.
 > launch. Until then, install from source:
 
 ```bash
-git clone https://github.com/projectledger/receipts-sdk
+git clone https://github.com/askledger/receipts-sdk
 cd receipts-sdk
 npm install
 npm run build
@@ -41,13 +41,13 @@ npm link
 Once published, the standard install applies:
 
 ```bash
-npm install @projectledger/receipts-sdk
+npm install @askledger/receipts-sdk
 ```
 
 ## Sign your first receipt
 
 ```ts
-import { generateKeyPair, signReceipt, verifyReceipt } from "@projectledger/receipts-sdk";
+import { generateKeyPair, signReceipt, verifyReceipt } from "@askledger/receipts-sdk";
 
 const keypair = generateKeyPair();
 const receipt = signReceipt({
@@ -76,7 +76,7 @@ That's it. Six lines and you have a regulator-verifiable receipt.
 
 ```ts
 import OpenAI from "openai";
-import { wrapOpenAI, generateKeyPair } from "@projectledger/receipts-sdk";
+import { wrapOpenAI, generateKeyPair } from "@askledger/receipts-sdk";
 
 const client = wrapOpenAI(new OpenAI({ apiKey }), {
   tenantId: "acme",
@@ -94,7 +94,7 @@ Adapters available today: `wrapOpenAI` · `wrapAnthropic` · `withReceipts(fetch
 ## Try it without installing
 
 ```bash
-git clone https://github.com/projectledger/receipts-sdk.git && cd receipts-sdk
+git clone https://github.com/askledger/receipts-sdk.git && cd receipts-sdk
 npm install && npm run build
 node dist/cli.js demo
 ```
@@ -177,7 +177,7 @@ import {
   generateKeyPair,
   signReceipt,
   verifyReceipt,
-} from "@projectledger/receipts-sdk";
+} from "@askledger/receipts-sdk";
 
 // 1. Generate (or load) a keypair
 const kp = generateKeyPair();
@@ -300,7 +300,7 @@ to generate a keypair, sign a sample event, and verify the resulting
 receipt — entirely client-side, no server, no install.
 
 A hosted version will be available at
-`projectledger.github.io/receipts-sdk/playground.html` once the
+`askledger.github.io/receipts-sdk/playground.html` once the
 repository is public.
 
 ---
@@ -335,7 +335,7 @@ Pattern:
 
 ```ts
 import OpenAI from "openai";
-import { wrapOpenAI, generateKeyPair } from "@projectledger/receipts-sdk";
+import { wrapOpenAI, generateKeyPair } from "@askledger/receipts-sdk";
 
 const client = wrapOpenAI(new OpenAI({ apiKey }), {
   tenantId: "acme-corp",
@@ -356,11 +356,11 @@ Errors from the wrapped client always propagate — receipts never take down the
 
 | SDK | Language | Status | Conformance |
 |---|---|---|---|
-| `@projectledger/receipts-sdk` | TypeScript / Node 18+ / browsers | v0.2 · 88 tests passing | Reference |
-| `projectledger-receipts` | Python 3.10+ | v0.2 · 12 tests passing | Cross-verified against TS vectors |
-| `projectledger-receipts-go` | Go 1.22+ | Planned v0.3 | — |
-| `projectledger-receipts-rs` | Rust | Planned v0.3 | — |
-| `projectledger-receipts-java` | Java 17+ | Planned v0.3 | — |
+| `@askledger/receipts-sdk` | TypeScript / Node 18+ / browsers | v0.6.0 · 280 tests passing | Reference |
+| `askledger-receipts` (Python) | Python 3.10+ | v0.6.0 · cross-verified against TS vectors | Cross-verified |
+| `askledger-receipts-go` | Go 1.22+ | v0.6.0 · cross-verified against TS vectors | Cross-verified |
+| `askledger-receipts-rs` | Rust 1.75+ | v0.6.0 · cross-verified against TS vectors | Cross-verified |
+| `askledger-receipts-java` | Java 17+ | v0.6.0 · cross-verified against TS vectors | Cross-verified |
 
 Wire-format compatibility is enforced by [shared conformance vectors](test/conformance/) that every SDK must pass.
 
@@ -456,7 +456,7 @@ We are particularly interested in feedback from:
 | Key rotation, retirement, revocation, historical verification | ✅ Shipped |
 | FIPS-mode crypto path (`FipsSigningProvider`, `requireFipsMode`) | ✅ Shipped |
 | **HSM / KMS** | |
-| AWS KMS driver | ✅ Shipped (`@projectledger/receipts-sdk/hsm/aws-kms`) |
+| AWS KMS driver | ✅ Shipped (`@askledger/receipts-sdk/hsm/aws-kms`) |
 | Azure Key Vault driver | ✅ Shipped |
 | GCP KMS driver | ✅ Shipped |
 | PKCS#11 driver (Thales, Entrust, CloudHSM, YubiHSM) | ✅ Shipped |
@@ -515,7 +515,7 @@ If you reference this protocol or implementation in research or industry writing
 ```
 Khan, R. A., & Arif, M. (2026). Project Ledger Receipts SDK:
 Cryptographic AI Decision Receipts for enterprise AI.
-https://github.com/projectledger/receipts-sdk
+https://github.com/askledger/receipts-sdk
 ```
 
 ---
@@ -536,6 +536,12 @@ under multi-stakeholder governance preparation; we welcome
 contributions from individuals and organisations who want a seat at
 the standards table.
 
-**Contact** · `hello@projectledger.io` for general enquiries ·
-`security@projectledger.io` for responsible disclosure (see
-[`SECURITY.md`](SECURITY.md) for the GPG key).
+**Contact**
+
+- General questions →
+  [GitHub Discussions](https://github.com/askledger/receipts-sdk/discussions)
+- Bug reports →
+  [GitHub Issues](https://github.com/askledger/receipts-sdk/issues)
+- Security disclosures →
+  [private GitHub Security Advisory](https://github.com/askledger/receipts-sdk/security/advisories/new)
+  (see [`SECURITY.md`](SECURITY.md))

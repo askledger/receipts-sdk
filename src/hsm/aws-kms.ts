@@ -9,7 +9,7 @@
  * Production usage:
  *
  *   import { KMSClient } from "@aws-sdk/client-kms";
- *   import { AwsKmsSigningProvider } from "@projectledger/receipts-sdk/hsm/aws-kms";
+ *   import { AwsKmsSigningProvider } from "@askledger/receipts-sdk/hsm/aws-kms";
  *
  *   const provider = await AwsKmsSigningProvider.fromKeyId({
  *     client: new KMSClient({

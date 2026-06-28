@@ -7,7 +7,7 @@
  * Usage:
  *
  *   import { CBUAE_RESPONSIBLE_AI, EU_AI_ACT, citeReceipt } from
- *     "@projectledger/receipts-sdk/policy-templates";
+ *     "@askledger/receipts-sdk/policy-templates";
  *
  *   const citations = citeReceipt(signedReceipt, [
  *     CBUAE_RESPONSIBLE_AI,

@@ -9,7 +9,7 @@
  * Production usage:
  *
  *   import { KeyManagementServiceClient } from "@google-cloud/kms";
- *   import { GcpKmsSigningProvider } from "@projectledger/receipts-sdk/hsm/gcp-kms";
+ *   import { GcpKmsSigningProvider } from "@askledger/receipts-sdk/hsm/gcp-kms";
  *
  *   const provider = await GcpKmsSigningProvider.fromKeyVersionName({
  *     client: new KeyManagementServiceClient(),

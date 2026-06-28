@@ -14,7 +14,7 @@ Project Ledger's extension takes the opposite stance:
 
 ## Install (developer mode)
 
-1. Clone the repo: `git clone https://github.com/projectledger/receipts-sdk-ts.git`
+1. Clone the repo: `git clone https://github.com/askledger/receipts-sdk.git`
 2. Chrome → `chrome://extensions` → enable Developer mode
 3. Click **Load unpacked** → select `browser-extension/`
 4. Open ChatGPT, Claude, or Gemini. Ask anything.

@@ -45,7 +45,7 @@ NEVER sent to the ingest endpoint.
 ## Verification
 
 Receipts are verifiable from the Project Ledger public verifier:
-`https://verify.projectledger.io?receipt=<id>`.
+`https://askledger.github.io/receipts-sdk/verify.html?receipt=<id>`.
 
 ## Privacy
 

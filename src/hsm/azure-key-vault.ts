@@ -10,7 +10,7 @@
  *
  *   import { KeyClient, CryptographyClient } from "@azure/keyvault-keys";
  *   import { DefaultAzureCredential } from "@azure/identity";
- *   import { AzureKeyVaultSigningProvider } from "@projectledger/receipts-sdk/hsm/azure-key-vault";
+ *   import { AzureKeyVaultSigningProvider } from "@askledger/receipts-sdk/hsm/azure-key-vault";
  *
  *   const cred = new DefaultAzureCredential();
  *   const provider = await AzureKeyVaultSigningProvider.fromKeyId({

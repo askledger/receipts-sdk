@@ -29,7 +29,7 @@ import {
   ISO_27001_AI,
   GDPR_AI,
   citeReceipt,
-} from "@projectledger/receipts-sdk";
+} from "@askledger/receipts-sdk";
 
 // Healthcare AI deployment in the EU
 const TEMPLATES = [HIPAA_SECURITY_RULE, ISO_27001_AI, GDPR_AI];
@@ -79,7 +79,7 @@ Each becomes the `event_type` field on the receipt. The SDK validates the dotted
 Every AI use case in your industry gets a registry entry with an owner, risk tier, and approved models.
 
 ```ts
-import { UseCaseRegistry } from "@projectledger/receipts-sdk";
+import { UseCaseRegistry } from "@askledger/receipts-sdk";
 
 const registry = new UseCaseRegistry();
 
@@ -107,7 +107,7 @@ The same shape works for any industry — only the values change.
 The PII detector ships 14 categories, several of which are healthcare-relevant (US SSN, account_number, date_of_birth). You can extend with industry-specific patterns:
 
 ```ts
-import { evaluateContentSafety } from "@projectledger/receipts-sdk";
+import { evaluateContentSafety } from "@askledger/receipts-sdk";
 
 const policy = {
   shadow_ai: {
@@ -132,7 +132,7 @@ Identical to BFSI — adapters are vendor-specific, not industry-specific:
 
 ```ts
 import OpenAI from "openai";
-import { wrapOpenAI, generateKeyPair } from "@projectledger/receipts-sdk";
+import { wrapOpenAI, generateKeyPair } from "@askledger/receipts-sdk";
 
 const client = wrapOpenAI(new OpenAI({ apiKey }), {
   tenantId: "providence-health",

@@ -15,7 +15,7 @@ from dataclasses import dataclass, field
 from typing import Any, Callable, Mapping
 from urllib import request as urlrequest
 
-log = logging.getLogger("projectledger.agents")
+log = logging.getLogger("askledger.agents")
 
 
 @dataclass

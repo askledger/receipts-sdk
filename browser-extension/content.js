@@ -57,7 +57,7 @@
     };
     chrome.runtime.sendMessage({ type: "pl.sign", event }, (resp) => {
       if (resp?.ok) {
-        document.dispatchEvent(new CustomEvent("projectledger:receipt-signed", { detail: resp.receipt }));
+        document.dispatchEvent(new CustomEvent("askledger:receipt-signed", { detail: resp.receipt }));
       }
     });
   }

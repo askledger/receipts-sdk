@@ -66,7 +66,7 @@ event.payload = {
   effective_from : <RFC 3339>,
   effective_to   : <RFC 3339 | null>,
   statement      : <map of field → value>,    // e.g. salary, designation
-  schema_id      : <pkg:projectledger/credential-schema/...>
+  schema_id      : <pkg:askledger/credential-schema/...>
 }
 
 event.context = {
@@ -114,7 +114,7 @@ upgrade to (1) and (2) as adoption demands.
 
 A PL-RFC-011 credential **IS** a W3C VC if we set:
 - `@context` to the VC + PL contexts
-- `type` to `["VerifiableCredential", "ProjectLedgerCredential", <vertical type>]`
+- `type` to `["VerifiableCredential", "AskLedgerCredential", <vertical type>]`
 - `proof.type` to `"Ed25519Signature2020"`
 - `proof.proofValue` to the receipt's base64 signature
 

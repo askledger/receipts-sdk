@@ -1,7 +1,7 @@
 {
   "uid": "pl-platform-overview",
   "title": "Project Ledger · Platform Overview",
-  "tags": ["projectledger", "production"],
+  "tags": ["askledger", "production"],
   "schemaVersion": 39,
   "version": 1,
   "refresh": "30s",

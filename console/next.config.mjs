@@ -17,7 +17,7 @@ const CSP_STRICT = [
   "font-src 'self' data:",
   "script-src 'self' 'wasm-unsafe-eval'",  // wasm for in-browser verifier
   "style-src 'self' 'unsafe-inline'",       // Tailwind hashed at build time
-  "connect-src 'self' https://api.projectledger.io https://*.projectledger.io",
+  "connect-src 'self' https://api.github.com/askledger/receipts-sdk https://*.github.com/askledger/receipts-sdk",
   "worker-src 'self' blob:",
   "manifest-src 'self'",
   "upgrade-insecure-requests",
@@ -46,7 +46,7 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   experimental: { typedRoutes: true },
-  transpilePackages: ["@projectledger/receipts-sdk"],
+  transpilePackages: ["@askledger/receipts-sdk"],
   async headers() {
     return [
       {

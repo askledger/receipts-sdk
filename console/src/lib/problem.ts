@@ -12,7 +12,7 @@ export interface Problem {
   [ext: string]: unknown;
 }
 
-const BASE = "https://errors.projectledger.io";
+const BASE = "https://errors.github.com/askledger/receipts-sdk";
 
 export const Problems = {
   unauthenticated: (instance?: string): Problem => ({

@@ -71,7 +71,7 @@ here with an owner, a deliverable, and a date.
 
 | Item | Owner | Done when |
 |---|---|---|
-| `staging.projectledger.io` live with TLS cert | SRE | `curl https://staging.projectledger.io/api/health` returns 200 |
+| `staging.github.com/askledger/receipts-sdk` live with TLS cert | SRE | `curl https://staging.github.com/askledger/receipts-sdk/api/health` returns 200 |
 | Helm chart installed (`deploy/helm/`) with PDB + HPA + NetworkPolicy | SRE | `kubectl get deploy` shows 3 replicas, all ready |
 | ServiceMonitor scraping `/api/metrics` | SRE | Prometheus shows `pl_console_uptime_seconds` |
 | PrometheusRule firing into PagerDuty for a synthetic incident | SRE | A controlled 5xx triggers the on-call rotation |
@@ -85,10 +85,10 @@ here with an owner, a deliverable, and a date.
 | Item | Owner | Done when |
 |---|---|---|
 | `v0.6.0` tagged on `main` | Release captain | `release.yml` workflow runs end-to-end |
-| Cosign-signed image published to `ghcr.io/projectledger/console:0.6.0` | Release captain | `cosign verify` passes |
+| Cosign-signed image published to `ghcr.io/askledger/console:0.6.0` | Release captain | `cosign verify` passes |
 | SBOM attested via `cosign attest` | Release captain | Attestation visible in Rekor |
 | SLSA L3 provenance attached | Release captain | Verifiable with `slsa-verifier` |
-| npm package `@projectledger/receipts-sdk@0.6.0` published with `--provenance` | Release captain | `npm install` works for external users |
+| npm package `@askledger/receipts-sdk@0.6.0` published with `--provenance` | Release captain | `npm install` works for external users |
 | GitHub release notes generated from CHANGELOG | Release captain | Release page live |
 
 **Target:** 2026-07-31. **Budget:** 1 engineer-day.
@@ -103,7 +103,7 @@ here with an owner, a deliverable, and a date.
 | Prometheus operator installed via kube-prometheus-stack | SRE | Prometheus shows our ServiceMonitor target |
 | Grafana provisioned with `monitoring/grafana-dashboard.json` | SRE | Dashboard loads with live data |
 | Alertmanager → PagerDuty integration | SRE | Test page reaches on-call phone |
-| Status page (Atlassian Statuspage or similar) connected to synthetic probes | SRE | `status.projectledger.io` shows component health |
+| Status page (Atlassian Statuspage or similar) connected to synthetic probes | SRE | `status.github.com/askledger/receipts-sdk` shows component health |
 
 **Target:** 2026-09-15. **Budget:** 2 SRE-weeks + ~$1k/mo or Grafana Cloud free tier.
 
@@ -115,7 +115,7 @@ here with an owner, a deliverable, and a date.
 |---|---|---|
 | Developer account registered + 2FA + backup publisher | CTO | Developer dashboard shows two publishers |
 | Signing key provisioned in HSM, KID recorded | Crypto + SRE | First signed build produced by CI |
-| Privacy policy, single-purpose statement, permissions justification published | Legal + CTO | Pages live at `projectledger.io/privacy` |
+| Privacy policy, single-purpose statement, permissions justification published | Legal + CTO | Pages live at `github.com/askledger/receipts-sdk/privacy` |
 | Listing assets (icon, screenshots, promo tile) checked in | Design | `browser-extension/store-listing/` populated |
 | Managed-policy schema published | Backend eng | JSON Schema served from extension URL |
 | Submitted for review | CTO | Submission ID + review status visible |

@@ -1,4 +1,4 @@
-package io.projectledger.receipts;
+package io.askledger.receipts;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -150,7 +150,7 @@ Honest answer, broken into the audiences who will ask:
 
 ### To a developer evaluating the SDK
 **Yes.** The substrate is real, the tests are real, the cross-language
-parity is real. They can `npm install @projectledger/receipts-sdk` (once
+parity is real. They can `npm install @askledger/receipts-sdk` (once
 published), call `signReceipt`, get a real signed receipt, and verify it
 with the bundled `verifyReceipt`. The docs are accurate.
 

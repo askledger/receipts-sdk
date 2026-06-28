@@ -43,7 +43,7 @@ The issue has been mitigated as of [TIME UTC]. Error rates have returned
 to baseline.
 
 We will publish a public postmortem within 5 business days at
-status.projectledger.io/postmortems.
+status.github.com/askledger/receipts-sdk/postmortems.
 
 ---
 

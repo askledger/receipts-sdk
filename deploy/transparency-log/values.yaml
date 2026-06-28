@@ -28,9 +28,9 @@ sth:
 ingress:
   enabled: true
   className: nginx
-  host: log.projectledger.io
+  host: log.github.com/askledger/receipts-sdk
   tls:
-    secretName: log-projectledger-tls
+    secretName: log-askledger-tls
 
 prometheus:
   serviceMonitor:

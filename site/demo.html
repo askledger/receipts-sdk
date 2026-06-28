@@ -535,7 +535,7 @@ footer { padding: 32px 0; border-top: 1px solid var(--line); color: var(--ink-50
       <a href="index.html">Home</a>
       <a href="verify.html">Verifier</a>
       <a href="playground.html">Playground</a>
-      <a href="https://github.com/projectledger/receipts-sdk-ts">GitHub</a>
+      <a href="https://github.com/askledger/receipts-sdk">GitHub</a>
     </nav>
   </div>
 </header>
@@ -599,7 +599,7 @@ footer { padding: 32px 0; border-top: 1px solid var(--line); color: var(--ink-50
 
 <footer>
   <div class="container">
-    Every line of code that runs above is published in <a href="https://github.com/projectledger/receipts-sdk">@projectledger/receipts-sdk</a> v0.7.0 — open spec at <a href="https://spec.projectledger.io/">PL-RFC-001 … 010</a> · Apache-2.0 · 9 native integrations · CL1/CL2/CL3 conformance suite.
+    Every line of code that runs above is published in <a href="https://github.com/askledger/receipts-sdk">@askledger/receipts-sdk</a> v0.7.0 — open spec at <a href="https://github.com/askledger/receipts-sdk/tree/main/spec/">PL-RFC-001 … 010</a> · Apache-2.0 · 9 native integrations · CL1/CL2/CL3 conformance suite.
   </div>
 </footer>
 
@@ -665,7 +665,7 @@ function syntaxJSON(obj) {
 const APPROVED = {
   vendors: ["anthropic", "openai", "bedrock"],
   models: ["claude-sonnet-4-6", "gpt-5", "claude-3-sonnet"],
-  sources: ["demo.projectledger.io"],
+  sources: ["demo.github.com/askledger/receipts-sdk"],
   consumer_endpoints: ["chatgpt.com", "claude.ai", "gemini.google.com"],
 };
 
@@ -1333,7 +1333,7 @@ async function signOne(scenario, previous) {
     schema_version: "1.0",
     tenant_id: "demo-tenant",
     event_type: scenario.event_type ?? "gateway.request",
-    source_system: "demo.projectledger.io",
+    source_system: "demo.github.com/askledger/receipts-sdk",
     event_id: "evt-" + Math.random().toString(36).slice(2, 10),
     captured_at: new Date().toISOString(),
     context: { environment: "production", user_id: scenario.user_role ?? undefined },

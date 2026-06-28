@@ -1,4 +1,4 @@
-# @projectledger/conformance
+# @askledger/conformance
 
 Conformance test corpus + runner for the Project Ledger AI Decision
 Receipts protocol (PL-RFC-001…010).
@@ -14,7 +14,7 @@ Three conformance levels, mirroring the SLSA pattern:
 ## Run
 
 ```
-npx @projectledger/conformance run \
+npx @askledger/conformance run \
   --canonicalize ./scripts/my-canonicalize.sh \
   --sign         ./scripts/my-sign.sh \
   --chain        ./scripts/my-chain.sh

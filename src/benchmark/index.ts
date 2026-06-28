@@ -70,7 +70,7 @@ export function score(samples: VendorSample[]): BenchmarkReport {
   return {
     schema_version: "1.0",
     generated_at: new Date().toISOString(),
-    methodology_url: "https://spec.projectledger.io/benchmark/methodology.md",
+    methodology_url: "https://github.com/askledger/receipts-sdk/tree/main/spec/benchmark/methodology.md",
     sample_size: totalInvocations,
     by_vendor,
     rankings: {

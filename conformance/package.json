@@ -1,5 +1,5 @@
 {
-  "name": "@projectledger/conformance",
+  "name": "@askledger/conformance",
   "version": "0.1.0",
   "description": "Conformance test corpus + runner for Project Ledger AI Decision Receipts (PL-RFC-001..010)",
   "license": "Apache-2.0",
@@ -29,7 +29,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/projectledger/receipts-sdk",
+    "url": "https://github.com/askledger/receipts-sdk",
     "directory": "conformance"
   }
 }

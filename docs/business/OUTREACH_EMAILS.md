@@ -121,7 +121,7 @@ spec is in the right shape to graduate into the LF AI / OpenSSF
 ecosystem. Second, advice on whether to position as a profile of
 OpenSSF Model Signing or as a standalone runtime layer.
 
-Brief attached. Specification at `spec.projectledger.io`.
+Brief attached. Specification at `github.com/askledger/receipts-sdk/tree/main/spec`.
 
 Thirty minutes whenever convenient.
 

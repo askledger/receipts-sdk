@@ -7,7 +7,7 @@ describe("AI SBOM", () => {
       tenant_id: "acme",
       components: [
         { type: "model", name: "claude-sonnet-4-6", version: "20251101", vendor: "Anthropic", source_uri: "https://anthropic.com/claude" },
-        { type: "mcp-server", name: "projectledger-receipts", version: "0.1.0", license: "Apache-2.0" },
+        { type: "mcp-server", name: "askledger-receipts", version: "0.1.0", license: "Apache-2.0" },
       ],
     });
     expect(sbom.bomFormat).toBe("CycloneDX");
@@ -28,12 +28,12 @@ describe("AI SBOM", () => {
     });
     expect(sbom.dependencies).toHaveLength(1);
     expect(sbom.dependencies[0]?.dependsOn).toEqual([
-      "pkg:projectledger/claude-sonnet-4-6",
-      "pkg:projectledger/risk-scorer",
+      "pkg:askledger/claude-sonnet-4-6",
+      "pkg:askledger/risk-scorer",
     ]);
   });
 
-  it("uses purl when supplied; falls back to projectledger purl otherwise", () => {
+  it("uses purl when supplied; falls back to askledger purl otherwise", () => {
     const sbom = buildAISBOM({
       tenant_id: "acme",
       components: [
@@ -43,7 +43,7 @@ describe("AI SBOM", () => {
     });
     expect(sbom.components[0]?.purl).toBe("pkg:huggingface/meta-llama/Meta-Llama-3-70B");
     expect(sbom.components[0]?.["bom-ref"]).toBe("pkg:huggingface/meta-llama/Meta-Llama-3-70B");
-    expect(sbom.components[1]?.["bom-ref"]).toBe("pkg:projectledger/custom@1.0.0");
+    expect(sbom.components[1]?.["bom-ref"]).toBe("pkg:askledger/custom@1.0.0");
   });
 
   it("attestations surface as CycloneDX properties", () => {

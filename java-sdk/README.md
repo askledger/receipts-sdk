@@ -4,14 +4,14 @@ Wire-format compatible. Cross-verified via shared conformance vectors. Apache-2.
 
 ```xml
 <dependency>
-  <groupId>io.projectledger</groupId>
+  <groupId>io.askledger</groupId>
   <artifactId>receipts-sdk</artifactId>
   <version>0.1.0</version>
 </dependency>
 ```
 
 ```java
-import io.projectledger.receipts.*;
+import io.askledger.receipts.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 

@@ -5,7 +5,7 @@ unsigned source to officially-published, enterprise-deployable extension.
 
 ## 1 · Developer account
 
-- [ ] Register `developer@projectledger.io` as a Chrome Web Store developer ($5 one-time).
+- [ ] Register `developer@github.com/askledger/receipts-sdk` as a Chrome Web Store developer ($5 one-time).
 - [ ] Enable 2FA. Hardware key required for the publisher account.
 - [ ] Add at least one backup publisher (so we don't lose the listing if the primary leaves).
 
@@ -31,7 +31,7 @@ unsigned source to officially-published, enterprise-deployable extension.
 
 ## 4 · Required policies
 
-- [ ] **Privacy policy** at `https://projectledger.io/privacy`. Must enumerate every category of data the extension can access, every purpose, and every recipient (us; no third parties).
+- [ ] **Privacy policy** at `https://github.com/askledger/receipts-sdk/privacy`. Must enumerate every category of data the extension can access, every purpose, and every recipient (us; no third parties).
 - [ ] **Permissions justification** for each entry in `manifest.json`. Write the customer-visible text NOW so review is fast.
 - [ ] **Single purpose statement**: "Sign receipts of AI interactions for compliance and audit purposes."
 - [ ] **Remote code disclosure**: NONE. Confirm CSP `script-src 'self'` and no eval/Function constructor anywhere.

@@ -25,12 +25,12 @@ Here's the playbook, ordered.
 - `PL-RFC-009` — Cost ledger format (we just shipped the substrate; codify it).
 - `PL-RFC-010` — Carbon ledger format.
 
-Ship under `/spec/` in the repo, also at `spec.projectledger.io`. Versioned. Diffable. Citable by regulators.
+Ship under `/spec/` in the repo, also at `github.com/askledger/receipts-sdk/tree/main/spec`. Versioned. Diffable. Citable by regulators.
 
 ### 2 · Publish the conformance test suite as a runnable artifact
-- `npx @projectledger/conformance` runs against any implementation of `signReceipt` + `verifyReceipt`.
+- `npx @askledger/conformance` runs against any implementation of `signReceipt` + `verifyReceipt`.
 - Conformance levels 1, 2, 3 (CL1/CL2/CL3) mirror the SLSA-level pattern.
-- Public conformance dashboard at `conformance.projectledger.io` lists every implementation that passes.
+- Public conformance dashboard at `conformance.github.com/askledger/receipts-sdk` lists every implementation that passes.
 - A vendor's badge ("AI Receipts CL3 conformant") is the same trust signal SSL Labs A+ became.
 
 ### 3 · Submit to Linux Foundation AI (LF AI & Data) under the Sigstore-adjacent track
@@ -93,7 +93,7 @@ The doc names Portkey, LiteLLM, Cloudflare, Kong, Bedrock. Today we sit above an
 CODEOWNERS already shows the discipline. The next step is naming maintainer leads from organizations outside Project Ledger Inc. so the project is not single-vendor. Target: by year-end, ≥ 3 organizations with merge rights.
 
 ### 6 · A public transparency log anyone can query
-Today the Trillian client is shipped; the log is not deployed. Stand up `log.projectledger.io` publicly. Receipt id → inclusion proof endpoint. Mirror Sigstore Rekor's pattern. This is the artifact that lets a CISO say "I can prove our AI history without trusting Project Ledger Inc."
+Today the Trillian client is shipped; the log is not deployed. Stand up `log.github.com/askledger/receipts-sdk` publicly. Receipt id → inclusion proof endpoint. Mirror Sigstore Rekor's pattern. This is the artifact that lets a CISO say "I can prove our AI history without trusting Project Ledger Inc."
 
 ### 7 · Reference verifier as a Lambda / Cloudflare Worker / static page
 Three deployments of the same verifier so a customer's auditor can run it themselves. Already shipped as a static `site/verifier.html`; add the Worker + Lambda + CLI variants.
@@ -113,7 +113,7 @@ A `pl-vendor-kit` package an LLM provider ships alongside their own SDK so "ever
 
 ### 11 · 60-second hello world
 ```
-curl -sSL get.projectledger.io | bash
+curl -sSL github.com/askledger/receipts-sdk | bash
 ```
 - Installs the CLI.
 - Generates a keypair locally.
@@ -125,7 +125,7 @@ Measured by time-to-first-signed-receipt; target < 60s on a fresh laptop.
 
 ### 12 · Embeddable verifier widget
 ```html
-<script src="https://verify.projectledger.io/widget.js"></script>
+<script src="https://askledger.github.io/receipts-sdk/verify.html/widget.js"></script>
 <pl-verifier receipt-id="01J9X..."></pl-verifier>
 ```
 - 8 KB JavaScript.
@@ -182,18 +182,18 @@ Munich Re aiSure / Mosaic / Armilla all need an underwriting feed. Publish the r
 Realistic, named, owned:
 
 1. **Week 1 · `/spec/PL-RFC-001..010` v0.1 draft.** Just versioned markdown — the act of publication is the move.
-2. **Week 1 · `npx @projectledger/conformance` package** — same conformance corpus already in `test/conformance.test.ts`, packaged for external invocation.
+2. **Week 1 · `npx @askledger/conformance` package** — same conformance corpus already in `test/conformance.test.ts`, packaged for external invocation.
 3. **Week 2 · LF AI submission package** — README, governance, license check, security policy. We already have every prerequisite.
 4. **Week 2 · LiteLLM upstream PR** — adds a `pl_receipts` success callback. Single biggest gateway-share win available.
 5. **Week 3 · Public conformance dashboard scaffold.** Static page that reads JSON results. Vendors PR their results.
 6. **Week 3 · Cursor + Claude Code adapters.** Two files each. Massive narrative impact ("every Cursor edit is signed").
-7. **Week 4 · Public transparency log goes live at `log.projectledger.io`.** Trillian, MySQL, STH archive in S3 with Object Lock.
+7. **Week 4 · Public transparency log goes live at `log.github.com/askledger/receipts-sdk`.** Trillian, MySQL, STH archive in S3 with Object Lock.
 8. **Week 4 · OpenSSF Model Signing co-authored doc.** Position runtime accountability as the layer above model identity.
 
 ---
 
 ## Why this wins
 
-The doc says the moat is "RFC 8785 + JWS Ed25519 + RFC 3161 + Merkle commitments — Empty Slot". An empty slot only stays ours if we **plant the standard before anyone else does**. Cisco bought Galileo to plant model-provenance. Palo Alto bought Portkey to plant gateway-level guardrails. Neither has the runtime-receipts substrate. We have a ~12-18 month window to make `projectledger` the term-of-art for AI accountability.
+The doc says the moat is "RFC 8785 + JWS Ed25519 + RFC 3161 + Merkle commitments — Empty Slot". An empty slot only stays ours if we **plant the standard before anyone else does**. Cisco bought Galileo to plant model-provenance. Palo Alto bought Portkey to plant gateway-level guardrails. Neither has the runtime-receipts substrate. We have a ~12-18 month window to make `askledger` the term-of-art for AI accountability.
 
 The hundred-feature path doesn't win. The standard-plus-conformance-plus-governance path wins. Every Tier 1 item above is a publication act, not a build act. The code largely exists. Publishing it as a versioned, citable, conformant standard is the move that converts product into industry position.

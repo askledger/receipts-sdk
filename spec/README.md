@@ -30,7 +30,7 @@ This is an evolving public spec following the IETF tradition.
 
 ## Conformance
 
-The [`@projectledger/conformance`](../conformance/) package implements the
+The [`@askledger/conformance`](../conformance/) package implements the
 test corpus against which an implementation is verified. Three levels:
 
 - **CL1 — Canonical** · Implementation produces byte-identical canonical bytes for every fixture in the corpus.
@@ -38,7 +38,7 @@ test corpus against which an implementation is verified. Three levels:
 - **CL3 — Chained** · Implementation produces byte-identical chain state across 100 sequential events.
 
 An implementation that passes all three earns the right to display the
-**AI Receipts CL3** badge. Results are published at `conformance.projectledger.io`.
+**AI Receipts CL3** badge. Results are published at `conformance.github.com/askledger/receipts-sdk`.
 
 ## Governance
 
@@ -53,7 +53,7 @@ stewardship to the Linux Foundation AI & Data project upon acceptance.
 
 Cite a specific draft as:
 
-> Project Ledger Working Group. *Project Ledger Receipt Schema*. PL-RFC-001, Draft v0.1. 2026. https://spec.projectledger.io/PL-RFC-001
+> Project Ledger Working Group. *Project Ledger Receipt Schema*. PL-RFC-001, Draft v0.1. 2026. https://github.com/askledger/receipts-sdk/tree/main/spec/PL-RFC-001
 
 A bibliographic export (BibTeX, RIS) is provided in the rendered site.
 

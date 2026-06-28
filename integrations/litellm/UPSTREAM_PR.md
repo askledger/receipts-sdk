@@ -1,7 +1,7 @@
 # LiteLLM upstream PR · Project Ledger Receipts Callback
 
 **Target repo:** https://github.com/BerriAI/litellm
-**Branch:** `feat/projectledger-receipts-callback`
+**Branch:** `feat/askledger-receipts-callback`
 **Title:** *feat(callbacks): Project Ledger cryptographic receipts callback*
 
 ---
@@ -26,16 +26,16 @@ to ship a receipt never fail the upstream LLM call.
 
 ## Files changed
 
-- `litellm/integrations/projectledger.py`  (new — 195 LOC, MIT-licensed by author)
+- `litellm/integrations/askledger.py`  (new — 195 LOC, MIT-licensed by author)
 - `litellm/__init__.py`  (1 line: re-export)
-- `docs/observability/projectledger.md`  (new — 1 page configuration guide)
-- `tests/test_projectledger_callback.py`  (new — 6 unit tests, all mocked)
+- `docs/observability/askledger.md`  (new — 1 page configuration guide)
+- `tests/test_askledger_callback.py`  (new — 6 unit tests, all mocked)
 
 ## Configuration
 
 ```python
 import litellm
-from litellm.integrations.projectledger import PLReceiptsCallback
+from litellm.integrations.askledger import PLReceiptsCallback
 
 litellm.success_callback = [PLReceiptsCallback(
     tenant_id="acme",
@@ -46,7 +46,7 @@ litellm.success_callback = [PLReceiptsCallback(
 
 The callback file is bundled at `integrations/litellm/pl_receipts_callback.py`
 in the Project Ledger repository for reference; the PR vendors it under
-`litellm/integrations/projectledger.py` with the proper docstring header
+`litellm/integrations/askledger.py` with the proper docstring header
 and the BerriAI copyright block per LiteLLM contribution guidelines.
 
 ## Tests included in the PR
@@ -80,11 +80,11 @@ LiteLLM ≥ 1.40 (current is 1.52). No changes to `litellm.completion` signature
 ## Filing checklist
 
 - [ ] Fork BerriAI/litellm.
-- [ ] Branch `feat/projectledger-receipts-callback`.
-- [ ] Copy `integrations/litellm/pl_receipts_callback.py` → `litellm/integrations/projectledger.py`.
+- [ ] Branch `feat/askledger-receipts-callback`.
+- [ ] Copy `integrations/litellm/pl_receipts_callback.py` → `litellm/integrations/askledger.py`.
 - [ ] Add re-export to `litellm/__init__.py`.
-- [ ] Add doc page under `docs/observability/projectledger.md`.
-- [ ] Add tests file `tests/test_projectledger_callback.py`.
-- [ ] Run `pytest tests/test_projectledger_callback.py` locally.
+- [ ] Add doc page under `docs/observability/askledger.md`.
+- [ ] Add tests file `tests/test_askledger_callback.py`.
+- [ ] Run `pytest tests/test_askledger_callback.py` locally.
 - [ ] `pre-commit run --all-files`.
 - [ ] Open PR using the title above. Link the three closing issues.

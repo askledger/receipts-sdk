@@ -37,7 +37,7 @@ if (!ROLES.includes(role)) {
 
 const session = {
   sub: "dev-user-001",
-  email: "demo@projectledger.io",
+  email: "demo@github.com/askledger/receipts-sdk",
   name: "Demo User",
   tenantId: "acme-bank",
   roles: [role],

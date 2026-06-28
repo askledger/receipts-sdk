@@ -4,7 +4,7 @@
  *
  * This reference implementation uses an in-memory tree suitable for
  * tests and the demo. The production deployment at
- * transparency.projectledger.io persists entries in append-only object
+ * transparency.github.com/askledger/receipts-sdk persists entries in append-only object
  * storage (S3 + DynamoDB) and rebuilds the tree on each STH publication.
  *
  * Operators MUST publish STHs on a fixed cadence (default: every 5

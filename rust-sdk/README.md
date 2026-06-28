@@ -4,11 +4,11 @@ Wire-format compatible. Cross-verified via shared conformance vectors. Apache-2.
 
 ```toml
 [dependencies]
-projectledger-receipts = "0.1"
+askledger-receipts = "0.1"
 ```
 
 ```rust
-use projectledger_receipts::{generate_keypair, sign_receipt, verify_receipt};
+use askledger_receipts::{generate_keypair, sign_receipt, verify_receipt};
 use std::collections::HashMap;
 
 let kp = generate_keypair();

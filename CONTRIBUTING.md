@@ -27,7 +27,7 @@ Thank you for considering a contribution. The receipts substrate is intended to 
 ## Development setup
 
 ```bash
-git clone https://github.com/projectledger/receipts-sdk-ts.git
+git clone https://github.com/askledger/receipts-sdk.git
 cd receipts-sdk-ts
 npm install
 npm run build
@@ -57,7 +57,7 @@ All 13 tests must pass before opening a PR.
 
 - **GitHub Discussions** for protocol design conversations
 - **GitHub Issues** for bugs and concrete enhancements
-- **Email** (`security@projectledger.io`) for vulnerability disclosures
+- **Email** ([GitHub Security Advisories](https://github.com/askledger/receipts-sdk/security/advisories/new)) for vulnerability disclosures
 - We aim to respond within 5 business days
 
 ## Code of Conduct

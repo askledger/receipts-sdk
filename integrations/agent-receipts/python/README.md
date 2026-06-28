@@ -1,9 +1,9 @@
-# projectledger-agents (Python)
+# askledger-agents (Python)
 
 Project Ledger receipts for the major Python agent frameworks.
 
 ```
-pip install projectledger-agents
+pip install askledger-agents
 ```
 
 ## Use
@@ -11,7 +11,7 @@ pip install projectledger-agents
 One line per framework, hooked from your boot script:
 
 ```python
-from projectledger_agents import (
+from askledger_agents import (
     ReceiptsSink,
     install_autogen,
     install_crewai,
@@ -37,7 +37,7 @@ emits a Project Ledger receipt. The wrappers are idempotent and
 non-blocking — a receipt-emit failure never breaks the agent.
 
 LangChain / LangGraph callers should use the existing
-[`@projectledger/receipts-sdk`](../../../) JS adapter — both Python
+[`@askledger/receipts-sdk`](../../../) JS adapter — both Python
 and JS handlers are conformant per PL-RFC-007.
 
 ## License

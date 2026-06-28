@@ -139,8 +139,8 @@ export class SoftwareSigningProvider implements SigningProvider {
  *
  * This is the integration shape your PKCS#11 / CloudHSM / Thales adapter
  * implements. The reference SDK ships the stub; vendor-specific
- * integrations live in separate packages (e.g. @projectledger/hsm-aws,
- * @projectledger/hsm-thales) which depend on this interface.
+ * integrations live in separate packages (e.g. @askledger/hsm-aws,
+ * @askledger/hsm-thales) which depend on this interface.
  *
  * The stub exists so consumers can write code against the interface
  * today, and swap in a real HSM tomorrow with zero call-site changes.

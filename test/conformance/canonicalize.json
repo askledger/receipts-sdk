@@ -1,5 +1,5 @@
 {
-  "$schema": "https://projectledger.io/conformance/canonicalize.v1.json",
+  "$schema": "https://github.com/askledger/receipts-sdk/conformance/canonicalize.v1.json",
   "description": "RFC 8785 canonicalize vectors. Any compliant implementation must produce these exact strings.",
   "vectors": [
     {

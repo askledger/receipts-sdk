@@ -120,7 +120,7 @@ export function buildEvidencePack(
   const merkle = buildBatch(receipts);
   // Also recompute the pack-level hash for tamper-evident packaging.
   const corePack: Omit<EvidencePack, "integrity"> = {
-    "@context": "https://projectledger.io/schema/evidence-pack-v1.jsonld",
+    "@context": "https://github.com/askledger/receipts-sdk/schema/evidence-pack-v1.jsonld",
     "@type": "EvidencePack",
     meta,
     trusted_keys: trustedKeys,

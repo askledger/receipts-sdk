@@ -7,7 +7,7 @@
  * Usage:
  *
  *   import Anthropic from "@anthropic-ai/sdk";
- *   import { wrapAnthropic } from "@projectledger/receipts-sdk/adapters/anthropic";
+ *   import { wrapAnthropic } from "@askledger/receipts-sdk/adapters/anthropic";
  *
  *   const client = wrapAnthropic(new Anthropic({ apiKey }), {
  *     tenantId: "acme-corp",

@@ -1,4 +1,4 @@
-# @projectledger/openai-proxy
+# @askledger/openai-proxy
 
 A drop-in HTTP proxy that signs every OpenAI-compatible call routed
 through it. Designed so a single install covers every IDE, agent, and
@@ -16,7 +16,7 @@ and signs every call.
 ## Install
 
 ```
-npm install -g @projectledger/openai-proxy
+npm install -g @askledger/openai-proxy
 ```
 
 ## Run

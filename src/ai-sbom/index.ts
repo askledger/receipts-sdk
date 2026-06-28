@@ -55,12 +55,12 @@ export function buildAISBOM(input: AISBOMInput): CycloneDX {
     version: 1,
     metadata: {
       timestamp: new Date().toISOString(),
-      tools: [{ vendor: "ProjectLedger", name: "ai-sbom", version: "0.1.0" }],
+      tools: [{ vendor: "AskLedger", name: "ai-sbom", version: "0.1.0" }],
     },
     components: input.components.map(toCdxComponent),
     dependencies: input.components
       .filter((c) => (c.dependencies?.length ?? 0) > 0)
-      .map((c) => ({ ref: refFor(c), dependsOn: (c.dependencies ?? []).map((d) => `pkg:projectledger/${d}`) })),
+      .map((c) => ({ ref: refFor(c), dependsOn: (c.dependencies ?? []).map((d) => `pkg:askledger/${d}`) })),
   };
 }
 
@@ -96,7 +96,7 @@ function cdxType(t: ComponentType): string {
 }
 
 function refFor(c: AIComponent): string {
-  return c.purl ?? `pkg:projectledger/${encodeURIComponent(c.name)}@${encodeURIComponent(c.version)}`;
+  return c.purl ?? `pkg:askledger/${encodeURIComponent(c.name)}@${encodeURIComponent(c.version)}`;
 }
 
 function stableUuid(seed: string): string {

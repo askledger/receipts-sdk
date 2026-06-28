@@ -316,7 +316,7 @@ the recent consolidation moves (Cisco, Palo Alto) confirm is forming.
 
 | Quarter | Milestones |
 |---|---|
-| **Q3 2026** | Public GitHub launch · npm publication of `@projectledger/receipts-sdk` v0.6.0 with Sigstore provenance · spec site at `spec.projectledger.io` · LF AI Sandbox submission · LiteLLM upstream callback PR · Chrome Web Store extension · public transparency log live · first 3 design partners |
+| **Q3 2026** | Public GitHub launch · npm publication of `@askledger/receipts-sdk` v0.6.0 with Sigstore provenance · spec site at `github.com/askledger/receipts-sdk/tree/main/spec` · LF AI Sandbox submission · LiteLLM upstream callback PR · Chrome Web Store extension · public transparency log live · first 3 design partners |
 | **Q4 2026** | Hosted SaaS GA (Team and Business tiers) · SOC 2 Type I · third-party penetration test · first 5 paying customers · Public Vendor Benchmark v1 |
 | **Q1 2027** | SOC 2 Type II observation window complete · first Tier-1 regulated reference customer · customer-managed HSM support · multi-region tenant deployment · first insurance-carrier underwriting feed live |
 | **Q2 2027** | SR 11-7, OSFI E-23, PRA SS1/23, RBI FREE-AI regulator-template packs GA · Verifier Model R&D begins (cross-tenant trained quality model) |
@@ -337,10 +337,10 @@ the recent consolidation moves (Cisco, Palo Alto) confirm is forming.
 
 ## 15 · Current activity · this month
 
-- Public repository launch in flight (`github.com/projectledger/receipts-sdk`, Apache-2.0)
-- npm publication of `@projectledger/receipts-sdk@0.6.0` with
+- Public repository launch in flight (`github.com/askledger/receipts-sdk`, Apache-2.0)
+- npm publication of `@askledger/receipts-sdk@0.6.0` with
   Sigstore keyless provenance
-- Specification site going live at `spec.projectledger.io` (GitHub
+- Specification site going live at `github.com/askledger/receipts-sdk/tree/main/spec` (GitHub
   Pages, PL-RFC-001 through PL-RFC-010)
 - LF AI Sandbox application in submission
 - LiteLLM upstream callback PR drafted and review-ready
@@ -393,9 +393,9 @@ will move toward it carefully and transparently.
 
 ---
 
-**Repository** · github.com/projectledger/receipts-sdk (Apache-2.0)
-**Specification** · spec.projectledger.io (PL-RFC-001 through PL-RFC-010)
-**General enquiries** · hello@projectledger.io
-**Security disclosures** · security@projectledger.io
+**Repository** · github.com/askledger/receipts-sdk (Apache-2.0)
+**Specification** · github.com/askledger/receipts-sdk/tree/main/spec (PL-RFC-001 through PL-RFC-010)
+**General enquiries** · GitHub Discussions (https://github.com/askledger/receipts-sdk/discussions)
+**Security disclosures** · GitHub Security Advisories (https://github.com/askledger/receipts-sdk/security/advisories/new)
 
 Project Ledger Project · Document v1.2 · June 2026 · CC-BY-4.0

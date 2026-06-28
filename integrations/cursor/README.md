@@ -1,4 +1,4 @@
-# @projectledger/cursor-receipts
+# @askledger/cursor-receipts
 
 MCP server that emits a Project Ledger receipt for every Cursor
 completion — drop-in audit evidence for AI-assisted code.
@@ -6,7 +6,7 @@ completion — drop-in audit evidence for AI-assisted code.
 ## Install
 
 ```
-npm install -g @projectledger/cursor-receipts
+npm install -g @askledger/cursor-receipts
 ```
 
 ## Configure Cursor

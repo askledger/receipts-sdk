@@ -11,7 +11,7 @@
  * Usage:
  *
  *   import OpenAI from "openai";
- *   import { wrapOpenAI } from "@projectledger/receipts-sdk/adapters/openai";
+ *   import { wrapOpenAI } from "@askledger/receipts-sdk/adapters/openai";
  *
  *   const client = wrapOpenAI(new OpenAI({ apiKey }), {
  *     tenantId: "acme-corp",

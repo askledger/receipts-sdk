@@ -22,7 +22,7 @@ groups:
         labels:
           severity: warning
           service: signer
-          runbook_url: https://github.com/projectledger/receipts-sdk/blob/main/docs/operations/RUNBOOK.md#31-signersigning_latency_p95_high
+          runbook_url: https://github.com/askledger/receipts-sdk/blob/main/docs/operations/RUNBOOK.md#31-signersigning_latency_p95_high
         annotations:
           summary: "Signer p95 latency > 100ms"
           description: "Signing latency p95 is {{ $value }}ms. Check KMS throttling and HSM pool."
@@ -33,7 +33,7 @@ groups:
         labels:
           severity: critical
           service: signer
-          runbook_url: https://github.com/projectledger/receipts-sdk/blob/main/docs/operations/RUNBOOK.md#31-signersigning_latency_p95_high
+          runbook_url: https://github.com/askledger/receipts-sdk/blob/main/docs/operations/RUNBOOK.md#31-signersigning_latency_p95_high
         annotations:
           summary: "Signer p95 latency > 250ms — PAGE"
           description: "Sustained p95 > 250ms means active customer impact."
@@ -47,7 +47,7 @@ groups:
         labels:
           severity: critical
           service: chain-store
-          runbook_url: https://github.com/projectledger/receipts-sdk/blob/main/docs/operations/RUNBOOK.md#32-chainwrite_failure_rate_high
+          runbook_url: https://github.com/askledger/receipts-sdk/blob/main/docs/operations/RUNBOOK.md#32-chainwrite_failure_rate_high
         annotations:
           summary: "Chain write failure rate > 0.5%"
           description: "Failures: {{ $value | humanizePercentage }}. Check Postgres + disk + uniqueness race."
@@ -61,7 +61,7 @@ groups:
         labels:
           severity: critical
           service: tlog
-          runbook_url: https://github.com/projectledger/receipts-sdk/blob/main/docs/operations/RUNBOOK.md#33-tlogsth_publish_delayed
+          runbook_url: https://github.com/askledger/receipts-sdk/blob/main/docs/operations/RUNBOOK.md#33-tlogsth_publish_delayed
         annotations:
           summary: "Transparency log STH not published for > 5min"
           description: "Last STH: {{ $value }}s ago. Trillian may be electing."
@@ -75,7 +75,7 @@ groups:
         labels:
           severity: warning
           service: extension-relay
-          runbook_url: https://github.com/projectledger/receipts-sdk/blob/main/docs/operations/RUNBOOK.md#34-extensionidentity_binding_failures_high
+          runbook_url: https://github.com/askledger/receipts-sdk/blob/main/docs/operations/RUNBOOK.md#34-extensionidentity_binding_failures_high
         annotations:
           summary: "Browser extension identity binding failure rate > 1%"
           description: "Could be tenant OIDC outage or extension update bug."
@@ -89,7 +89,7 @@ groups:
         labels:
           severity: critical
           service: api-gateway
-          runbook_url: https://github.com/projectledger/receipts-sdk/blob/main/docs/operations/RUNBOOK.md#35-tenantcross_tenant_query_detected
+          runbook_url: https://github.com/askledger/receipts-sdk/blob/main/docs/operations/RUNBOOK.md#35-tenantcross_tenant_query_detected
         annotations:
           summary: "P0 — cross-tenant query attempt detected"
           description: "Page CTO + Security on-call. {{ $value }} attempts in last 1m. Capture forensic snapshot."
@@ -103,7 +103,7 @@ groups:
         labels:
           severity: critical
           service: console-web
-          runbook_url: https://github.com/projectledger/receipts-sdk/blob/main/docs/operations/RUNBOOK.md
+          runbook_url: https://github.com/askledger/receipts-sdk/blob/main/docs/operations/RUNBOOK.md
         annotations:
           summary: "Console readiness probe failing for > 2min"
           description: "A pod cannot serve requests. Check downstream deps."
@@ -117,7 +117,7 @@ groups:
         labels:
           severity: warning
           service: supply-chain
-          runbook_url: https://github.com/projectledger/receipts-sdk/blob/main/docs/security/HARDENING_CHECKLIST.md#g--supply-chain-mandatory
+          runbook_url: https://github.com/askledger/receipts-sdk/blob/main/docs/security/HARDENING_CHECKLIST.md#g--supply-chain-mandatory
         annotations:
           summary: "High/critical vuln in dependencies"
           description: "{{ $value }} dependencies with high/critical CVEs."

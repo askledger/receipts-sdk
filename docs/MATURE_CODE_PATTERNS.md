@@ -20,7 +20,7 @@ the difference between "made it work" and "made it production".
 | **Resilience tests** | `test/resilience.test.ts` | 11 tests covering circuit breaker state transitions, rate-limit window semantics, idempotency replay/conflict, outbox at-least-once. |
 | **Two-pass canonicalization for hash field** | `src/receipt.ts` | The receipt's own hash is part of the body that gets signed. We sign over the body with the populated hash; the hash is computed over the body with the field set to "". Same trick Sigstore/Rekor uses. |
 | **Sliding-window failure ratio** | `circuit-breaker.ts` | Failure ratio is recomputed over a rolling window, not a lifetime counter — recovers cleanly from transient outages. |
-| **AppError taxonomy via Problem.type URIs** | `problem.ts` | Each error has a stable URL (`https://errors.projectledger.io/cross-tenant`) so downstream tooling (dashboards, alerts) can pivot on it without parsing free text. |
+| **AppError taxonomy via Problem.type URIs** | `problem.ts` | Each error has a stable URL (`https://errors.github.com/askledger/receipts-sdk/cross-tenant`) so downstream tooling (dashboards, alerts) can pivot on it without parsing free text. |
 | **Headers that don't leak** | `route.ts`, `health/route.ts` | All security-sensitive endpoints emit `cache-control: no-store, no-cache, must-revalidate` + `x-content-type-options: nosniff`. Internal trace IDs are scoped to admin probes only. |
 | **Permission-tiered rate limits** | `route.ts` + `defaultLimits` | A read endpoint gets 1000/min; a write endpoint gets 100/min; a sensitive admin endpoint gets 10/min. The tier is declared at the route level, not enforced via copy-paste. |
 

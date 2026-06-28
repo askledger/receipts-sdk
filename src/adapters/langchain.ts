@@ -5,7 +5,7 @@
  * every LLM call and every tool invocation:
  *
  *   import { ChatAnthropic } from "@langchain/anthropic";
- *   import { ReceiptsCallbackHandler } from "@projectledger/receipts-sdk/adapters/langchain";
+ *   import { ReceiptsCallbackHandler } from "@askledger/receipts-sdk/adapters/langchain";
  *
  *   const handler = new ReceiptsCallbackHandler({ tenantId, keypair, onReceipt });
  *   const llm = new ChatAnthropic({ model, callbacks: [handler] });

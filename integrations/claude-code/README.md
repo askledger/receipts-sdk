@@ -1,4 +1,4 @@
-# @projectledger/claude-code-skill
+# @askledger/claude-code-skill
 
 Claude Code skill that turns every AI action in a project — tool calls,
 file edits, plan steps — into a cryptographically signed Project Ledger
@@ -7,7 +7,7 @@ receipt.
 ## Install
 
 ```
-npm install -g @projectledger/claude-code-skill
+npm install -g @askledger/claude-code-skill
 ```
 
 The package ships:
@@ -61,7 +61,7 @@ they also carry diff hashes — never the diff itself.
 pl verify --receipt receipt.json
 ```
 
-Or paste the receipt id at `https://verify.projectledger.io`.
+Or paste the receipt id at `https://askledger.github.io/receipts-sdk/verify.html`.
 
 ## License
 

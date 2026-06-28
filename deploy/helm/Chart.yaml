@@ -4,9 +4,9 @@ description: Project Ledger — cryptographic AI receipts substrate + admin cons
 type: application
 version: 0.1.0
 appVersion: "0.6.0"
-home: https://projectledger.io
+home: https://github.com/askledger/receipts-sdk
 sources:
-  - https://github.com/projectledger/receipts-sdk
+  - https://github.com/askledger/receipts-sdk
 maintainers:
   - name: ProjectLedger Maintainers
-    email: maintainers@projectledger.io
+    email: maintainers@github.com/askledger/receipts-sdk

@@ -16,7 +16,7 @@ spec:
           serviceAccountName: pl-sth-publisher
           containers:
             - name: publisher
-              image: ghcr.io/projectledger/receipts-sdk:{{ .Chart.AppVersion }}
+              image: ghcr.io/askledger/receipts-sdk:{{ .Chart.AppVersion }}
               command: ["node", "/app/dist/scripts/sth-publisher.js"]
               env:
                 - name: PL_TRILLIAN_URL

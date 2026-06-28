@@ -1,5 +1,5 @@
 {
-  "$schema": "https://projectledger.io/conformance/sha256.v1.json",
+  "$schema": "https://github.com/askledger/receipts-sdk/conformance/sha256.v1.json",
   "description": "SHA-256 vectors. The `input` field is a UTF-8 string; SDKs encode and hash.",
   "vectors": [
     {

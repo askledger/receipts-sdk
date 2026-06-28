@@ -2,7 +2,7 @@
 // wedge: drop a single import, and every supported AI vendor SDK in
 // this process emits a signed receipt for every call.
 //
-//   import { installReceipts } from "@projectledger/receipts-sdk/vendor-kit";
+//   import { installReceipts } from "@askledger/receipts-sdk/vendor-kit";
 //   installReceipts({ tenantId: "acme" });
 //
 // The function generates (or loads) a tenant signing key, wraps any
@@ -77,7 +77,7 @@ export function installReceipts(opts: InstallOptions): InstallHandle {
 }
 
 function resolve(opts: InstallOptions): ResolvedConfig {
-  const home = process.env.PL_HOME ?? path.join(os.homedir(), ".projectledger");
+  const home = process.env.PL_HOME ?? path.join(os.homedir(), ".askledger");
   const keyfile = opts.keypairFile ?? path.join(home, "keys", "vendor-kit.json");
   let keypair = opts.keypair;
   if (!keypair) {

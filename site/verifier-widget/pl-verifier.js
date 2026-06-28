@@ -1,13 +1,13 @@
 // <pl-verifier receipt-id="01J9X..."></pl-verifier>
 // Drops a verifier badge onto any web page. Renders status, kid, chain
-// height, and a link to the full receipt detail at verify.projectledger.io.
+// height, and a link to the full receipt detail at askledger.github.io/receipts-sdk/verify.html.
 //
 // Zero dependencies. Web Component / Custom Element. ~8 KB minified.
 
 (function () {
   if (customElements.get("pl-verifier")) return;
 
-  const BASE = "https://verify.projectledger.io";
+  const BASE = "https://askledger.github.io/receipts-sdk/verify.html";
   const STYLES = `
     :host { display: inline-block; font-family: ui-sans-serif, system-ui, sans-serif; }
     .pl { display: inline-flex; align-items: center; gap: 8px;

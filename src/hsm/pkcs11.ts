@@ -16,7 +16,7 @@
  *
  * Production usage:
  *
- *   import { Pkcs11SigningProvider } from "@projectledger/receipts-sdk/hsm/pkcs11";
+ *   import { Pkcs11SigningProvider } from "@askledger/receipts-sdk/hsm/pkcs11";
  *   import { GrapheneAdapter } from "./graphene-adapter";  // your code
  *
  *   const provider = await Pkcs11SigningProvider.fromKeyLabel({

@@ -1,11 +1,11 @@
 {
-  "name": "@projectledger/claude-code-skill",
+  "name": "@askledger/claude-code-skill",
   "version": "0.1.0",
   "description": "Claude Code skill — signs a Project Ledger receipt for every AI action in a project",
   "license": "Apache-2.0",
   "files": ["SKILL.md", "emit.sh", "README.md", "LICENSE"],
   "keywords": ["claude-code", "skill", "ai", "receipts", "audit", "project-ledger"],
-  "repository": { "type": "git", "url": "https://github.com/projectledger/receipts-sdk", "directory": "integrations/claude-code" },
+  "repository": { "type": "git", "url": "https://github.com/askledger/receipts-sdk", "directory": "integrations/claude-code" },
   "engines": { "node": ">=18" },
   "scripts": {
     "prepublishOnly": "test -f SKILL.md && test -x emit.sh"

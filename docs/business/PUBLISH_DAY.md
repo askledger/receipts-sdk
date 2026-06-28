@@ -18,9 +18,9 @@ them; do not optimise further.
 |---|---|---|
 | Brand name | **AskLedger** (per your other product family) — "Project Ledger" stays the technical project name | Portfolio consistency; minor semantic friction is acceptable |
 | Primary TLD | **`.org`** (~$10) | Standards-body credibility; same TLD as openssf.org, w3c.org |
-| GitHub org | `askledger` (or `projectledger` if taken) | Match the brand or stay independent — both work |
-| npm org | `askledger` (or `projectledger`) | Same |
-| Public email | A Gmail / Outlook address you control today | Replace `hello@projectledger.io` everywhere in the repo |
+| GitHub org | `askledger` (or `askledger` if taken) | Match the brand or stay independent — both work |
+| npm org | `askledger` (or `askledger`) | Same |
+| Public email | A Gmail / Outlook address you control today | Replace [GitHub Discussions](https://github.com/askledger/receipts-sdk/discussions) everywhere in the repo |
 | Stage 1 review group | 3 senior engineers in your network | Decide names now; messaging happens in Phase 7 |
 
 If `askledger.org` is taken when you check, fall back order:
@@ -81,26 +81,26 @@ find . -type f \( -name "*.md" -o -name "*.html" -o -name "*.ts" -o -name "*.tsx
   -not -path "./node_modules/*" -not -path "./.next/*" -not -path "./dist/*" -not -path "./console/.next/*" \
   -exec sed -i '' 's/Project Ledger/AskLedger/g' {} +
 
-# Replace the package scope (@projectledger → @askledger)
+# Replace the package scope (@askledger → @askledger)
 find . -type f \( -name "*.json" -o -name "*.md" -o -name "*.ts" \) \
   -not -path "./node_modules/*" -not -path "./dist/*" \
-  -exec sed -i '' 's/@projectledger/@askledger/g' {} +
+  -exec sed -i '' 's/@askledger/@askledger/g' {} +
 
 # Replace the GitHub org name
 find . -type f \( -name "*.md" -o -name "*.html" -o -name "*.yml" -o -name "*.json" \) \
   -not -path "./node_modules/*" -not -path "./dist/*" \
-  -exec sed -i '' 's|projectledger/receipts-sdk|askledger/receipts-sdk|g' {} +
+  -exec sed -i '' 's|askledger/receipts-sdk|askledger/receipts-sdk|g' {} +
 
 # Replace the email and domain
 find . -type f \( -name "*.md" -o -name "*.html" -o -name "*.ts" \) \
   -not -path "./node_modules/*" -not -path "./dist/*" \
-  -exec sed -i '' 's/projectledger\.io/askledger.org/g' {} +
+  -exec sed -i '' 's/askledger\.io/askledger.org/g' {} +
 ```
 
 If you keep "Project Ledger" as the project name (recommended in the
 dual-brand model), skip the first command — leave the technical name
-intact and only change `@projectledger` → `@askledger` for npm and
-`projectledger.io` → `askledger.org` for the domain.
+intact and only change `@askledger` → `@askledger` for npm and
+`github.com/askledger/receipts-sdk` → `askledger.org` for the domain.
 
 After running, verify the build is still clean:
 

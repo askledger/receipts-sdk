@@ -14,7 +14,7 @@ spec:
           labels: { severity: warning, service: console-web }
           annotations:
             summary: "Console 5xx rate > 2%"
-            runbook_url: https://github.com/projectledger/receipts-sdk/blob/main/docs/operations/RUNBOOK.md
+            runbook_url: https://github.com/askledger/receipts-sdk/blob/main/docs/operations/RUNBOOK.md
 
         - alert: SignerLatencyP95High
           expr: histogram_quantile(0.95, sum by (le) (rate(pl_signer_sign_duration_ms_bucket[5m]))) > 100
@@ -22,7 +22,7 @@ spec:
           labels: { severity: warning, service: signer }
           annotations:
             summary: "Signer p95 latency > 100ms"
-            runbook_url: https://github.com/projectledger/receipts-sdk/blob/main/docs/operations/RUNBOOK.md#31-signersigning_latency_p95_high
+            runbook_url: https://github.com/askledger/receipts-sdk/blob/main/docs/operations/RUNBOOK.md#31-signersigning_latency_p95_high
 
         - alert: CrossTenantQueryDetected
           expr: increase(pl_tenant_cross_tenant_attempts_total[1m]) > 0
@@ -30,5 +30,5 @@ spec:
           labels: { severity: critical, service: api-gateway, page: "true" }
           annotations:
             summary: "P0 — cross-tenant query attempt detected"
-            runbook_url: https://github.com/projectledger/receipts-sdk/blob/main/docs/operations/RUNBOOK.md#35-tenantcross_tenant_query_detected
+            runbook_url: https://github.com/askledger/receipts-sdk/blob/main/docs/operations/RUNBOOK.md#35-tenantcross_tenant_query_detected
 {{- end }}

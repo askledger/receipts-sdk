@@ -117,17 +117,17 @@ fi
 
 # ---------- Phase 2 · brand find-and-replace ----------
 say "Phase 2 · brand rename (optional)"
-echo "  Current package scope: @projectledger"
-echo "  Current domain refs:   projectledger.io"
+echo "  Current package scope: @askledger"
+echo "  Current domain refs:   github.com/askledger/receipts-sdk"
 echo
 echo "  If you've decided to rebrand (e.g. AskLedger / askledger.org),"
 echo "  this step does the find-and-replace across the repo."
 
 if confirm "Rebrand to a new name now?"; then
   read -r -p "  New brand name (e.g. AskLedger; ENTER to keep Project Ledger): " NEW_BRAND
-  read -r -p "  New npm scope (e.g. askledger; ENTER to keep projectledger): " NEW_SCOPE
-  read -r -p "  New GitHub org (e.g. askledger; ENTER to keep projectledger): " NEW_ORG
-  read -r -p "  New domain root (e.g. askledger.org; ENTER to keep projectledger.io): " NEW_DOMAIN
+  read -r -p "  New npm scope (e.g. askledger; ENTER to keep askledger): " NEW_SCOPE
+  read -r -p "  New GitHub org (e.g. askledger; ENTER to keep askledger): " NEW_ORG
+  read -r -p "  New domain root (e.g. askledger.org; ENTER to keep github.com/askledger/receipts-sdk): " NEW_DOMAIN
 
   if [ -n "$NEW_BRAND" ]; then
     grep -rlE --include="*.md" --include="*.html" "Project Ledger" . 2>/dev/null \
@@ -137,23 +137,23 @@ if confirm "Rebrand to a new name now?"; then
   fi
 
   if [ -n "$NEW_SCOPE" ]; then
-    grep -rlE --include="*.json" --include="*.md" --include="*.ts" "@projectledger" . 2>/dev/null \
+    grep -rlE --include="*.json" --include="*.md" --include="*.ts" "@askledger" . 2>/dev/null \
       | grep -v node_modules | grep -v .next | grep -v dist \
-      | xargs -I{} sed -i '' "s/@projectledger/@$NEW_SCOPE/g" {} 2>/dev/null || true
+      | xargs -I{} sed -i '' "s/@askledger/@$NEW_SCOPE/g" {} 2>/dev/null || true
     ok "npm scope updated"
   fi
 
   if [ -n "$NEW_ORG" ]; then
-    grep -rlE --include="*.md" --include="*.yml" --include="*.json" "projectledger/" . 2>/dev/null \
+    grep -rlE --include="*.md" --include="*.yml" --include="*.json" "askledger/" . 2>/dev/null \
       | grep -v node_modules | grep -v .next | grep -v dist \
-      | xargs -I{} sed -i '' "s|projectledger/|$NEW_ORG/|g" {} 2>/dev/null || true
+      | xargs -I{} sed -i '' "s|askledger/|$NEW_ORG/|g" {} 2>/dev/null || true
     ok "GitHub org updated"
   fi
 
   if [ -n "$NEW_DOMAIN" ]; then
-    grep -rlE --include="*.md" --include="*.html" "projectledger.io" . 2>/dev/null \
+    grep -rlE --include="*.md" --include="*.html" "github.com/askledger/receipts-sdk" . 2>/dev/null \
       | grep -v node_modules | grep -v .next | grep -v dist \
-      | xargs -I{} sed -i '' "s/projectledger\.io/$NEW_DOMAIN/g" {} 2>/dev/null || true
+      | xargs -I{} sed -i '' "s/askledger\.io/$NEW_DOMAIN/g" {} 2>/dev/null || true
     ok "domain updated"
   fi
 

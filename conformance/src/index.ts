@@ -1,4 +1,4 @@
-// Public API of @projectledger/conformance. Importing this from another
+// Public API of @askledger/conformance. Importing this from another
 // package lets you embed conformance checks in your test suite.
 
 export interface CanonicalVector { id: string; input: unknown; expected_bytes_hex: string }

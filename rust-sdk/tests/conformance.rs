@@ -1,4 +1,4 @@
-use projectledger_receipts::{
+use askledger_receipts::{
     canonicalize, generate_keypair, sha256_hex, sign_receipt, verify_receipt,
 };
 use serde_json::Value;

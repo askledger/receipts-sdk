@@ -65,7 +65,7 @@ Implementations **MUST** follow this two-pass procedure.
 
 ## 7 · Conformance test corpus
 
-The conformance package (`@projectledger/conformance`) ships a fixture
+The conformance package (`@askledger/conformance`) ships a fixture
 set with input/output pairs that exercise:
 
 - Unicode escape sequences (control characters, surrogate pairs).

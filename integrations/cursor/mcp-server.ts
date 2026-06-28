@@ -7,7 +7,7 @@
 //   "mcpServers": {
 //     "project-ledger-receipts": {
 //       "command": "npx",
-//       "args": ["-y", "@projectledger/cursor-receipts"],
+//       "args": ["-y", "@askledger/cursor-receipts"],
 //       "env": {
 //         "PL_TENANT": "acme",
 //         "PL_INGEST_URL": "https://ingest.acme.example/v1/receipts",

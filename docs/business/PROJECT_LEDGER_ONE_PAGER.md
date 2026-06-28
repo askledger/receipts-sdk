@@ -45,8 +45,8 @@ insurance, healthcare, or government.
 
 ---
 
-Repository · github.com/projectledger/receipts-sdk (Apache-2.0)
-Specification · spec.projectledger.io (PL-RFC-001 through PL-RFC-010)
-Contact · hello@projectledger.io
+Repository · github.com/askledger/receipts-sdk (Apache-2.0)
+Specification · github.com/askledger/receipts-sdk/tree/main/spec (PL-RFC-001 through PL-RFC-010)
+Contact · GitHub Discussions (https://github.com/askledger/receipts-sdk/discussions)
 
 *Full 7-minute brief available on request.*

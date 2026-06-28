@@ -27,7 +27,7 @@ deploy-bot in `#ops-prod`, `kubectl` + `psql` + `aws` (or `az`/`gcp`).
 ## 2 · Quick reference
 
 ```
-Status page  ........  status.projectledger.io  (Atlassian Statuspage)
+Status page  ........  status.github.com/askledger/receipts-sdk  (Atlassian Statuspage)
 Pager        ........  PagerDuty service "PL Prod"
 Runbook      ........  docs/operations/RUNBOOK.md (this file)
 Incident war room  ..  #incident-prod (auto-created by PagerDuty)

@@ -7,11 +7,11 @@
 <title>Project Ledger · Cryptographic AI Decision Receipts</title>
 <meta name="description" content="The cryptographic substrate for enterprise AI. RFC 8785 + Ed25519 + hash-chained receipts. Regulator-verifiable. Open standard. Production-grade." />
 <meta name="theme-color" content="#0a1530" />
-<link rel="canonical" href="https://projectledger.io/" />
+<link rel="canonical" href="https://github.com/askledger/receipts-sdk/" />
 <meta property="og:title" content="Project Ledger · Cryptographic AI Decision Receipts" />
 <meta property="og:description" content="The cryptographic substrate for enterprise AI. Open spec. Regulator-verifiable. Five language SDKs. Production-grade." />
 <meta property="og:type" content="website" />
-<meta property="og:url" content="https://projectledger.io/" />
+<meta property="og:url" content="https://github.com/askledger/receipts-sdk/" />
 <style>
 :root {
   --navy-950: #060d22;
@@ -372,7 +372,7 @@ footer {
     <div class="nav-cta">
       <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="nav-links" onclick="(()=>{const n=document.getElementById('nav-links');const o=n.classList.toggle('open');this.setAttribute('aria-expanded',o);})()">Menu ▾</button>
       <a class="btn" href="demo.html">Demo</a>
-      <a class="btn btn-primary" href="https://github.com/projectledger/receipts-sdk-ts">GitHub</a>
+      <a class="btn btn-primary" href="https://github.com/askledger/receipts-sdk">GitHub</a>
     </div>
   </div>
 </header>
@@ -396,7 +396,7 @@ footer {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
           </a>
           <a class="btn" href="verify.html">Open the verifier</a>
-          <a class="btn btn-ghost" href="https://github.com/projectledger/receipts-sdk-ts">View on GitHub →</a>
+          <a class="btn btn-ghost" href="https://github.com/askledger/receipts-sdk">View on GitHub →</a>
         </div>
         <div class="hero-meta">
           <span><b>5</b> language SDKs</span>
@@ -518,12 +518,12 @@ footer {
     <div style="margin-top:48px">
       <div class="code"><span class="cm">// v0.7 · one import. Every Anthropic + OpenAI call in this process</span>
 <span class="cm">// becomes a signed receipt. No other line of your code changes.</span>
-<span class="k">import</span> { installReceipts } <span class="k">from</span> <span class="s">"@projectledger/receipts-sdk/vendor-kit"</span>;
+<span class="k">import</span> { installReceipts } <span class="k">from</span> <span class="s">"@askledger/receipts-sdk/vendor-kit"</span>;
 
 <span class="fn">installReceipts</span>({ tenantId: <span class="s">"acme"</span> });
 
 <span class="cm">// Prefer the manual path? Same as before.</span>
-<span class="k">import</span> { wrapOpenAI, generateKeyPair } <span class="k">from</span> <span class="s">"@projectledger/receipts-sdk"</span>;
+<span class="k">import</span> { wrapOpenAI, generateKeyPair } <span class="k">from</span> <span class="s">"@askledger/receipts-sdk"</span>;
 <span class="k">const</span> client = <span class="fn">wrapOpenAI</span>(<span class="k">new</span> <span class="fn">OpenAI</span>({ apiKey }), { tenantId: <span class="s">"acme"</span>, keypair: <span class="fn">generateKeyPair</span>() });</div>
     </div>
   </div>
@@ -539,24 +539,24 @@ footer {
 
     <h3 style="text-align:center;color:var(--ink-400);font-size:13px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;margin-bottom:16px">5 SDKs · wire-format conformant · CL1/CL2/CL3 conformance suite</h3>
     <div class="sdk-grid">
-      <div class="sdk"><b>TypeScript</b><span>@projectledger/receipts-sdk</span></div>
-      <div class="sdk"><b>Python</b><span>projectledger-receipts</span></div>
+      <div class="sdk"><b>TypeScript</b><span>@askledger/receipts-sdk</span></div>
+      <div class="sdk"><b>Python</b><span>askledger-receipts</span></div>
       <div class="sdk"><b>Go</b><span>receipts-sdk-go</span></div>
-      <div class="sdk"><b>Rust</b><span>projectledger-receipts</span></div>
-      <div class="sdk"><b>Java</b><span>io.projectledger:receipts-sdk</span></div>
+      <div class="sdk"><b>Rust</b><span>askledger-receipts</span></div>
+      <div class="sdk"><b>Java</b><span>io.askledger:receipts-sdk</span></div>
     </div>
 
     <div style="display:flex;justify-content:center;margin:28px 0 8px"><pl-verifier receipt-id="01J9X8VK0001"></pl-verifier></div>
 
     <h3 style="text-align:center;color:var(--ink-400);font-size:13px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;margin:36px 0 16px">9 native integrations · IDE · agents · gateways · one install per surface</h3>
     <div class="sdk-grid" style="grid-template-columns:repeat(3,1fr);gap:10px">
-      <div class="sdk"><b>Cursor</b><span>@projectledger/cursor-receipts</span></div>
-      <div class="sdk"><b>Claude Code</b><span>@projectledger/claude-code-skill</span></div>
-      <div class="sdk"><b>OpenAI proxy</b><span>@projectledger/openai-proxy · Aider · Cline · Windsurf · Codeium · Cody · Zed · Tabnine</span></div>
+      <div class="sdk"><b>Cursor</b><span>@askledger/cursor-receipts</span></div>
+      <div class="sdk"><b>Claude Code</b><span>@askledger/claude-code-skill</span></div>
+      <div class="sdk"><b>OpenAI proxy</b><span>@askledger/openai-proxy · Aider · Cline · Windsurf · Codeium · Cody · Zed · Tabnine</span></div>
       <div class="sdk"><b>LiteLLM</b><span>upstream callback · PR-ready</span></div>
       <div class="sdk"><b>LangChain · LangGraph</b><span>ReceiptsCallbackHandler</span></div>
       <div class="sdk"><b>Vercel AI SDK · Mastra · LlamaIndex</b><span>native middleware</span></div>
-      <div class="sdk"><b>AutoGen · CrewAI · Pydantic AI · smolagents</b><span>projectledger-agents (PyPI)</span></div>
+      <div class="sdk"><b>AutoGen · CrewAI · Pydantic AI · smolagents</b><span>askledger-agents (PyPI)</span></div>
       <div class="sdk"><b>Portkey · Cloudflare · Kong</b><span>gateway-native plug-ins</span></div>
       <div class="sdk"><b>Chrome extension</b><span>MV3 · managed-policy identity binding</span></div>
     </div>
@@ -721,7 +721,7 @@ footer {
     </div>
 
     <div style="margin-top:28px;padding:18px 24px;border-radius:12px;background:rgba(255,255,255,.02);border:1px solid var(--line);font-size:13.5px;color:var(--ink-300);line-height:1.6">
-      Manifest V3 · Chrome / Edge / Brave. Private key generated and stored locally. Optional corporate ingest is opt-in and HTTPS-only. <a href="https://github.com/projectledger/receipts-sdk-ts/tree/main/browser-extension">Source on GitHub</a>.
+      Manifest V3 · Chrome / Edge / Brave. Private key generated and stored locally. Optional corporate ingest is opt-in and HTTPS-only. <a href="https://github.com/askledger/receipts-sdk/tree/main/browser-extension">Source on GitHub</a>.
     </div>
   </div>
 </section>
@@ -837,7 +837,7 @@ footer {
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <a class="btn btn-primary" href="verify.html">Open the verifier</a>
         <a class="btn" href="playground.html">Try the playground</a>
-        <a class="btn btn-ghost" href="https://github.com/projectledger/receipts-sdk-ts/blob/main/docs/RECEIPTS_PROTOCOL.md">Read the spec →</a>
+        <a class="btn btn-ghost" href="https://github.com/askledger/receipts-sdk/blob/main/docs/RECEIPTS_PROTOCOL.md">Read the spec →</a>
       </div>
     </div>
   </div>
@@ -855,21 +855,21 @@ footer {
       <h4>Product</h4>
       <a href="playground.html">Playground</a>
       <a href="verify.html">Public verifier</a>
-      <a href="https://github.com/projectledger/receipts-sdk-ts">Receipts SDK</a>
+      <a href="https://github.com/askledger/receipts-sdk">Receipts SDK</a>
       <a href="#stack">Console</a>
     </div>
     <div class="col">
       <h4>Specification</h4>
-      <a href="https://spec.projectledger.io/">Open spec · PL-RFC-001 … PL-RFC-010 (Draft v0.1)</a>
-      <a href="https://github.com/projectledger/receipts-sdk-ts/blob/main/docs/ARCHITECTURE.md">Architecture</a>
-      <a href="https://github.com/projectledger/receipts-sdk-ts/blob/main/docs/security/THREAT_MODEL.md">Threat model</a>
-      <a href="https://github.com/projectledger/receipts-sdk-ts/blob/main/docs/security/ZERO_TRUST_ARCHITECTURE.md">Zero Trust</a>
+      <a href="https://github.com/askledger/receipts-sdk/tree/main/spec/">Open spec · PL-RFC-001 … PL-RFC-010 (Draft v0.1)</a>
+      <a href="https://github.com/askledger/receipts-sdk/blob/main/docs/ARCHITECTURE.md">Architecture</a>
+      <a href="https://github.com/askledger/receipts-sdk/blob/main/docs/security/THREAT_MODEL.md">Threat model</a>
+      <a href="https://github.com/askledger/receipts-sdk/blob/main/docs/security/ZERO_TRUST_ARCHITECTURE.md">Zero Trust</a>
     </div>
     <div class="col">
       <h4>Company</h4>
-      <a href="mailto:hello@projectledger.io">hello@projectledger.io</a>
-      <a href="mailto:security@projectledger.io">security@projectledger.io</a>
-      <a href="https://github.com/projectledger">GitHub</a>
+      <a href="https://github.com/askledger/receipts-sdk/discussions">GitHub Discussions</a>
+      <a href="https://github.com/askledger/receipts-sdk/security/advisories/new">GitHub Security Advisories</a>
+      <a href="https://github.com/askledger">GitHub</a>
     </div>
   </div>
   <div class="container legal">

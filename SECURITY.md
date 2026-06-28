@@ -4,7 +4,10 @@
 
 If you discover a security vulnerability in this SDK or the receipts protocol, please report it privately.
 
-**Email:** `security@projectledger.io`
+**How to report:** Open a private advisory at
+[github.com/askledger/receipts-sdk/security/advisories/new](https://github.com/askledger/receipts-sdk/security/advisories/new).
+GitHub Security Advisories give us a private channel to collaborate on
+remediation before public disclosure.
 
 Please include:
 - Description of the issue

@@ -235,7 +235,7 @@ For customers running Project Ledger in their own environment (on-prem or own cl
 | HSM/KMS | Customer choice; the SDK plugs into AWS KMS, Azure Key Vault, GCP KMS, PKCS#11 |
 | Database | Postgres with RLS enabled (mandatory) |
 | Secrets | HashiCorp Vault or cloud-native KMS |
-| Container images | Customer's registry; verify signatures from `projectledger/*` against Sigstore Rekor |
+| Container images | Customer's registry; verify signatures from `askledger/*` against Sigstore Rekor |
 | Telemetry | Customer's SIEM (Splunk, Sentinel, Chronicle) |
 
 This is the design we will socialize with regulator security review teams (CBUAE, SAMA, ECB IT) when supporting Tier-1 BFSI deployments.

@@ -28,7 +28,7 @@ This document is the audit-ready map of every Trust Services Criterion to its im
 |---|---|---|---|
 | CC2.1 | Obtains/generates relevant quality information | Centralized log aggregation; security metrics dashboard | SIEM exports |
 | CC2.2 | Internally communicates information | Quarterly all-hands; security newsletter | Calendar + emails |
-| CC2.3 | Externally communicates information | Public security page, transparency reports, status page | https://projectledger.io/security, https://status.projectledger.io |
+| CC2.3 | Externally communicates information | Public security page, transparency reports, status page | https://github.com/askledger/receipts-sdk/security, https://status.github.com/askledger/receipts-sdk |
 
 ### CC3 — Risk Assessment
 
@@ -131,7 +131,7 @@ This document is the audit-ready map of every Trust Services Criterion to its im
 
 | TSC Ref | Control | Implementation | Evidence source |
 |---|---|---|---|
-| P1.1 | Notice and communication | Privacy notice; transparency about hashing + retention | https://projectledger.io/privacy |
+| P1.1 | Notice and communication | Privacy notice; transparency about hashing + retention | https://github.com/askledger/receipts-sdk/privacy |
 | P2.1 | Choice and consent | Customer controls classification labels and retention windows | Tenant settings UI |
 | P3.1 | Collection | Default minimal: only event metadata + hashes; raw text opt-in only | Default adapter config |
 | P4.1 | Use, retention, and disposal | Per-tenant retention; cryptographic tombstone on delete to preserve audit integrity | Retention policy + delete API |

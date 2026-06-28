@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
         status: "401",
         detail: "Bearer token required",
       },
-      { status: 401, headers: { "www-authenticate": 'Bearer realm="projectledger"' } },
+      { status: 401, headers: { "www-authenticate": 'Bearer realm="askledger"' } },
     );
   }
 

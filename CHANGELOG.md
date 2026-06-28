@@ -12,14 +12,14 @@ This release lowers the install friction to zero so any developer or
 company can adopt Project Ledger receipts without thinking.
 
 #### Added
-- **`@projectledger/receipts-sdk/vendor-kit`** — one-call auto-
+- **`@askledger/receipts-sdk/vendor-kit`** — one-call auto-
   instrumentation. `installReceipts({ tenantId: "acme" })` hooks every
   Anthropic and OpenAI client constructor in the process; every AI
   call from that point on emits a signed receipt. Lazy-loads vendor
   SDKs so missing optional deps don't break the install.
 - **`pl quickstart`** — interactive 60-second flow: keygen → sign a
   sample receipt → verify → emit badge URL.
-- **`scripts/install.sh`** — `curl -sSL get.projectledger.io | bash`
+- **`scripts/install.sh`** — `curl -sSL github.com/askledger/receipts-sdk | bash`
   installs the CLI globally and runs quickstart.
 - **`POST /api/ingest`** — vendor-kit-instrumented processes POST
   signed receipts here; the handler verifies signature + tenant
@@ -28,11 +28,11 @@ company can adopt Project Ledger receipts without thinking.
   receipt schema, canonical bytes, chain semantics, transparency log,
   evidence pack, identity binding, capture semantics, policy + decision
   block, cost ledger, carbon ledger.
-- **`@projectledger/conformance`** package — CL1/CL2/CL3 levels for
+- **`@askledger/conformance`** package — CL1/CL2/CL3 levels for
   external SDKs to self-test and earn the conformance badge.
 - **Integrations** — LiteLLM Python callback (upstream-PR-ready),
   Cursor MCP server, Claude Code skill.
-- **Subpath exports** — `@projectledger/receipts-sdk/vendor-kit`,
+- **Subpath exports** — `@askledger/receipts-sdk/vendor-kit`,
   `/adapters/openai`, `/adapters/anthropic`, `/adapters/fetch`,
   `/adapters/langchain`.
 - **CLI rename** — primary `pl` binary; `ledger-cli` preserved as alias.
@@ -55,7 +55,7 @@ company can adopt Project Ledger receipts without thinking.
 
 ### Planned for v0.7
 - Postgres data plane wired live (replace `console/src/lib/fixtures.ts`)
-- Public transparency log at `log.projectledger.io`
+- Public transparency log at `log.github.com/askledger/receipts-sdk`
 - Browser extension published to Chrome Web Store
 - LiteLLM upstream PR merged
 - Cursor + Claude Code adapters packaged on npm
@@ -100,5 +100,5 @@ company can adopt Project Ledger receipts without thinking.
 
 ---
 
-[Unreleased]: https://github.com/projectledger/receipts-sdk-ts/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/projectledger/receipts-sdk-ts/releases/tag/v0.1.0
+[Unreleased]: https://github.com/askledger/receipts-sdk/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/askledger/receipts-sdk/releases/tag/v0.1.0

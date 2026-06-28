@@ -17,7 +17,7 @@ This is **not** a competing standard to Sigstore, in-toto, SLSA, or OWASP AIBOM.
 
 ## 1. Status of this document
 
-This specification is at **early-preview maturity**. The schema, signature scheme, and verification rules described here are implemented in the reference implementation [@projectledger/receipts-sdk](https://github.com/projectledger/receipts-sdk-ts). Breaking changes are possible between minor versions before v1.0.
+This specification is at **early-preview maturity**. The schema, signature scheme, and verification rules described here are implemented in the reference implementation [@askledger/receipts-sdk](https://github.com/askledger/receipts-sdk). Breaking changes are possible between minor versions before v1.0.
 
 The protocol is intended for submission to the **Linux Foundation AI &amp; Data Foundation** as a hosted standard, targeted for Year 2 (2027).
 
@@ -295,4 +295,4 @@ Tenants MAY require a second signature on every receipt from a customer-controll
 
 ---
 
-*This protocol is being authored as a candidate open standard. We welcome public review via [GitHub Discussions](https://github.com/projectledger/receipts-sdk-ts/discussions).*
+*This protocol is being authored as a candidate open standard. We welcome public review via [GitHub Discussions](https://github.com/askledger/receipts-sdk/discussions).*

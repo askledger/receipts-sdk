@@ -48,9 +48,9 @@ A real audit's first question — "how many stubs are still in the code?" — an
 
 ### Standards leadership — **A−** (specs published, governance pending)
 - 10 RFC drafts shipped under `spec/PL-RFC-001..010`.
-- `@projectledger/conformance` package with CL1/CL2/CL3 levels.
+- `@askledger/conformance` package with CL1/CL2/CL3 levels.
 - LF AI & Data submission package drafted.
-- Still missing: a public hostname for `spec.projectledger.io`, an actual submitted LF AI application, two independent organizations on CODEOWNERS.
+- Still missing: a public hostname for `github.com/askledger/receipts-sdk/tree/main/spec`, an actual submitted LF AI application, two independent organizations on CODEOWNERS.
 
 ### Backend implementation — **C** (contracts real, data plane fixtured)
 - The 8 dashboard routes go through real auth + tenant + permission + rate-limit + Problem+JSON error envelopes. Contracts are A-grade.
@@ -59,7 +59,7 @@ A real audit's first question — "how many stubs are still in the code?" — an
 - **Customer benefit:** a customer can DEPLOY the console but won't see their real data until milestone 1 of the production roadmap is executed (2-3 engineer-weeks).
 
 ### Hosted product — **F** (literally never deployed)
-- No `staging.projectledger.io`. No real cluster. No real Trillian. No real Prometheus scraping.
+- No `staging.github.com/askledger/receipts-sdk`. No real cluster. No real Trillian. No real Prometheus scraping.
 - Helm chart exists, Dockerfile exists, docker-compose.prod.yml exists — none of them have been run against a real cluster.
 - **Customer benefit at this moment: zero.** A customer cannot buy hosted Project Ledger because hosted Project Ledger does not exist.
 
@@ -106,7 +106,7 @@ Total realistic cost: **$60-150k external** + **$3-5k/month infra**.
 ### Developers benefit TODAY
 
 A developer can:
-- `npm install @projectledger/receipts-sdk` and produce a real signed receipt in < 60s (once published — local build works today).
+- `npm install @askledger/receipts-sdk` and produce a real signed receipt in < 60s (once published — local build works today).
 - Read PL-RFC-001..010 and understand the protocol without reading our code.
 - Run `pl-conformance` against their own implementation and earn a CL1/CL2/CL3 badge.
 - Drop the LiteLLM callback into their gateway in 5 minutes.

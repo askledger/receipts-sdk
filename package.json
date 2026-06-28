@@ -1,10 +1,12 @@
 {
-  "name": "@projectledger/receipts-sdk",
+  "name": "@askledger/receipts-sdk",
   "version": "0.6.0",
   "description": "Cryptographic AI Decision Receipts — RFC 8785 canonical JSON, JWS Ed25519, hash-chained, regulator-verifiable",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "homepage": "https://github.com/askledger/receipts-sdk#readme",
+  "bugs": "https://github.com/askledger/receipts-sdk/issues",
   "bin": {
     "pl": "dist/cli.js",
     "ledger-cli": "dist/cli.js"
@@ -41,10 +43,13 @@
     "regulator",
     "compliance"
   ],
-  "author": "Rashed Ali Khan & Mahamed Arif — Project Ledger",
+  "author": "AskLedger contributors",
   "license": "Apache-2.0",
   "engines": {
     "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "@noble/ed25519": "^2.1.0",
@@ -60,7 +65,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/projectledger/receipts-sdk-ts"
+    "url": "git+https://github.com/askledger/receipts-sdk.git"
   },
   "files": [
     "dist/",

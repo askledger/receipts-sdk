@@ -4,7 +4,7 @@ import { HashCell } from "@/components/HashCell";
 
 const AUDIT = [
   { at: "2026-06-10 17:31", actor: "rashed.khan@acme-bank", action: "key.rotate", target: "kms-prod-2026Q3", status: "allow", hash: "f01a2b3c4d5e6f70...a9b8c7" },
-  { at: "2026-06-10 16:02", actor: "ops.support@projectledger", action: "support.impersonate", target: "tenant=acme-bank", status: "flag", hash: "8b1c2d3e4f506172...e1d2c3" },
+  { at: "2026-06-10 16:02", actor: "ops.support@askledger", action: "support.impersonate", target: "tenant=acme-bank", status: "flag", hash: "8b1c2d3e4f506172...e1d2c3" },
   { at: "2026-06-10 14:58", actor: "rashed.khan@acme-bank", action: "policy.publish", target: "platform/api/v1/authz@2026.06.04", status: "allow", hash: "13d4e5f607182930...4b5c6d" },
   { at: "2026-06-10 11:41", actor: "audit@acme-bank", action: "evidence.export", target: "evp-2026-q2-cbuae", status: "allow", hash: "ab1c2d3e4f506172...123456" },
 ] as const;

@@ -21,7 +21,7 @@ Open any of these single-file pages in any modern browser. They run entirely cli
 ## Path 2 · I want to run it from the terminal
 
 ```bash
-git clone https://github.com/projectledger/receipts-sdk-ts.git
+git clone https://github.com/askledger/receipts-sdk.git
 cd receipts-sdk-ts
 npm install
 npm run build
@@ -52,7 +52,7 @@ node dist/cli.js verify .ledger/demo-chain.json --key .ledger/keys/demo.json
 
 ```ts
 import OpenAI from "openai";
-import { wrapOpenAI, generateKeyPair } from "@projectledger/receipts-sdk";
+import { wrapOpenAI, generateKeyPair } from "@askledger/receipts-sdk";
 
 const client = wrapOpenAI(new OpenAI({ apiKey }), {
   tenantId: "acme-corp",
@@ -71,16 +71,16 @@ That's it. Every `chat.completions.create` now emits a signed receipt.
 
 ```bash
 # Python
-pip install projectledger-receipts
+pip install askledger-receipts
 
 # Go
-go get github.com/projectledger/receipts-sdk-go
+go get github.com/askledger/receipts-sdk-go
 
 # Rust
-cargo add projectledger-receipts
+cargo add askledger-receipts
 
 # Java (Maven)
-# <dependency><groupId>io.projectledger</groupId><artifactId>receipts-sdk</artifactId><version>0.1.0</version></dependency>
+# <dependency><groupId>io.askledger</groupId><artifactId>receipts-sdk</artifactId><version>0.1.0</version></dependency>
 ```
 
 All five SDKs produce byte-identical receipts. Cross-verified via shared conformance vectors in [`test/conformance/`](test/conformance/).

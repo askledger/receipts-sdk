@@ -5,13 +5,13 @@ Wire-format-compatible Python SDK for [Project Ledger Receipts](../README.md). R
 ## Install
 
 ```bash
-pip install projectledger-receipts
+pip install askledger-receipts
 ```
 
 ## Quick start
 
 ```python
-from projectledger.receipts import sign_receipt, verify_receipt, generate_keypair
+from askledger.receipts import sign_receipt, verify_receipt, generate_keypair
 
 kp = generate_keypair()
 event = {

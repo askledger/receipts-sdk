@@ -28,7 +28,7 @@ Implements [`docs/design/DESIGN_SYSTEM.md`](../docs/design/DESIGN_SYSTEM.md). Co
 
 ## Security
 
-- All client-side verifications run via the bundled `@projectledger/receipts-sdk`
+- All client-side verifications run via the bundled `@askledger/receipts-sdk`
 - No raw private keys ever sent to the browser
 - mTLS to backing services via reverse proxy
 - Receipts and policy decisions verified independently in-browser

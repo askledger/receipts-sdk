@@ -1,5 +1,5 @@
 {
-  "name": "@projectledger/openai-proxy",
+  "name": "@askledger/openai-proxy",
   "version": "0.1.0",
   "description": "Universal OpenAI-compatible receipts proxy — one install signs every IDE that calls /v1/chat/completions",
   "license": "Apache-2.0",
@@ -8,6 +8,6 @@
   "files": ["dist/", "README.md", "LICENSE"],
   "scripts": { "build": "tsc", "prepublishOnly": "npm run build" },
   "keywords": ["openai", "proxy", "ai", "receipts", "audit", "project-ledger", "aider", "cline", "windsurf", "cursor", "tabnine"],
-  "repository": { "type": "git", "url": "https://github.com/projectledger/receipts-sdk", "directory": "integrations/openai-proxy" },
+  "repository": { "type": "git", "url": "https://github.com/askledger/receipts-sdk", "directory": "integrations/openai-proxy" },
   "engines": { "node": ">=18" }
 }

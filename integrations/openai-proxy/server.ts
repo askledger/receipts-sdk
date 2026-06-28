@@ -43,7 +43,7 @@ export function startProxy(opts: ProxyOptions): http.Server {
 }
 
 function loadOrCreateKey(): KeyPair {
-  const home = process.env.PL_HOME ?? path.join(os.homedir(), ".projectledger");
+  const home = process.env.PL_HOME ?? path.join(os.homedir(), ".askledger");
   const file = path.join(home, "keys", "openai-proxy.json");
   if (fs.existsSync(file)) return JSON.parse(fs.readFileSync(file, "utf-8")) as KeyPair;
   fs.mkdirSync(path.dirname(file), { recursive: true });

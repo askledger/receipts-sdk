@@ -10,7 +10,7 @@ export async function GET() {
   const session = await getSession();
   requirePermission(session, "keys.read");
 
-  const { KeyRegistry } = await import("@projectledger/receipts-sdk");
+  const { KeyRegistry } = await import("@askledger/receipts-sdk");
   // Production: hydrate from durable store, e.g. JSON in encrypted S3 / Postgres
   const reg = new KeyRegistry();
   return NextResponse.json(

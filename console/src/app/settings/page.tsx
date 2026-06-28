@@ -48,7 +48,7 @@ export default function SettingsPage() {
             <li className="flex justify-between"><span>Logo</span><span className="text-xs">acme-bank.svg · uploaded</span></li>
             <li className="flex justify-between"><span>Primary color</span><span className="text-xs font-mono">#0a1530</span></li>
             <li className="flex justify-between"><span>Accent color</span><span className="text-xs font-mono">#c79b3c</span></li>
-            <li className="flex justify-between"><span>Console URL</span><span className="text-xs font-mono">console.acme-bank.projectledger.io</span></li>
+            <li className="flex justify-between"><span>Console URL</span><span className="text-xs font-mono">console.acme-bank.github.com/askledger/receipts-sdk</span></li>
           </ul>
         </Card>
       </div>

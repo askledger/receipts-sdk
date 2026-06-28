@@ -9,7 +9,7 @@ import * as os from "node:os";
 import { generateKeyPair, signReceipt, verifyReceipt } from "../index.js";
 import type { RawEvent } from "../types.js";
 
-const HOME = process.env.PL_HOME ?? path.join(os.homedir(), ".projectledger");
+const HOME = process.env.PL_HOME ?? path.join(os.homedir(), ".askledger");
 const KEYS_DIR = path.join(HOME, "keys");
 const KEY_FILE = path.join(KEYS_DIR, "default.json");
 const RECEIPT_FILE = path.join(HOME, "first-receipt.json");
@@ -64,7 +64,7 @@ export async function quickstart(): Promise<number> {
   process.stdout.write(`${green("✓")} verify locally · OK\n`);
 
   // 4. Badge URL.
-  const badge = `https://verify.projectledger.io/?receipt_id=${encodeURIComponent(signed.receipt.receipt_id)}`;
+  const badge = `https://askledger.github.io/receipts-sdk/verify.html/?receipt_id=${encodeURIComponent(signed.receipt.receipt_id)}`;
   process.stdout.write(`\n${bold("Receipt saved at")} ${dim(RECEIPT_FILE)}\n`);
   process.stdout.write(`${bold("Badge URL")}        ${badge}\n\n`);
 

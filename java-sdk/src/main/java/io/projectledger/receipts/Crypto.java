@@ -1,4 +1,4 @@
-package io.projectledger.receipts;
+package io.askledger.receipts;
 
 import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters;
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;

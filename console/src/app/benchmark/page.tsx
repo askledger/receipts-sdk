@@ -16,7 +16,7 @@ export default function BenchmarkPage() {
       <header>
         <h1 className="text-2xl font-bold">AI vendor benchmark · 2026-Q2</h1>
         <p className="text-sm mt-1" style={{ color: "var(--pl-text-secondary)" }}>
-          Composite scoring derived from {SCORES.reduce((n, s) => n + s.invocations, 0).toLocaleString()} anonymised receipts. Methodology open at <span style={{ color: "var(--pl-status-info)" }}>spec.projectledger.io/benchmark</span>.
+          Composite scoring derived from {SCORES.reduce((n, s) => n + s.invocations, 0).toLocaleString()} anonymised receipts. Methodology open at <span style={{ color: "var(--pl-status-info)" }}>github.com/askledger/receipts-sdk/tree/main/spec/benchmark</span>.
         </p>
       </header>
 

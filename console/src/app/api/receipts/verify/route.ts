@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Dynamic import so the SDK is only resolved when the route is hit
-  const { verifyReceipt } = await import("@projectledger/receipts-sdk");
+  const { verifyReceipt } = await import("@askledger/receipts-sdk");
   try {
     const result = verifyReceipt(
       body.signed as Parameters<typeof verifyReceipt>[0],

@@ -2,16 +2,16 @@
 # Project Ledger · 60-second installer.
 #
 # Usage (post-launch, once npm package is published):
-#   curl -sSL https://get.projectledger.io | bash
+#   curl -sSL https://github.com/askledger/receipts-sdk | bash
 #
 # Usage today (pre-launch):
-#   git clone https://github.com/projectledger/receipts-sdk
+#   git clone https://github.com/askledger/receipts-sdk
 #   cd receipts-sdk && npm install && npm run build && npm link
 #   pl quickstart
 #
 # What it does:
 #   1. Verifies Node >= 18 is available.
-#   2. Installs @projectledger/receipts-sdk globally (or to ~/.projectledger/bin).
+#   2. Installs @askledger/receipts-sdk globally (or to ~/.askledger/bin).
 #   3. Runs `pl quickstart` to generate a keypair, sign a sample receipt,
 #      verify it, and print the badge URL.
 #
@@ -19,7 +19,7 @@
 
 set -euo pipefail
 
-PL_INSTALL_DIR="${PL_INSTALL_DIR:-$HOME/.projectledger}"
+PL_INSTALL_DIR="${PL_INSTALL_DIR:-$HOME/.askledger}"
 PL_BIN="$PL_INSTALL_DIR/bin"
 COLOR_GREEN=$'\033[0;32m'
 COLOR_RED=$'\033[0;31m'
@@ -42,7 +42,7 @@ install_cli() {
     ok "pl already on PATH; upgrading"
   fi
   mkdir -p "$PL_BIN"
-  npm install --prefix "$PL_INSTALL_DIR" --silent --no-audit --no-fund @projectledger/cli@latest
+  npm install --prefix "$PL_INSTALL_DIR" --silent --no-audit --no-fund @askledger/cli@latest
   ln -sf "$PL_INSTALL_DIR/node_modules/.bin/pl" "$PL_BIN/pl"
   ok "Installed pl → $PL_BIN/pl"
 }
@@ -55,7 +55,7 @@ ensure_path() {
   local profile="$HOME/.$rc"
   [ -f "$HOME/.zshrc" ] && profile="$HOME/.zshrc"
   [ -f "$HOME/.bashrc" ] && profile="$HOME/.bashrc"
-  printf '\nexport PATH="%s:$PATH"   # added by projectledger installer\n' "$PL_BIN" >> "$profile"
+  printf '\nexport PATH="%s:$PATH"   # added by askledger installer\n' "$PL_BIN" >> "$profile"
   export PATH="$PL_BIN:$PATH"
   ok "Added $PL_BIN to $profile (run: source $profile)"
 }
@@ -73,10 +73,10 @@ ensure_path
 run_quickstart
 say ""
 say "Done. Next steps:"
-say "  · pl sign  --event events.json --key ~/.projectledger/keys/default.json"
+say "  · pl sign  --event events.json --key ~/.askledger/keys/default.json"
 say "  · pl verify --receipt receipt.json"
 say "  · pl init  --tenant=my-company  (set up a real tenant)"
 say ""
-say "Docs:    https://projectledger.io/docs"
-say "Spec:    https://spec.projectledger.io"
-say "Verify:  https://verify.projectledger.io"
+say "Docs:    https://github.com/askledger/receipts-sdk#readme"
+say "Spec:    https://github.com/askledger/receipts-sdk/tree/main/spec"
+say "Verify:  https://askledger.github.io/receipts-sdk/verify.html"

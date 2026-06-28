@@ -82,7 +82,7 @@ A regulator citing our spec **once** flips the market. Banks regulated by that a
 ### What we offer regulators
 
 1. **A vendor-neutral, open-source verifier** they can deploy without buying anything from us
-2. **A regulator portal** — projectledger.io/verify — they can paste any bank's evidence pack and verify offline
+2. **A regulator portal** — github.com/askledger/receipts-sdk/verify — they can paste any bank's evidence pack and verify offline
 3. **Free training** for their inspection teams
 4. **Co-authored guidance** if they want it
 5. **Saudi / UAE / EU / UK / US locale-aware reference implementations** with the local-regulator template pre-loaded

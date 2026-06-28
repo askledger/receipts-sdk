@@ -5,7 +5,7 @@
  *
  * Quick start:
  *
- *   import { signReceipt, verifyReceipt, generateKeyPair } from "@projectledger/receipts-sdk";
+ *   import { signReceipt, verifyReceipt, generateKeyPair } from "@askledger/receipts-sdk";
  *
  *   const kp = generateKeyPair();
  *   const signed = signReceipt({

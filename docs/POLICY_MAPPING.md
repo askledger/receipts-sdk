@@ -80,7 +80,7 @@ Source: NIST AI RMF 1.0 (Jan 2023). Voluntary in the US; cited by CO, CA, NY sta
 ## How to cite a receipt against these
 
 ```ts
-import { citeAgainstAll, signReceipt, generateKeyPair } from "@projectledger/receipts-sdk";
+import { citeAgainstAll, signReceipt, generateKeyPair } from "@askledger/receipts-sdk";
 
 const receipt = signReceipt({ event, keypair: generateKeyPair() });
 const citations = citeAgainstAll(receipt);
