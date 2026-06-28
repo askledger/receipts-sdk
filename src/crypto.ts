@@ -67,7 +67,11 @@ export function sha256String(s: string): string {
  * In production, the private key never leaves the HSM.
  */
 export function generateKeyPair(): KeyPair {
-  const privateKey = ed.utils.randomPrivateKey();
+  // Use Node's crypto.randomBytes directly instead of ed.utils.randomPrivateKey().
+  // Noble's randomPrivateKey depends on globalThis.crypto.getRandomValues which is
+  // not consistently available across Node versions and vitest worker contexts.
+  // An Ed25519 private key is simply 32 cryptographically random bytes.
+  const privateKey = new Uint8Array(randomBytes(32));
   const publicKey = ed.getPublicKey(privateKey);
   const kid = `dev-${Buffer.from(randomBytes(6)).toString("hex")}`;
 
