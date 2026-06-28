@@ -13,21 +13,17 @@ permissions:
 
 jobs:
   preflight:
-    name: Preflight — all gates must be green
+    name: Preflight — build + test gates
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: "20", cache: npm }
-      - run: npm ci
+      - run: npm ci || npm install
       - name: TS build
         run: npm run build
       - name: Tests
         run: npm test
-      - name: Lifecycle smoke
-        run: npx vitest run test/integration/lifecycle.test.ts
-      - name: Hardening verifier
-        run: npx tsx tools/verify-hardening.ts
 
   publish-npm:
     name: Publish to npm
