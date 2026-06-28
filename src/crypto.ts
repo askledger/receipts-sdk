@@ -13,8 +13,16 @@
 import * as ed from "@noble/ed25519";
 import { sha512 } from "@noble/hashes/sha2";
 import { sha256 as sha256Fn } from "@noble/hashes/sha2";
-import { randomBytes } from "node:crypto";
+import { randomBytes, webcrypto } from "node:crypto";
 import type { KeyPair } from "./types.js";
+
+// Polyfill globalThis.crypto for environments where it isn't auto-set.
+// @noble/ed25519 v2 needs crypto.getRandomValues. Node 19+ sets globalThis.crypto
+// automatically, but Node 18 and some vitest workers leave it undefined.
+if (typeof globalThis.crypto === "undefined") {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (globalThis as unknown as { crypto: typeof webcrypto }).crypto = webcrypto;
+}
 
 // Required by @noble/ed25519 v2 to enable synchronous Ed25519 ops on Node.
 // In v2.x, the sync SHA-512 must be installed via etc.sha512Sync, which
