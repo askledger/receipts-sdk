@@ -1,0 +1,65 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pl
+      POSTGRES_USER: pl
+      POSTGRES_PASSWORD_FILE: /run/secrets/pg_password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ../migrations:/docker-entrypoint-initdb.d:ro
+    secrets: [pg_password]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pl"]
+      interval: 5s
+
+  trillian-log-server:
+    image: gcr.io/trillian-opensource-ci/log_server:latest
+    restart: unless-stopped
+    command:
+      - "--storage_system=mysql"
+      - "--rpc_endpoint=0.0.0.0:8090"
+      - "--http_endpoint=0.0.0.0:8091"
+    depends_on:
+      - mysql
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_password
+      MYSQL_DATABASE: trillian
+    volumes:
+      - mysqldata:/var/lib/mysql
+    secrets: [mysql_password]
+
+  console:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    restart: unless-stopped
+    environment:
+      PL_DATABASE_URL: postgres://pl:${PG_PASSWORD}@postgres:5432/pl?sslmode=disable
+      PL_USE_FIXTURES: "false"
+      PL_TRILLIAN_URL: http://trillian-log-server:8091
+      PL_BUILD_SHA: ${PL_BUILD_SHA:-dev}
+    ports: ["3000:3000"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./tls:/etc/nginx/tls:ro
+    ports: ["443:443", "80:80"]
+    depends_on: [console]
+
+volumes:
+  pgdata: {}
+  mysqldata: {}
+
+secrets:
+  pg_password: { file: ./secrets/pg_password }
+  mysql_password: { file: ./secrets/mysql_password }

@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pl-sth-publisher
+spec:
+  schedule: "*/{{ .Values.sth.publishIntervalMinutes }} * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          restartPolicy: Never
+          serviceAccountName: pl-sth-publisher
+          containers:
+            - name: publisher
+              image: ghcr.io/projectledger/receipts-sdk:{{ .Chart.AppVersion }}
+              command: ["node", "/app/dist/scripts/sth-publisher.js"]
+              env:
+                - name: PL_TRILLIAN_URL
+                  value: "http://trillian-log-server:8091"
+                - name: PL_LOG_ID
+                  valueFrom: { configMapKeyRef: { name: pl-log, key: log_id } }
+                - name: PL_STH_ARCHIVE_S3
+                  value: "s3://{{ .Values.sth.archive.bucket }}/sth"
+                - name: AWS_REGION
+                  value: {{ .Values.sth.archive.region | quote }}
+              resources:
+                requests: { cpu: 50m, memory: 64Mi }
+                limits:   { cpu: 250m, memory: 256Mi }

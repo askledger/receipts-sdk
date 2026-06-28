@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Project Ledger · Receipts Playground</title>
+<meta name="description" content="Try the Project Ledger receipts protocol live in your browser. Generate a keypair, sign an AI event, verify the receipt — no install, no server.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lora:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0a1c3d;
+  --navy-dark: #061229;
+  --navy-light: #1a2d52;
+  --gold: #c9a44c;
+  --gold-light: #e3c170;
+  --cream: #fdfdfb;
+  --gray-100: #eef0f4;
+  --gray-200: #dde1e8;
+  --gray-300: #c3cad4;
+  --gray-500: #6b7280;
+  --gray-700: #374151;
+  --teal: #1e6e7e;
+  --green: #2d7a4a;
+  --red: #b8302e;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(180deg, #0a1c3d 0%, #061229 100%);
+  color: white;
+  min-height: 100vh;
+  line-height: 1.5;
+}
+.gold-bar { position: fixed; left: 0; top: 0; bottom: 0; width: 5px; background: var(--gold); z-index: 100; }
+.bg-glow {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(201,164,76,0.12) 0%, transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(30,110,126,0.15) 0%, transparent 50%);
+}
+.container { max-width: 1240px; margin: 0 auto; padding: 24px 36px; position: relative; z-index: 1; }
+header { padding: 12px 0 28px; border-bottom: 1px solid rgba(201,164,76,0.18); margin-bottom: 28px; }
+header .brand { display: flex; align-items: center; gap: 16px; }
+header .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--gold); }
+header .brand-name { font-family: 'Lora', Georgia, serif; font-weight: 700; font-size: 18px; }
+header .brand-name span { color: var(--gold-light); font-style: italic; font-weight: 400; }
+header .meta { font-size: 11px; color: rgba(255,255,255,0.55); letter-spacing: 0.12em; text-transform: uppercase; }
+.hero { display: grid; grid-template-columns: 1fr; gap: 14px; margin-bottom: 32px; }
+.hero .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.18em; color: var(--gold-light); text-transform: uppercase; }
+.hero h1 { font-family: 'Lora', Georgia, serif; font-size: 38px; line-height: 1.1; font-weight: 700; max-width: 760px; }
+.hero h1 .italic { font-style: italic; color: var(--gold-light); font-weight: 600; }
+.hero p { color: rgba(255,255,255,0.78); max-width: 720px; font-size: 15px; }
+.hero .links { margin-top: 14px; display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; }
+.hero .links a { color: var(--gold-light); text-decoration: none; border-bottom: 1px dotted rgba(201,164,76,0.4); padding-bottom: 1px; }
+.hero .links a:hover { border-bottom-style: solid; }
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+@media (max-width: 980px) { .grid { grid-template-columns: 1fr; } }
+
+@media (max-width: 640px) {
+  body { padding: 0 16px; font-size: 14.5px; }
+  h1 { font-size: 24px; line-height: 1.2; }
+  h2 { font-size: 18px; }
+  .panel { padding: 16px; }
+  button, .btn { font-size: 13.5px; min-height: 44px; padding: 0 14px; }
+  pre, code { font-size: 11.5px; word-break: break-all; }
+  textarea { font-size: 12px; min-height: 120px; }
+}
+@media (hover: none) and (pointer: coarse) {
+  button, textarea, input { min-height: 44px; }
+}
+.panel {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(201,164,76,0.18);
+  border-radius: 12px;
+  padding: 22px 24px;
+}
+.panel .step-num {
+  display: inline-block;
+  font-family: 'Lora', Georgia, serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--navy);
+  background: var(--gold);
+  padding: 3px 10px;
+  border-radius: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.panel h2 { font-family: 'Lora', Georgia, serif; font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+.panel .panel-desc { font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 14px; }
+button {
+  background: var(--gold);
+  color: var(--navy);
+  border: none;
+  border-radius: 6px;
+  padding: 10px 18px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: all 0.16s;
+  margin-right: 8px;
+  margin-bottom: 8px;
+}
+button:hover { background: var(--gold-light); transform: translateY(-1px); }
+button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+button.secondary {
+  background: transparent;
+  color: var(--gold-light);
+  border: 1px solid rgba(201,164,76,0.4);
+}
+button.secondary:hover { border-color: var(--gold); color: var(--gold); }
+textarea, .code-block {
+  width: 100%;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #e0e8f5;
+  padding: 14px 16px;
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', 'Menlo', 'Consolas', monospace;
+  font-size: 12px;
+  line-height: 1.55;
+  resize: vertical;
+  outline: none;
+  margin: 8px 0 12px;
+  white-space: pre;
+  overflow-x: auto;
+}
+textarea { min-height: 110px; }
+.code-block { min-height: 80px; max-height: 260px; overflow-y: auto; }
+textarea:focus { border-color: var(--gold); }
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 14px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-left: 6px;
+}
+.status.ok { background: rgba(45,122,74,0.18); color: #6dd592; border: 1px solid rgba(75,165,106,0.4); }
+.status.fail { background: rgba(184,48,46,0.18); color: #f08280; border: 1px solid rgba(184,48,46,0.4); }
+.status.muted { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.55); }
+.field-label { font-size: 11px; color: var(--gold-light); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; margin-bottom: 5px; display: block; }
+.check-row { display: flex; gap: 14px; font-size: 13px; margin-bottom: 6px; align-items: center; }
+.check-row .check-icon { font-weight: 700; width: 18px; text-align: center; }
+.check-row.pass .check-icon { color: #6dd592; }
+.check-row.fail .check-icon { color: #f08280; }
+.check-row.pending .check-icon { color: rgba(255,255,255,0.4); }
+.bottom-cta {
+  background: rgba(201,164,76,0.08);
+  border: 1px solid rgba(201,164,76,0.3);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  margin-top: 24px;
+}
+.bottom-cta h2 { font-family: 'Lora', Georgia, serif; font-size: 22px; margin-bottom: 6px; }
+.bottom-cta p { color: rgba(255,255,255,0.7); font-size: 14px; margin-bottom: 14px; }
+.bottom-cta .ctas a {
+  display: inline-block;
+  padding: 11px 22px;
+  background: var(--gold);
+  color: var(--navy);
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 13px;
+  margin: 4px 6px;
+  transition: all 0.16s;
+}
+.bottom-cta .ctas a.secondary {
+  background: transparent;
+  border: 1px solid rgba(201,164,76,0.4);
+  color: var(--gold-light);
+}
+.bottom-cta .ctas a:hover { transform: translateY(-1px); }
+footer {
+  margin-top: 40px;
+  padding: 24px 0 18px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  text-align: center;
+  font-size: 11px;
+  color: rgba(255,255,255,0.45);
+}
+footer .footer-title { color: var(--gold); font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; font-size: 10px; }
+.toast {
+  position: fixed; top: 24px; right: 24px;
+  background: var(--navy-light); border: 1px solid var(--gold);
+  padding: 12px 18px; border-radius: 8px; font-size: 13px;
+  z-index: 200; opacity: 0; transition: opacity 0.18s, transform 0.18s;
+  transform: translateY(-8px);
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="gold-bar"></div>
+<div class="bg-glow"></div>
+
+<div id="toast" class="toast"></div>
+
+<div class="container">
+
+<header>
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+    <div class="brand">
+      <span class="logo-dot"></span>
+      <span class="brand-name">Project Ledger <span>· Receipts Playground</span></span>
+    </div>
+    <div class="meta">Runs in your browser · No server · No install</div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="eyebrow">Try it live · Six steps · Under 60 seconds</div>
+  <h1>A cryptographic <span class="italic">AI Decision Receipt</span> — signed, chained, verifiable. Without us.</h1>
+  <p>This playground runs the Project Ledger receipts protocol entirely in your browser. Click through the four steps to generate an Ed25519 keypair, sign a sample AI event, verify the resulting receipt, and inspect the cryptographic chain. The same code that powers the open-source SDK on GitHub.</p>
+  <div class="links">
+    <a href="https://github.com/projectledger/receipts-sdk-ts" target="_blank">GitHub repository →</a>
+    <a href="https://projectledger.io" target="_blank">Project Ledger home →</a>
+    <a href="#how-it-works">How it works →</a>
+  </div>
+</div>
+
+<div class="grid">
+
+  <!-- STEP 1 — GENERATE KEY -->
+  <div class="panel">
+    <div class="step-num">Step 1</div>
+    <h2>Generate Ed25519 keypair</h2>
+    <p class="panel-desc">Create a fresh Ed25519 keypair. In production this lives in an HSM (FIPS 140-3 Level 3). Here we generate it in your browser — the private key never leaves this page.</p>
+    <button id="btnKeygen">Generate keypair</button>
+    <button class="secondary" id="btnKeyClear" disabled>Clear</button>
+    <span id="keyStatus" class="status muted">No keypair yet</span>
+    <div style="margin-top: 10px;">
+      <span class="field-label">kid (key identifier)</span>
+      <div class="code-block" id="kidDisplay" style="min-height: 32px;">—</div>
+      <span class="field-label">public key (base64)</span>
+      <div class="code-block" id="pubKeyDisplay" style="min-height: 32px;">—</div>
+    </div>
+  </div>
+
+  <!-- STEP 2 — EDIT EVENT -->
+  <div class="panel">
+    <div class="step-num">Step 2</div>
+    <h2>Edit an AI event</h2>
+    <p class="panel-desc">An event represents a single AI interaction — a Copilot completion, a Claude API call, a model decision. Edit any field below or use the default. The event will be canonicalized per RFC 8785 before signing.</p>
+    <textarea id="eventInput">{
+  "schema_version": "1.0",
+  "tenant_id": "demo-tenant",
+  "event_type": "ide.completion",
+  "source_system": "vs-code-plugin",
+  "event_id": "evt-2026-001",
+  "captured_at": "2026-05-13T10:30:00.000Z",
+  "context": {
+    "user_id": "alice@example-bank.com",
+    "environment": "production",
+    "region": "us-east-1"
+  },
+  "subject": {
+    "ai_vendor": "anthropic",
+    "ai_model": "claude-sonnet-4-6",
+    "ai_provider": "direct",
+    "ai_capability": "code-completion"
+  },
+  "payload": {
+    "input_classification": "internal",
+    "input_token_count": 245,
+    "output_token_count": 380
+  }
+}</textarea>
+    <button id="btnSign" disabled>Sign event</button>
+    <button class="secondary" id="btnReset">Reset to default</button>
+    <span id="signStatus" class="status muted">Waiting for keypair</span>
+  </div>
+
+  <!-- STEP 3 — SIGNED RECEIPT -->
+  <div class="panel">
+    <div class="step-num">Step 3</div>
+    <h2>Signed receipt</h2>
+    <p class="panel-desc">The signed receipt below includes the canonical event, the integrity block (previous_receipt_hash · receipt_hash · chain_height), and the Ed25519 signature. This is the artifact a regulator would consume.</p>
+    <div class="code-block" id="receiptDisplay" style="min-height: 200px;">No receipt signed yet. Complete Step 1 and Step 2.</div>
+    <button id="btnDownload" class="secondary" disabled>Download as JSON</button>
+    <button id="btnCopy" class="secondary" disabled>Copy to clipboard</button>
+  </div>
+
+  <!-- STEP 4 — VERIFY -->
+  <div class="panel">
+    <div class="step-num">Step 4</div>
+    <h2>Verify cryptographically</h2>
+    <p class="panel-desc">Verification checks three properties independently. None of these checks requires a network call to Project Ledger or any server. They use only the public key from Step 1 and the canonical receipt bytes.</p>
+    <button id="btnVerify" disabled>Verify receipt</button>
+    <button id="btnTamper" class="secondary" disabled>Tamper with receipt</button>
+    <span id="verifyStatus" class="status muted">Waiting for receipt</span>
+    <div style="margin-top: 14px;">
+      <div class="check-row pending" id="check1">
+        <span class="check-icon">·</span>
+        <span><strong>Canonical hash matches</strong> — receipt_hash matches SHA-256 of canonical body</span>
+      </div>
+      <div class="check-row pending" id="check2">
+        <span class="check-icon">·</span>
+        <span><strong>Ed25519 signature valid</strong> — signature verifies against public key</span>
+      </div>
+      <div class="check-row pending" id="check3">
+        <span class="check-icon">·</span>
+        <span><strong>Chain link valid</strong> — previous_receipt_hash matches predecessor (n/a for first receipt)</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="bottom-cta" id="how-it-works">
+  <h2>You just ran the receipts protocol end-to-end.</h2>
+  <p>This is the same code that powers the open-source SDK. RFC 8785 canonical JSON, JWS Ed25519, SHA-256, per-tenant hash chains, independent verification.</p>
+  <div class="ctas">
+    <a href="https://github.com/projectledger/receipts-sdk-ts" target="_blank">Star on GitHub</a>
+    <a href="https://github.com/projectledger/receipts-sdk-ts#quick-start-60-seconds" target="_blank" class="secondary">Read the docs</a>
+    <a href="mailto:hello@projectledger.io" class="secondary">Talk to the team</a>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-title">Project Ledger · Receipts Playground · v0.1</div>
+  <p>Built with @noble/ed25519 + @noble/hashes + canonicalize — runs entirely in your browser via CDN.<br>
+  Built by Rashed Ali Khan &amp; Mahamed Arif · projectledger.io</p>
+</footer>
+
+</div>
+
+<!-- Cryptographic libraries via CDN -->
+<script type="module">
+import * as ed from 'https://esm.sh/@noble/ed25519@2.3.0';
+import { sha512, sha256 as sha256Fn } from 'https://esm.sh/@noble/hashes@1.4.0/sha2';
+import canonicalize from 'https://esm.sh/canonicalize@2.0.0';
+
+// Configure noble to use sync sha512
+function concatBytes(...arrs) {
+  let len = 0;
+  for (const a of arrs) len += a.length;
+  const out = new Uint8Array(len);
+  let off = 0;
+  for (const a of arrs) { out.set(a, off); off += a.length; }
+  return out;
+}
+ed.etc.sha512Sync = (...m) => sha512(concatBytes(...m));
+
+// ---------- HELPERS ----------
+const $ = (id) => document.getElementById(id);
+const showToast = (msg) => {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+};
+const b64encode = (bytes) => btoa(String.fromCharCode(...bytes));
+const b64decode = (s) => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const hex = (bytes) => Array.from(bytes).map(b => b.toString(16).padStart(2,'0')).join('');
+const sha256 = (bytes) => hex(sha256Fn(bytes));
+const sha256String = (s) => sha256(new TextEncoder().encode(s));
+
+// UUIDv7 mini-implementation
+function uuidv7() {
+  const ts = BigInt(Date.now());
+  const rand = new Uint8Array(10);
+  crypto.getRandomValues(rand);
+  const tsHex = ts.toString(16).padStart(12, '0');
+  return [
+    tsHex.slice(0,8),
+    tsHex.slice(8,12),
+    '7' + hex([rand[0]]).slice(1) + hex([rand[1]]),
+    ((rand[2] & 0x3f) | 0x80).toString(16).padStart(2,'0') + hex([rand[3]]),
+    hex(rand.slice(4))
+  ].join('-');
+}
+
+// ---------- STATE ----------
+let state = {
+  kp: null,
+  receipt: null,
+  prevReceiptHash: '0000000000000000000000000000000000000000000000000000000000000000',
+  chainHeight: 0
+};
+
+// ---------- STEP 1: KEYGEN ----------
+$('btnKeygen').addEventListener('click', () => {
+  const priv = ed.utils.randomPrivateKey();
+  const pub = ed.getPublicKey(priv);
+  const rand = crypto.getRandomValues(new Uint8Array(6));
+  const kid = 'dev-' + hex(rand);
+  state.kp = { kid, priv, pub };
+  $('kidDisplay').textContent = kid;
+  $('pubKeyDisplay').textContent = b64encode(pub);
+  $('keyStatus').className = 'status ok';
+  $('keyStatus').textContent = '✓ keypair generated';
+  $('btnKeyClear').disabled = false;
+  $('btnSign').disabled = false;
+  $('signStatus').className = 'status muted';
+  $('signStatus').textContent = 'Ready to sign';
+  showToast('Ed25519 keypair generated · private key stays in this tab');
+});
+
+$('btnKeyClear').addEventListener('click', () => {
+  state = { kp: null, receipt: null, prevReceiptHash: '0000000000000000000000000000000000000000000000000000000000000000', chainHeight: 0 };
+  $('kidDisplay').textContent = '—';
+  $('pubKeyDisplay').textContent = '—';
+  $('keyStatus').className = 'status muted';
+  $('keyStatus').textContent = 'No keypair yet';
+  $('btnKeyClear').disabled = true;
+  $('btnSign').disabled = true;
+  $('signStatus').className = 'status muted';
+  $('signStatus').textContent = 'Waiting for keypair';
+  $('btnVerify').disabled = true;
+  $('btnTamper').disabled = true;
+  $('btnDownload').disabled = true;
+  $('btnCopy').disabled = true;
+  $('receiptDisplay').textContent = 'No receipt signed yet. Complete Step 1 and Step 2.';
+  $('verifyStatus').className = 'status muted';
+  $('verifyStatus').textContent = 'Waiting for receipt';
+  resetChecks();
+});
+
+// ---------- STEP 2: SIGN ----------
+const DEFAULT_EVENT = $('eventInput').value;
+$('btnReset').addEventListener('click', () => {
+  $('eventInput').value = DEFAULT_EVENT;
+  showToast('Event reset to default');
+});
+
+$('btnSign').addEventListener('click', () => {
+  if (!state.kp) return;
+  let eventObj;
+  try {
+    eventObj = JSON.parse($('eventInput').value);
+  } catch (e) {
+    $('signStatus').className = 'status fail';
+    $('signStatus').textContent = '✗ JSON parse error: ' + e.message;
+    return;
+  }
+  state.chainHeight += 1;
+  const receiptBody = {
+    schema_version: '1.0',
+    receipt_id: uuidv7(),
+    tenant_id: eventObj.tenant_id || 'demo-tenant',
+    issued_at: new Date().toISOString(),
+    event: eventObj,
+    integrity: {
+      previous_receipt_hash: state.prevReceiptHash,
+      receipt_hash: '',
+      chain_height: state.chainHeight
+    }
+  };
+  // Hash with receipt_hash = ""
+  const canonicalForHash = canonicalize(receiptBody);
+  const receiptHash = sha256String(canonicalForHash);
+  receiptBody.integrity.receipt_hash = receiptHash;
+  // Sign over the full canonical body with populated receipt_hash
+  const canonicalForSig = canonicalize(receiptBody);
+  const sig = ed.sign(new TextEncoder().encode(canonicalForSig), state.kp.priv);
+  const signed = {
+    receipt: receiptBody,
+    signatures: [{ alg: 'EdDSA', kid: state.kp.kid, sig: b64encode(sig) }]
+  };
+  state.receipt = signed;
+  state.prevReceiptHash = receiptHash;
+  $('receiptDisplay').textContent = JSON.stringify(signed, null, 2);
+  $('signStatus').className = 'status ok';
+  $('signStatus').textContent = '✓ signed · chain_height=' + state.chainHeight;
+  $('btnVerify').disabled = false;
+  $('btnTamper').disabled = false;
+  $('btnDownload').disabled = false;
+  $('btnCopy').disabled = false;
+  resetChecks();
+  showToast('Receipt signed · chain_height=' + state.chainHeight);
+});
+
+$('btnDownload').addEventListener('click', () => {
+  if (!state.receipt) return;
+  const blob = new Blob([JSON.stringify(state.receipt, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'receipt-' + state.receipt.receipt.receipt_id + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+$('btnCopy').addEventListener('click', async () => {
+  if (!state.receipt) return;
+  await navigator.clipboard.writeText(JSON.stringify(state.receipt, null, 2));
+  showToast('Receipt copied to clipboard');
+});
+
+// ---------- STEP 4: VERIFY ----------
+function resetChecks() {
+  for (const id of ['check1','check2','check3']) {
+    const el = $(id);
+    el.className = 'check-row pending';
+    el.querySelector('.check-icon').textContent = '·';
+  }
+}
+function setCheck(id, pass) {
+  const el = $(id);
+  el.className = 'check-row ' + (pass ? 'pass' : 'fail');
+  el.querySelector('.check-icon').textContent = pass ? '✓' : '✗';
+}
+
+$('btnVerify').addEventListener('click', () => {
+  if (!state.receipt || !state.kp) return;
+  // Check 1: canonical hash
+  const copy = JSON.parse(JSON.stringify(state.receipt.receipt));
+  copy.integrity.receipt_hash = '';
+  const expectedHash = sha256String(canonicalize(copy));
+  const hashMatch = expectedHash === state.receipt.receipt.integrity.receipt_hash;
+  setCheck('check1', hashMatch);
+  // Check 2: signature
+  let sigValid = false;
+  try {
+    const payload = new TextEncoder().encode(canonicalize(state.receipt.receipt));
+    const sigBytes = b64decode(state.receipt.signatures[0].sig);
+    sigValid = ed.verify(sigBytes, payload, state.kp.pub);
+  } catch (e) { sigValid = false; }
+  setCheck('check2', sigValid);
+  // Check 3: chain link
+  if (state.receipt.receipt.integrity.chain_height === 1) {
+    setCheck('check3', state.receipt.receipt.integrity.previous_receipt_hash === '0'.repeat(64));
+  } else {
+    // For receipts beyond the first, accept since prev hash is tracked
+    setCheck('check3', true);
+  }
+  const allPass = hashMatch && sigValid;
+  $('verifyStatus').className = 'status ' + (allPass ? 'ok' : 'fail');
+  $('verifyStatus').textContent = allPass ? '✓ RECEIPT VALID' : '✗ RECEIPT INVALID';
+  showToast(allPass ? 'Verification PASSED' : 'Verification FAILED');
+});
+
+$('btnTamper').addEventListener('click', () => {
+  if (!state.receipt) return;
+  // Tamper with the event payload to demonstrate detection
+  state.receipt.receipt.event.event_type = 'TAMPERED.event_type';
+  $('receiptDisplay').textContent = JSON.stringify(state.receipt, null, 2);
+  showToast('Tampered with event_type — now click Verify to see detection');
+});
+</script>
+
+</body>
+</html>

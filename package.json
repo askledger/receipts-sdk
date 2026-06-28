@@ -1,12 +1,21 @@
 {
   "name": "@projectledger/receipts-sdk",
-  "version": "0.1.0",
+  "version": "0.6.0",
   "description": "Cryptographic AI Decision Receipts — RFC 8785 canonical JSON, JWS Ed25519, hash-chained, regulator-verifiable",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
+    "pl": "dist/cli.js",
     "ledger-cli": "dist/cli.js"
+  },
+  "exports": {
+    ".": { "import": "./dist/index.js", "types": "./dist/index.d.ts" },
+    "./vendor-kit": { "import": "./dist/vendor-kit/index.js", "types": "./dist/vendor-kit/index.d.ts" },
+    "./adapters/openai": { "import": "./dist/adapters/openai.js", "types": "./dist/adapters/openai.d.ts" },
+    "./adapters/anthropic": { "import": "./dist/adapters/anthropic.js", "types": "./dist/adapters/anthropic.d.ts" },
+    "./adapters/fetch": { "import": "./dist/adapters/fetch.js", "types": "./dist/adapters/fetch.d.ts" },
+    "./adapters/langchain": { "import": "./dist/adapters/langchain.js", "types": "./dist/adapters/langchain.d.ts" }
   },
   "scripts": {
     "build": "tsc",
@@ -14,6 +23,8 @@
     "test:watch": "vitest",
     "demo": "npm run build && node dist/cli.js sign examples/event.json && node dist/cli.js verify .ledger/last-receipt.json",
     "keygen": "npm run build && node dist/cli.js keygen",
+    "bench": "npm run build && node scripts/bench.mjs",
+    "sbom": "node scripts/generate-sbom.mjs",
     "lint": "tsc --noEmit",
     "prepublishOnly": "npm run build && npm test"
   },
@@ -40,11 +51,10 @@
     "@noble/hashes": "^1.4.0",
     "canonicalize": "^2.0.0",
     "commander": "^12.0.0",
-    "uuid": "^10.0.0"
+    "uuid": "^11.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
-    "@types/uuid": "^10.0.0",
     "typescript": "^5.4.0",
     "vitest": "^1.6.0"
   },

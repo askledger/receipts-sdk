@@ -1,0 +1,12 @@
+apiVersion: v2
+name: project-ledger
+description: Project Ledger — cryptographic AI receipts substrate + admin console
+type: application
+version: 0.1.0
+appVersion: "0.6.0"
+home: https://projectledger.io
+sources:
+  - https://github.com/projectledger/receipts-sdk
+maintainers:
+  - name: ProjectLedger Maintainers
+    email: maintainers@projectledger.io

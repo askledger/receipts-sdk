@@ -1,0 +1,51 @@
+{
+  "manifest_version": 3,
+  "name": "Project Ledger · AI Activity Receipts",
+  "version": "0.1.0",
+  "description": "Captures every AI prompt you send to ChatGPT, Claude, Gemini, Bedrock and signs a cryptographic receipt locally. Stays on your machine. Optional ship-to-corp-IT for shadow-AI visibility.",
+  "author": "Project Ledger",
+  "homepage_url": "https://projectledger.io",
+  "permissions": ["storage", "webRequest", "activeTab", "scripting"],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "https://chat.openai.com/*",
+    "https://claude.ai/*",
+    "https://gemini.google.com/*",
+    "https://copilot.microsoft.com/*",
+    "https://perplexity.ai/*",
+    "https://huggingface.co/*",
+    "https://api.openai.com/*",
+    "https://api.anthropic.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*",
+        "https://claude.ai/*",
+        "https://gemini.google.com/*",
+        "https://copilot.microsoft.com/*",
+        "https://perplexity.ai/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Project Ledger · AI Activity Receipts"
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "options_page": "options.html",
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
+}

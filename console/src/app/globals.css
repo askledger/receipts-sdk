@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --pl-brand-navy-900: #0a1530;
+  --pl-brand-navy-700: #172547;
+  --pl-brand-navy-500: #2e4480;
+  --pl-brand-gold-500: #c79b3c;
+  --pl-brand-gold-300: #e8c878;
+  --pl-surface-0: #f6f7fb;
+  --pl-surface-1: #ffffff;
+  --pl-surface-2: #fafbfd;
+  --pl-border: #dde1ec;
+  --pl-text-primary: #101430;
+  --pl-text-secondary: #525a76;
+  --pl-text-disabled: #a3a9bd;
+  --pl-status-allow: #1b7f55;
+  --pl-status-block: #a32424;
+  --pl-status-flag: #b97607;
+  --pl-status-pending: #4a5d8a;
+  --pl-status-info: #1f5e9e;
+  --pl-status-revoked: #5a2a8c;
+  --pl-focus: #0a1530;
+}
+
+[data-theme="dark"] {
+  --pl-surface-0: #0b1024;
+  --pl-surface-1: #121a3a;
+  --pl-surface-2: #19224b;
+  --pl-border: #27325f;
+  --pl-text-primary: #eef1fa;
+  --pl-text-secondary: #a8b1cf;
+  --pl-text-disabled: #5b6688;
+  --pl-focus: #e8c878;
+}
+
+html,
+body {
+  background: var(--pl-surface-0);
+  color: var(--pl-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--pl-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001s !important;
+    transition-duration: 0.001s !important;
+  }
+}

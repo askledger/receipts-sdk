@@ -1,0 +1,53 @@
+name: Feature request
+description: Suggest an enhancement or new capability
+title: "[Feature]: "
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for proposing an enhancement. For substantial protocol changes (e.g., new receipt fields, signature algorithm changes), please open a GitHub Discussion first.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What problem does this solve?
+      placeholder: I'm trying to do X, but currently I have to do Y because...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: What would you like to see?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What other approaches did you think about?
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Scope
+      options:
+        - Core SDK
+        - CLI
+        - Receipts protocol (envelope change)
+        - Documentation
+        - New language SDK (Python/Go/Rust/etc.)
+        - Integration with other standards (Sigstore, OpenTelemetry, etc.)
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Concrete use case
+      description: Describe a real scenario where this would be used. The more specific, the better.

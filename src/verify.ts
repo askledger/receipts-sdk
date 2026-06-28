@@ -15,6 +15,7 @@ import {
   canonicalSigningPayload,
   canonicalHashingPayload,
 } from "./receipt.js";
+import { recordVerify } from "./observability/otel.js";
 import type { SignedReceipt } from "./types.js";
 
 export interface VerifyResult {
@@ -96,11 +97,11 @@ export function verifyReceipt(
     }
   }
 
-  // Overall validity = canonical hash matches AND signature valid AND (chain link valid if checked)
   result.valid =
     result.checks.canonical_hash_matches &&
     result.checks.signature_valid &&
     (result.checks.chain_link_valid !== false);
 
+  recordVerify({ tenantId: signed.receipt.tenant_id, ok: result.valid });
   return result;
 }

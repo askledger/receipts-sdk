@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Project Ledger · Settings</title>
+<style>
+body { font-family: -apple-system, system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 24px; background: #f6f7fb; color: #101430; line-height: 1.6; }
+h1 { font-size: 28px; margin-bottom: 8px; }
+.lead { color: #525a76; margin-bottom: 32px; }
+section { background: #fff; border: 1px solid #dde1ec; border-radius: 10px; padding: 24px; margin: 14px 0; }
+section h2 { font-size: 16px; margin-bottom: 12px; }
+label { display: block; font-size: 13px; font-weight: 600; margin-top: 12px; }
+input[type=text], input[type=url] { width: 100%; padding: 10px 12px; margin-top: 4px; border-radius: 6px; border: 1px solid #dde1ec; font-size: 14px; }
+input[type=checkbox] { margin-right: 8px; }
+button { margin-top: 16px; background: #0a1530; color: white; padding: 10px 18px; border-radius: 6px; border: none; font-weight: 700; cursor: pointer; font-size: 14px; }
+.note { font-size: 12px; color: #525a76; margin-top: 4px; }
+.danger { color: #a32424; }
+</style>
+</head>
+<body>
+<h1>Project Ledger settings</h1>
+<p class="lead">Your receipts stay on your machine by default. Configure ship-to-corp-IT only with your CISO's blessing.</p>
+
+<section>
+  <h2>Local-only mode (default)</h2>
+  <p>Every receipt is signed with a keypair generated in this browser. The private key never leaves your machine. Receipts are stored encrypted in <code>chrome.storage.local</code>.</p>
+</section>
+
+<section>
+  <h2>Corporate ingest (optional)</h2>
+  <p>Your corporate IT can configure an ingest URL. With your explicit consent, every signed receipt will be shipped to that URL <b>in addition</b> to local storage. The corporate side can never modify your local receipt history.</p>
+  <label>Corporate ingest URL
+    <input type="url" id="ingest" placeholder="https://ledger.your-company.com/v1/receipts">
+  </label>
+  <label><input type="checkbox" id="consent"> I consent to ship signed receipts to my corporate ingest endpoint</label>
+  <button id="save">Save</button>
+  <p class="note danger">Only enable this if you trust your corporate IT environment. The receipts include hashes of your prompts — not the prompt text — but metadata (vendor, model, time, URL path) is shipped.</p>
+</section>
+
+<section>
+  <h2>Your public key</h2>
+  <p>Share this with anyone verifying your receipts. The private key stays in this browser.</p>
+  <input type="text" id="pubkey" readonly>
+</section>
+
+<script type="module">
+chrome.storage.local.get("pl.settings").then(r => {
+  const s = r["pl.settings"] ?? {};
+  if (s.corporate_ingest_url) document.getElementById("ingest").value = s.corporate_ingest_url;
+  if (s.consent_to_ship) document.getElementById("consent").checked = true;
+});
+chrome.runtime.sendMessage({ type: "pl.pubkey" }, (resp) => {
+  if (resp?.public_key) document.getElementById("pubkey").value = resp.public_key;
+});
+document.getElementById("save").addEventListener("click", async () => {
+  const settings = {
+    corporate_ingest_url: document.getElementById("ingest").value.trim(),
+    consent_to_ship: document.getElementById("consent").checked,
+  };
+  await chrome.storage.local.set({ "pl.settings": settings });
+  alert("Saved.");
+});
+</script>
+</body>
+</html>

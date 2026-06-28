@@ -1,0 +1,34 @@
+{{- if .Values.prometheusRule.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "project-ledger.fullname" . }}
+  labels: {{- include "project-ledger.labels" . | nindent 4 }}
+spec:
+  groups:
+    - name: pl-console
+      rules:
+        - alert: ConsoleHighErrorRate
+          expr: sum(rate(pl_console_http_requests_total{status=~"5.."}[5m])) / sum(rate(pl_console_http_requests_total[5m])) > 0.02
+          for: 5m
+          labels: { severity: warning, service: console-web }
+          annotations:
+            summary: "Console 5xx rate > 2%"
+            runbook_url: https://github.com/projectledger/receipts-sdk/blob/main/docs/operations/RUNBOOK.md
+
+        - alert: SignerLatencyP95High
+          expr: histogram_quantile(0.95, sum by (le) (rate(pl_signer_sign_duration_ms_bucket[5m]))) > 100
+          for: 5m
+          labels: { severity: warning, service: signer }
+          annotations:
+            summary: "Signer p95 latency > 100ms"
+            runbook_url: https://github.com/projectledger/receipts-sdk/blob/main/docs/operations/RUNBOOK.md#31-signersigning_latency_p95_high
+
+        - alert: CrossTenantQueryDetected
+          expr: increase(pl_tenant_cross_tenant_attempts_total[1m]) > 0
+          for: 0m
+          labels: { severity: critical, service: api-gateway, page: "true" }
+          annotations:
+            summary: "P0 — cross-tenant query attempt detected"
+            runbook_url: https://github.com/projectledger/receipts-sdk/blob/main/docs/operations/RUNBOOK.md#35-tenantcross_tenant_query_detected
+{{- end }}

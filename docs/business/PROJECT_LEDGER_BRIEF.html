@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Project Ledger · Executive Briefing</title>
+<meta name="description" content="The open-source runtime trust substrate for enterprise AI. Cryptographically verifiable receipts of every AI invocation — for regulators, auditors, customers, and insurers." />
+<meta name="theme-color" content="#0a1530" />
+<style>
+  :root {
+    --navy-950: #060d22;
+    --navy-900: #0a1530;
+    --navy-800: #11203f;
+    --navy-700: #18294e;
+    --gold: #c79b3c;
+    --gold-300: #e8c878;
+    --ink-50: #f8f9fc;
+    --ink-100: #eef1fa;
+    --ink-200: #dde2ee;
+    --ink-300: #c0c7da;
+    --ink-400: #98a1bd;
+    --ink-500: #6c7593;
+    --ink-700: #3a4061;
+    --ink-900: #0c1027;
+    --line: #e6e9f2;
+    --line-strong: #ced3e2;
+    --code-bg: #f4f6fb;
+    --bg: #fbfbfd;
+    --bg-dark: #0a1530;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink-900);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 56px 32px 96px;
+  }
+
+  /* Header */
+  header.brief-header {
+    border-bottom: 1px solid var(--line-strong);
+    padding-bottom: 28px;
+    margin-bottom: 40px;
+  }
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 14px;
+  }
+  h1.title {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+    margin: 0 0 12px;
+    color: var(--ink-900);
+  }
+  .subtitle {
+    font-size: 18px;
+    color: var(--ink-700);
+    margin: 0 0 22px;
+    font-weight: 500;
+  }
+  .audience-note {
+    font-size: 13px;
+    color: var(--ink-500);
+    font-style: italic;
+    margin: 0 0 12px;
+    line-height: 1.55;
+  }
+  .meta-line {
+    font-size: 12px;
+    color: var(--ink-500);
+    letter-spacing: .04em;
+  }
+
+  /* Section headings */
+  h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ink-900);
+    margin: 56px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+    letter-spacing: -0.005em;
+  }
+  h2 .sec-num {
+    color: var(--gold);
+    font-weight: 600;
+    margin-right: 10px;
+    font-variant-numeric: tabular-nums;
+  }
+  h3 {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 24px 0 8px;
+    color: var(--ink-900);
+  }
+
+  p { margin: 0 0 14px; }
+  p.lede {
+    font-size: 16px;
+    color: var(--ink-700);
+    line-height: 1.6;
+  }
+  em { color: var(--ink-700); }
+  strong { color: var(--ink-900); font-weight: 600; }
+
+  ul { margin: 0 0 14px; padding-left: 22px; }
+  ul li { margin-bottom: 6px; }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 4px 0 20px;
+    font-size: 13.5px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  th {
+    background: var(--ink-50);
+    font-weight: 600;
+    color: var(--ink-700);
+    font-size: 12px;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+  }
+  td.num { font-variant-numeric: tabular-nums; }
+  table.snapshot th { width: 32%; vertical-align: top; }
+
+  /* Code / diagram block */
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 18px 20px;
+    font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, monospace;
+    font-size: 12.5px;
+    line-height: 1.55;
+    overflow-x: auto;
+    color: var(--ink-900);
+    margin: 8px 0 20px;
+  }
+  code {
+    background: var(--code-bg);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12.5px;
+    color: var(--navy-900);
+  }
+
+  /* Callouts */
+  .callout {
+    background: linear-gradient(180deg, #fafbff, #f4f6fb);
+    border-left: 3px solid var(--gold);
+    padding: 16px 20px;
+    border-radius: 0 6px 6px 0;
+    margin: 16px 0;
+    font-size: 14px;
+    color: var(--ink-700);
+  }
+
+  /* Footer */
+  footer.brief-footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line-strong);
+    font-size: 13px;
+    color: var(--ink-500);
+  }
+  footer.brief-footer a { color: var(--navy-800); text-decoration: none; }
+  footer.brief-footer a:hover { text-decoration: underline; }
+  .contact-row {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 4px 16px;
+    margin-bottom: 6px;
+  }
+  .contact-label { color: var(--ink-500); }
+
+  /* TOC */
+  nav.toc {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 16px 18px;
+    font-size: 13px;
+    margin: 24px 0 36px;
+  }
+  nav.toc .toc-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-500);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  nav.toc ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    columns: 2;
+    column-gap: 32px;
+  }
+  nav.toc ol li { margin-bottom: 6px; break-inside: avoid; }
+  nav.toc a { color: var(--ink-700); text-decoration: none; }
+  nav.toc a:hover { color: var(--navy-800); text-decoration: underline; }
+  nav.toc .num {
+    color: var(--gold); font-weight: 600;
+    display: inline-block; width: 22px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Print */
+  @media print {
+    body { background: white; font-size: 11pt; }
+    .container { max-width: none; padding: 0; }
+    h2 { page-break-after: avoid; }
+    table, pre, .callout { page-break-inside: avoid; }
+    nav.toc { display: none; }
+    footer.brief-footer { page-break-before: avoid; }
+    a { color: inherit; text-decoration: none; }
+  }
+
+  /* Mobile */
+  @media (max-width: 640px) {
+    .container { padding: 36px 20px 64px; }
+    h1.title { font-size: 26px; }
+    .subtitle { font-size: 16px; }
+    nav.toc ol { columns: 1; }
+    table.snapshot th { width: 40%; }
+    table { font-size: 12.5px; }
+    th, td { padding: 8px 10px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header class="brief-header">
+  <div class="eyebrow">Executive Briefing · v1.2</div>
+  <h1 class="title">Project Ledger</h1>
+  <p class="subtitle">The open-source runtime trust substrate for enterprise AI</p>
+  <p class="lede">Every AI invocation inside a company produces a cryptographically signed, hash-chained, transparency-log-backed receipt — independently verifiable in a browser with the public key alone. No platform dependency. Apache-2.0. Built to the standard top regulators, auditors, customers, and insurers will require by 2026.</p>
+  <p class="audience-note">A briefing for Solution Architects, CTOs, CISOs, Heads of Risk, Heads of Compliance, OSS standards reviewers, and infrastructure investors evaluating runtime-trust infrastructure for the AI era.</p>
+  <div class="meta-line">June 2026 · Licensed CC-BY-4.0</div>
+</header>
+
+<nav class="toc" aria-label="Contents">
+  <div class="toc-title">Contents</div>
+  <ol>
+    <li><span class="num">1</span><a href="#s1">Executive snapshot</a></li>
+    <li><span class="num">2</span><a href="#s2">Thesis</a></li>
+    <li><span class="num">3</span><a href="#s3">Why now · 2025-2026 market signals</a></li>
+    <li><span class="num">4</span><a href="#s4">How it works</a></li>
+    <li><span class="num">5</span><a href="#s5">What we built</a></li>
+    <li><span class="num">6</span><a href="#s6">Cost discipline as buyer attractant</a></li>
+    <li><span class="num">7</span><a href="#s7">Engineering maturity</a></li>
+    <li><span class="num">8</span><a href="#s8">Security and privacy posture</a></li>
+    <li><span class="num">9</span><a href="#s9">Customers by readiness</a></li>
+    <li><span class="num">10</span><a href="#s10">Market sizing</a></li>
+    <li><span class="num">11</span><a href="#s11">Open-core commercial model</a></li>
+    <li><span class="num">12</span><a href="#s12">Category landscape</a></li>
+    <li><span class="num">13</span><a href="#s13">Roadmap · 12 months</a></li>
+    <li><span class="num">14</span><a href="#s14">Risks we are watching</a></li>
+    <li><span class="num">15</span><a href="#s15">Current activity</a></li>
+    <li><span class="num">16</span><a href="#s16">Engagement options</a></li>
+    <li><span class="num">17</span><a href="#s17">What we are not</a></li>
+    <li><span class="num">18</span><a href="#s18">Closing</a></li>
+  </ol>
+</nav>
+
+<h2 id="s1"><span class="sec-num">1</span>Executive snapshot</h2>
+<table class="snapshot">
+  <tbody>
+    <tr><th>What it is</th><td>Open-source cryptographic substrate making every AI call independently verifiable end-to-end.</td></tr>
+    <tr><th>What it solves</th><td>Cryptographically verifiable AI accountability for regulators, auditors, customers, insurers, and the buyer's own board.</td></tr>
+    <tr><th>Why now</th><td>EU AI Act enforcement August 2026; SR 11-7, OSFI E-23, PRA SS1/23, CBUAE, SAMA, RBI FREE-AI, GDPR Art. 22 already in force; Cisco and Palo Alto consolidating adjacent categories through acquisition.</td></tr>
+    <tr><th>What is built</th><td>5 language SDKs · 9 native integrations · browser extension · admin console · public verifier · 10 RFC drafts · 3-tier conformance program · 280+ tests · 66/66 hardening controls verified.</td></tr>
+    <tr><th>Today's users</th><td>Free open-source users (developers, small engineering teams); design-partner program now opening.</td></tr>
+    <tr><th>Tomorrow's buyers</th><td>~55,000 regulated companies globally — mid-market regulated SaaS, Tier-1 BFSI, insurance carriers, healthcare payers, government.</td></tr>
+    <tr><th>Market sizing</th><td>TAM <strong>$5-15B</strong> by 2030 · SAM <strong>$500M-2B</strong> today · SOM target <strong>$50-150M ARR</strong> within 3-5 years.</td></tr>
+    <tr><th>Stage</th><td>Engineering complete; publication, design-partner outreach, and standards-body submission in motion this month.</td></tr>
+    <tr><th>Ask</th><td>Honest expert review · pilot interest · standards-body co-authorship · introductions to anchor customers in BFSI, insurance, healthcare, or government.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="s2"><span class="sec-num">2</span>Thesis</h2>
+<p>The AI infrastructure stack is consolidating from the inside out. Model identity is being locked down (Sigstore, OpenSSF Model Signing, Cisco Model Provenance Kit). Build provenance is being locked down (in-toto, SLSA). Gateway-level guardrails are being locked down (Portkey-Palo Alto, LiteLLM, Cisco AI Defense). <strong>Runtime accountability — what the model actually did, when, under what policy, and what evidence survives the vendor relationship — has no incumbent.</strong> That is the category Project Ledger occupies, with a 12-18 month window before strategic consolidators arrive.</p>
+
+<h2 id="s3"><span class="sec-num">3</span>Why now · 2025-2026 market signals</h2>
+
+<h3>Regulatory pressure now binding, not theoretical</h3>
+<ul>
+  <li><strong>EU AI Act</strong> — Article 12 logging and Annex IV technical files enforced from August 2026 for high-risk AI systems.</li>
+  <li><strong>US Federal Reserve SR 11-7 / SR 26-2</strong> — model validation workpapers required for all banking AI.</li>
+  <li><strong>UK PRA SS1/23</strong>, <strong>Canadian OSFI E-23</strong>, <strong>UAE CBUAE</strong>, <strong>Saudi SAMA</strong>, <strong>India RBI FREE-AI</strong>, <strong>GDPR Article 22</strong> — all currently in force.</li>
+  <li><strong>NIST CAISI</strong> — US government-led AI evaluation framework setting the public benchmark standard.</li>
+</ul>
+
+<h3>Strategic acquisitions confirm category formation</h3>
+<ul>
+  <li>Cisco acquired Robust Intelligence (Q4 2024) → became Cisco AI Defense.</li>
+  <li>Cisco launched Model Provenance Kit (April 2026) — open-source AI supply-chain provenance.</li>
+  <li>Palo Alto acquired Portkey (April 2026) — anchors agentic security at the gateway.</li>
+  <li>Entrust acquired Onfido (2024, ~$650M) — identity verification consolidation.</li>
+</ul>
+
+<h3>Funded entrants signal investor conviction</h3>
+<ul>
+  <li><strong>WitnessAI</strong> — $58M (Jan 2026; Sound Ventures-led; 500% ARR growth; Fortune 1000 BFSI customers).</li>
+  <li><strong>Apiiro Guardian Agent</strong> — $135M (Jan 2026; Greylock, KP, General Catalyst; BlackRock, TIAA, USAA, SoFi, Shell).</li>
+  <li><strong>HiddenLayer</strong> — $50M Series A (M12, Booz Allen, IBM Ventures, Capital One Ventures).</li>
+  <li><strong>Armilla AI</strong> — $25M (Jan 2026, Chaucer-distributed) — AI liability underwriting.</li>
+</ul>
+
+<h3>AI liability insurance is live, not theoretical</h3>
+<ul>
+  <li>Munich Re aiSure + Mosaic partnership (Feb 2026) underwriting up to €15M / $15M / CAD 15M of AI liability per policy.</li>
+  <li>Carriers actively seeking signed-receipt data feeds to price risk.</li>
+</ul>
+
+<h3>Open-source standards codifying adjacent layers</h3>
+<ul>
+  <li><strong>Sigstore</strong> ascending as the de-facto software-supply-chain signing standard.</li>
+  <li><strong>OpenSSF Model Signing</strong> ratified with Google, NVIDIA NGC, Kaggle integration.</li>
+  <li><strong>LiteLLM</strong> processing trillions of tokens / month as the de-facto open-source AI gateway.</li>
+</ul>
+
+<h2 id="s4"><span class="sec-num">4</span>How it works</h2>
+<p>A receipt is produced and verified in five steps. The substrate is deliberately simple; complexity lives in the cryptographic guarantees, not in the code path.</p>
+<pre>   Application
+       │
+       ▼
+   AI call    ────►   Anthropic, OpenAI, Bedrock, Vertex, Cohere,
+                      any OpenAI-compatible endpoint, any gateway
+       │
+       ▼
+   ① Capture
+       Inputs and outputs are hashed (never stored in plaintext).
+       Vendor + model + actor identity + policy bundle are recorded.
+       │
+       ▼
+   ② Canonicalize
+       RFC 8785 JSON Canonicalization Scheme produces byte-identical
+       bytes across all 5 SDK implementations.
+       │
+       ▼
+   ③ Sign + chain
+       Ed25519 signature over the canonical bytes, key held in HSM
+       (AWS KMS / Azure Key Vault / GCP KMS / PKCS#11).
+       previous_receipt_hash links to the prior receipt for the same
+       tenant; tampering is detectable at the first divergence.
+       │
+       ▼
+   ④ Persist + commit
+       Receipt stored in customer-controlled storage (local file,
+       Postgres with row-level security, S3, or hosted tenant).
+       Leaf hash committed to RFC 9162 transparency log; signed tree
+       head archived to immutable storage with 10-year retention.
+       │
+       ▼
+   ⑤ Verify (any time, by anyone)
+       Public verifier in a browser confirms:
+         · canonical hash matches the signed digest
+         · Ed25519 signature verifies against the issuer's public key
+         · chain linkage is intact
+         · transparency-log inclusion proof is valid
+       Verification requires only the receipt + the public key. No
+       call to Project Ledger. No subscription. No vendor lookup.</pre>
+<div class="callout">The substrate does not block, judge, or guardrail the AI call. It <strong>records what happened, signed, in a format that survives the vendor relationship.</strong> That separation is intentional and is what makes it deployable inside regulated enterprises without operational risk.</div>
+
+<h2 id="s5"><span class="sec-num">5</span>What we built</h2>
+<table>
+  <thead><tr><th>Capability</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td>Cryptographic substrate (RFC 8785 + Ed25519 + RFC 9162 transparency log)</td><td>Production-grade</td></tr>
+    <tr><td>Five language SDKs (TypeScript, Python, Go, Rust, Java)</td><td>Byte-identical signatures verified by CL1/CL2/CL3 conformance</td></tr>
+    <tr><td>One-import vendor kit</td><td>Auto-instruments Anthropic and OpenAI clients in any process</td></tr>
+    <tr><td>OpenAI-compatible proxy</td><td>One install covers Aider, Cline, Cursor, Continue, Windsurf, Codeium, Cody, Zed, Tabnine</td></tr>
+    <tr><td>Native integrations</td><td>Cursor, Claude Code, LiteLLM, LangChain, Vercel AI SDK, Mastra, LlamaIndex, AutoGen, CrewAI, Pydantic AI, smolagents, Portkey, Cloudflare Worker, Kong</td></tr>
+    <tr><td>Browser extension</td><td>Chrome Manifest V3, corporate-OIDC identity binding, MDM-deployable</td></tr>
+    <tr><td>Admin console</td><td>Role dashboards for IT, Compliance, HR, Legal, Finance, Cost-discipline, Model-Risk-Management, Vendor-Benchmark, Insurance-underwriting, Data-lineage</td></tr>
+    <tr><td>Cost-discipline engine</td><td>Planner-then-executor cascade, savings ledger, recommendations, dedup cache, model-fit scoring, budget receipts, carbon attribution</td></tr>
+    <tr><td>Insurance-underwriting bundle</td><td>Carrier formats: Munich Re aiSure, Mosaic, Armilla, generic</td></tr>
+    <tr><td>Model Risk Management workpaper</td><td>SR 11-7, OSFI E-23, PRA SS1/23, EU AI Act Annex IV-shaped exports</td></tr>
+    <tr><td>Public Vendor Benchmark</td><td>Quarterly composite scoring across hallucination proxy, cost-per-outcome, compliance posture, supply-chain risk</td></tr>
+    <tr><td>Public verifier</td><td>Static HTML; runs entirely in browser, no server call</td></tr>
+    <tr><td>Open specification</td><td>PL-RFC-001 through PL-RFC-010 (Draft v0.1)</td></tr>
+    <tr><td>Conformance program</td><td>CL1 / CL2 / CL3 levels, runnable corpus, vendor self-test ready</td></tr>
+    <tr><td>HSM-backed signing</td><td>AWS KMS, Azure Key Vault, GCP KMS, PKCS#11; FIPS 140-3 path documented</td></tr>
+    <tr><td>Hardening verifier</td><td>66 mandatory controls, machine-verified in CI on every release</td></tr>
+  </tbody>
+</table>
+
+<h2 id="s6"><span class="sec-num">6</span>Cost discipline as buyer attractant</h2>
+<p>For Heads of Engineering and CFOs concerned about AI spend, the substrate ships a second-order benefit beyond accountability: a built-in cost-discipline engine that operates on the receipt stream.</p>
+<table>
+  <thead><tr><th>Module</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Planning cascade</strong></td><td>Cheap planner model drafts, expensive executor model commits only on approval. 60-80% cost reduction on multi-turn workflows.</td></tr>
+    <tr><td><strong>Savings ledger</strong></td><td>Append-only record of every cascade run with planner cost, executor cost, baseline cost, savings, approval status.</td></tr>
+    <tr><td><strong>Recommendations engine</strong></td><td>Surfaces patterns: "Opus invocations on this use case approved 87% of the time after Haiku preview — switching saves $1,842/month."</td></tr>
+    <tr><td><strong>Dedup cache</strong></td><td>Content-addressed cache by canonical prompt hash; cache hits audit-visible.</td></tr>
+    <tr><td><strong>Model-fit score</strong></td><td>Per-prompt 0-1 score of cheap-model fit; surfaces over-spend per use case.</td></tr>
+    <tr><td><strong>Budget receipts</strong></td><td>When a budget guard throttles or denies a call, a signed receipt records the policy decision — proof for the developer that the policy did it, not them.</td></tr>
+    <tr><td><strong>Carbon attribution</strong></td><td>Per-receipt CO₂e estimate by vendor + model + token count; feeds ESG reporting.</td></tr>
+  </tbody>
+</table>
+<p>This addresses a separate buyer (the CFO) with a measurable ROI metric (AI spend down 30-60% within one quarter) — a fast lane to a paid contract independent of compliance pressure.</p>
+
+<h2 id="s7"><span class="sec-num">7</span>Engineering maturity</h2>
+<p>Concrete artefacts inspectable in the repository today.</p>
+<table>
+  <thead><tr><th>Indicator</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td>Tests passing</td><td class="num">280+ across 30 test files</td></tr>
+    <tr><td>Hardening verifier</td><td class="num">66 / 66 mandatory controls PASS</td></tr>
+    <tr><td>Property-based fuzz tests on canonicalization</td><td class="num">2,000 random inputs, 3 invariants</td></tr>
+    <tr><td>Cross-language conformance</td><td>Byte-identical signatures across 5 SDKs</td></tr>
+    <tr><td>Lifecycle integration test</td><td>50-receipt chain with tamper detection proven at 4 positions</td></tr>
+    <tr><td>TODOs / FIXMEs / HACKs in production code</td><td class="num">0</td></tr>
+    <tr><td>Leaked credentials in committed code</td><td class="num">0</td></tr>
+    <tr><td>Supply-chain artefacts</td><td>CycloneDX SBOM, SLSA Level 3 provenance, Sigstore cosign keyless signatures</td></tr>
+    <tr><td>Operational artefacts</td><td>Runbook with 5 named alerts; 2026-Q2 adversarial review (10/10 scenarios PASS); 2026-Q2 multi-region failover drill (47-minute dry-run)</td></tr>
+  </tbody>
+</table>
+
+<h2 id="s8"><span class="sec-num">8</span>Security and privacy posture</h2>
+<p>For CISO and Head of Risk audiences:</p>
+<ul>
+  <li><strong>Multi-tenant isolation</strong> at the database layer. Postgres row-level security policies enforce tenant equality on every query. Cross-tenant query attempts are blocked, audit-logged, and trigger a P0 security event with named runbook procedure.</li>
+  <li><strong>Privacy by default.</strong> Prompts and responses are SHA-256 hashed before canonicalization. PII redaction is applied at the capture layer. Plaintext content never leaves the customer environment.</li>
+  <li><strong>HSM-backed signing.</strong> Private keys never leave the HSM. Four drivers shipped: AWS KMS, Azure Key Vault, GCP KMS, PKCS#11. FIPS 140-3 path documented for federal customers.</li>
+  <li><strong>Strict transport security.</strong> HSTS 2-year preload-eligible. CSP with per-request nonce. X-Frame-Options DENY. Cross-Origin policies pinned to same-origin.</li>
+  <li><strong>Auditable platform.</strong> Every privileged action — key rotation, role change, plan change, support impersonation, deployment — produces a signed receipt on the platform's own audit chain.</li>
+  <li><strong>No lock-in.</strong> Every receipt is verifiable independently with the public key alone. A customer leaving Project Ledger retains their evidence permanently.</li>
+</ul>
+
+<h2 id="s9"><span class="sec-num">9</span>Customers by readiness</h2>
+<table>
+  <thead><tr><th>Profile</th><th>Ready when</th><th>Annual price</th><th>Wedge</th></tr></thead>
+  <tbody>
+    <tr><td>Developers, small engineering teams</td><td>Today</td><td>Free (OSS)</td><td>Free install, real value in 60 seconds</td></tr>
+    <tr><td>AI-vendor SaaS attesting AI behaviour to customers</td><td>1-3 months</td><td class="num">$5-15k</td><td>Customer requests + reduced AI spend</td></tr>
+    <tr><td>Mid-market regulated (fintech, healthtech, insurtech)</td><td>3-6 months</td><td class="num">$25-75k</td><td>Regulator pressure + audit prep</td></tr>
+    <tr><td>Tier-1 BFSI, insurance, healthcare, government</td><td>12-18 months</td><td class="num">$50-300k+</td><td>EU AI Act + reference customer</td></tr>
+    <tr><td>Insurance carriers consuming underwriting feed</td><td>6-12 months</td><td>Channel revenue</td><td>Risk pricing + loss attribution</td></tr>
+    <tr><td>Standards bodies (LF AI, OpenSSF, CNCF)</td><td>Today</td><td>Free, partnership</td><td>Specification adoption</td></tr>
+  </tbody>
+</table>
+<p>Honest position today: zero paying customers, pre-launch. Three design-partner conversations now opening.</p>
+
+<h2 id="s10"><span class="sec-num">10</span>Market sizing</h2>
+<table>
+  <thead><tr><th>Tier</th><th>Definition</th><th>Size</th></tr></thead>
+  <tbody>
+    <tr><td><strong>TAM</strong></td><td>AI governance + accountability infrastructure spend globally</td><td><strong>$5-15B by 2030</strong> (Gartner-adjacent estimate; up from $200-500M today)</td></tr>
+    <tr><td><strong>SAM</strong></td><td>Regulated companies globally with binding AI compliance pressure today</td><td><strong>$500M-2B annually</strong> (≈ 55,000 companies × $10-40k average annual AI assurance spend)</td></tr>
+    <tr><td><strong>SOM</strong></td><td>Achievable ARR in years 3-5 with the proposed open-core motion</td><td><strong>$50-150M ARR</strong> (≈ 500-1,500 paying customers across Team / Business / Enterprise tiers)</td></tr>
+  </tbody>
+</table>
+<p>Comparable open-core trajectories: HashiCorp (~$5.1B at IPO), GitLab (~$7B at IPO), Snyk (~$7.4B last valuation), Chainguard (~$40M ARR within 24 months of launch, Sigstore-based).</p>
+
+<h2 id="s11"><span class="sec-num">11</span>Open-core commercial model</h2>
+<p><strong>Free forever:</strong> all five SDKs · full specification · conformance suite · browser extension · self-hosted console · public verifier · embeddable widget · single-tenant production use.</p>
+<table>
+  <thead><tr><th>Plan</th><th>Audience</th><th>What it adds</th><th>ACV</th></tr></thead>
+  <tbody>
+    <tr><td>Team</td><td>Engineering teams 20-100</td><td>Hosted ingest + transparency log, identity binding, email support</td><td class="num">$5-15k</td></tr>
+    <tr><td>Business</td><td>Mid-market regulated</td><td>+ SOC 2 audit reports, regulator-specific evidence packs, SLA, named CSM</td><td class="num">$25-75k</td></tr>
+    <tr><td>Enterprise</td><td>Tier-1 regulated, government</td><td>+ customer-cloud deployment, customer-managed HSM, 24×7, custom regulator templates, on-site quarterly review</td><td class="num">$50-300k+</td></tr>
+  </tbody>
+</table>
+<p><strong>Adjacent revenue streams:</strong> insurance underwriting feed (carrier contracts) · evidence-pack-on-demand · conformance certification of third-party implementations · hosted transparency-log service.</p>
+
+<h2 id="s12"><span class="sec-num">12</span>Category landscape</h2>
+<table>
+  <thead><tr><th>Category</th><th>Examples</th><th>Relationship</th></tr></thead>
+  <tbody>
+    <tr><td>AI governance dashboards</td><td>Credo AI ($41M), ValidMind ($11M), Holistic AI ($9M)</td><td>They sell questionnaire-driven dashboards. We supply the cryptographic substrate they lack. Coexisting.</td></tr>
+    <tr><td>AI gateways</td><td>Portkey (Palo Alto), LiteLLM, Cloudflare AI Gateway, Kong</td><td>Layer 3 traffic management. We sit at Layer 5 (trust) via native plug-ins.</td></tr>
+    <tr><td>AI security / red-team</td><td>Lakera, Robust Intelligence (Cisco), Protect AI (Palo Alto), HiddenLayer ($50M), WitnessAI ($58M)</td><td>Pre-invocation safety. We attest post-invocation. Complementary.</td></tr>
+    <tr><td>Model identity / signing</td><td>Sigstore, OpenSSF Model Signing, Cisco Model Provenance Kit</td><td>Where the model came from. We attest what it did. Co-authorship proposed with OpenSSF.</td></tr>
+    <tr><td>Build provenance</td><td>in-toto, SLSA</td><td>Build-time. We are runtime-time.</td></tr>
+    <tr><td>AI liability insurance</td><td>Munich Re aiSure, Mosaic, Armilla ($25M)</td><td>We supply the underwriting data feed. Channel partnership target.</td></tr>
+  </tbody>
+</table>
+<div class="callout"><strong>Strategic position:</strong> the runtime accountability substrate above model identity and below the governance dashboard — an empty category the recent consolidation moves (Cisco, Palo Alto) confirm is forming.</div>
+
+<h2 id="s13"><span class="sec-num">13</span>Roadmap · 12 months</h2>
+<table>
+  <thead><tr><th>Quarter</th><th>Milestones</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Q3 2026</strong></td><td>Public GitHub launch · npm publication of <code>@projectledger/receipts-sdk</code> v0.6.0 with Sigstore provenance · spec site at <code>spec.projectledger.io</code> · LF AI Sandbox submission · LiteLLM upstream callback PR · Chrome Web Store extension · public transparency log live · first 3 design partners</td></tr>
+    <tr><td><strong>Q4 2026</strong></td><td>Hosted SaaS GA (Team and Business tiers) · SOC 2 Type I · third-party penetration test · first 5 paying customers · Public Vendor Benchmark v1</td></tr>
+    <tr><td><strong>Q1 2027</strong></td><td>SOC 2 Type II observation window complete · first Tier-1 regulated reference customer · customer-managed HSM support · multi-region tenant deployment · first insurance-carrier underwriting feed live</td></tr>
+    <tr><td><strong>Q2 2027</strong></td><td>SR 11-7, OSFI E-23, PRA SS1/23, RBI FREE-AI regulator-template packs GA · Verifier Model R&D begins (cross-tenant trained quality model)</td></tr>
+  </tbody>
+</table>
+
+<h2 id="s14"><span class="sec-num">14</span>Risks we are watching</h2>
+<table>
+  <thead><tr><th>Risk</th><th>Mitigation</th></tr></thead>
+  <tbody>
+    <tr><td>Cisco (post-Galileo / MPK) or Palo Alto (post-Portkey) extending into runtime accountability before our standard takes hold</td><td>Spec publication this quarter + LF AI Sandbox submission + OpenSSF co-authorship outreach; standards-body alignment is the structural defense</td></tr>
+    <tr><td>Regulated enterprises accepting "dashboards + audit-firm sign-off" as sufficient before our cryptographic differentiation matters</td><td>Lead with AI-vendor SaaS layer first (faster pressure cycle) and build proof through Q4 design partners; reach BFSI when reference exists</td></tr>
+    <tr><td>Sigstore or OpenSSF expanding into runtime accountability before us</td><td>Position PL-RFC-001 as a VC profile compatible with OpenSSF; co-author rather than compete</td></tr>
+    <tr><td>Solo founder execution cannot scale to enterprise sales motion</td><td>Design-partner-only engagement until first paying customer; co-founder or first sales hire on second customer</td></tr>
+    <tr><td>Two-sided cold start for adjacent document-credentials use cases</td><td>Out of scope for 2026; architectural option preserved in code for 2027 expansion off the AI receipts customer base</td></tr>
+  </tbody>
+</table>
+
+<h2 id="s15"><span class="sec-num">15</span>Current activity · this month</h2>
+<ul>
+  <li>Public repository launch in flight (<code>github.com/projectledger/receipts-sdk</code>, Apache-2.0).</li>
+  <li>npm publication of <code>@projectledger/receipts-sdk@0.6.0</code> with Sigstore keyless provenance.</li>
+  <li>Specification site going live at <code>spec.projectledger.io</code> (GitHub Pages, PL-RFC-001 through PL-RFC-010).</li>
+  <li>LF AI Sandbox application in submission.</li>
+  <li>LiteLLM upstream callback PR drafted and review-ready.</li>
+  <li>Three design-partner conversations active across BFSI (UAE / India), AI-vendor SaaS, and insurance-tech.</li>
+  <li>OpenSSF Model Signing co-authorship outreach initiated.</li>
+  <li>Public verifier and embeddable widget going live alongside the spec site.</li>
+</ul>
+
+<h2 id="s16"><span class="sec-num">16</span>Engagement options</h2>
+<table>
+  <thead><tr><th>Mode</th><th>Investment</th><th>Use when</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Self-hosted evaluation</strong></td><td>Zero cost, today</td><td>Architecture and code review</td></tr>
+    <tr><td><strong>Guided design partner</strong></td><td>Free 12-week pilot</td><td>Real AI traffic, reference rights subject to your approval, path to paid renewal</td></tr>
+    <tr><td><strong>Architectural advisory</strong></td><td>Two-hour technical review with written summary</td><td>No further commitment intended</td></tr>
+    <tr><td><strong>Investor / advisor conversation</strong></td><td>Confidential briefing on roadmap, ARR plan, capital needs</td><td>Pattern matching to comparable open-core trajectories</td></tr>
+  </tbody>
+</table>
+<p>To engage on any mode, reply to this brief.</p>
+
+<h2 id="s17"><span class="sec-num">17</span>What we are <em>not</em></h2>
+<ul>
+  <li><strong>Not</strong> an AI vendor. We attest to other vendors' behaviour.</li>
+  <li><strong>Not</strong> an AI governance dashboard. We supply the substrate they lack.</li>
+  <li><strong>Not</strong> an AI safety guardrail. We attest after the fact, not block before.</li>
+  <li><strong>Not</strong> competing with W3C Verifiable Credentials, DigiLocker, or Microsoft Entra Verified ID. Different market (documents). Not pursued today.</li>
+  <li><strong>Not</strong> at first-customer stage. We are at design-partner stage. We will not pretend otherwise.</li>
+</ul>
+
+<h2 id="s18"><span class="sec-num">18</span>Closing</h2>
+<p>The runtime-trust category is forming in real time. The substrate is production-grade today. Publication, deployment, and external validation steps (SOC 2 Type II, third-party penetration test, first paying reference) are scoped, dated, and in motion.</p>
+<p>We are looking for honest expert review, design-partner pilots, standards-body co-authorship, and introductions to anchor customers in BFSI, insurance, healthcare, or government. We are not asking for a sale today. Where the conversation leads to one in 6-12 months, we will move toward it carefully and transparently.</p>
+
+<footer class="brief-footer">
+  <div class="contact-row"><span class="contact-label">Repository</span><span><a href="https://github.com/projectledger/receipts-sdk">github.com/projectledger/receipts-sdk</a> (Apache-2.0)</span></div>
+  <div class="contact-row"><span class="contact-label">Specification</span><span><a href="https://spec.projectledger.io/">spec.projectledger.io</a> (PL-RFC-001 through PL-RFC-010)</span></div>
+  <div class="contact-row"><span class="contact-label">General enquiries</span><a href="mailto:hello@projectledger.io">hello@projectledger.io</a></div>
+  <div class="contact-row"><span class="contact-label">Security disclosures</span><a href="mailto:security@projectledger.io">security@projectledger.io</a></div>
+  <div style="margin-top:18px;color:var(--ink-400);font-size:12px">Project Ledger · Document v1.2 · June 2026 · Licensed CC-BY-4.0</div>
+</footer>
+
+</div>
+</body>
+</html>

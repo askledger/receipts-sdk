@@ -1,0 +1,35 @@
+{
+  "name": "@projectledger/conformance",
+  "version": "0.1.0",
+  "description": "Conformance test corpus + runner for Project Ledger AI Decision Receipts (PL-RFC-001..010)",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "pl-conformance": "./dist/cli.js"
+  },
+  "files": [
+    "dist/",
+    "vectors/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run"
+  },
+  "keywords": [
+    "ai-receipts",
+    "project-ledger",
+    "conformance",
+    "rfc-8785",
+    "ed25519",
+    "transparency-log"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/projectledger/receipts-sdk",
+    "directory": "conformance"
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "uid": "pl-platform-overview",
+  "title": "Project Ledger · Platform Overview",
+  "tags": ["projectledger", "production"],
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-6h", "to": "now" },
+  "templating": {
+    "list": [
+      { "name": "tenant", "type": "query", "query": "label_values(pl_signer_sign_duration_ms_bucket, tenant_id)", "current": { "value": "all" }, "includeAll": true, "multi": true },
+      { "name": "region", "type": "query", "query": "label_values(pl_signer_sign_duration_ms_bucket, region)", "current": { "value": "all" }, "includeAll": true, "multi": true }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Receipts signed · last 24h",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 0 },
+      "targets": [
+        { "expr": "sum(increase(pl_signer_sign_total{tenant_id=~\"$tenant\", region=~\"$region\"}[24h]))" }
+      ],
+      "options": { "colorMode": "value", "graphMode": "area", "textMode": "value" }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Verification failures · last 24h",
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 0 },
+      "targets": [
+        { "expr": "sum(increase(pl_verify_failures_total{tenant_id=~\"$tenant\"}[24h]))" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": { "mode": "absolute", "steps": [{ "value": 0, "color": "green" }, { "value": 1, "color": "red" }] }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Cross-tenant attempts · 24h (must be 0)",
+      "gridPos": { "h": 6, "w": 6, "x": 12, "y": 0 },
+      "targets": [
+        { "expr": "sum(increase(pl_tenant_cross_tenant_attempts_total[24h]))" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": { "mode": "absolute", "steps": [{ "value": 0, "color": "green" }, { "value": 1, "color": "red" }] }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Chain integrity (verify rate)",
+      "gridPos": { "h": 6, "w": 6, "x": 18, "y": 0 },
+      "targets": [
+        { "expr": "1 - sum(rate(pl_chain_verify_failures_total[1h])) / sum(rate(pl_chain_verify_attempts_total[1h]))" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1 } }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Signer p50/p95/p99 latency",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "targets": [
+        { "expr": "histogram_quantile(0.50, sum by (le) (rate(pl_signer_sign_duration_ms_bucket[5m])))", "legendFormat": "p50" },
+        { "expr": "histogram_quantile(0.95, sum by (le) (rate(pl_signer_sign_duration_ms_bucket[5m])))", "legendFormat": "p95" },
+        { "expr": "histogram_quantile(0.99, sum by (le) (rate(pl_signer_sign_duration_ms_bucket[5m])))", "legendFormat": "p99" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "ms" } }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Chain writes · success vs error rate",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "targets": [
+        { "expr": "sum(rate(pl_chain_write_attempts_total[5m]))", "legendFormat": "attempts" },
+        { "expr": "sum(rate(pl_chain_write_errors_total[5m]))", "legendFormat": "errors" }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "STH publish latency (transparency log)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
+      "targets": [
+        { "expr": "time() - pl_tlog_last_sth_timestamp_seconds", "legendFormat": "seconds since last STH" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    },
+    {
+      "id": 8,
+      "type": "table",
+      "title": "Top tenants by receipts/h",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
+      "targets": [
+        { "expr": "topk(10, sum by (tenant_id) (rate(pl_signer_sign_total[1h])))", "format": "table" }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Console request rate by route",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 22 },
+      "targets": [
+        { "expr": "sum by (route) (rate(pl_console_http_requests_total[5m]))", "legendFormat": "{{route}}" }
+      ]
+    }
+  ]
+}

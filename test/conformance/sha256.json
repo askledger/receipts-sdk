@@ -1,0 +1,26 @@
+{
+  "$schema": "https://projectledger.io/conformance/sha256.v1.json",
+  "description": "SHA-256 vectors. The `input` field is a UTF-8 string; SDKs encode and hash.",
+  "vectors": [
+    {
+      "name": "empty string",
+      "input": "",
+      "expected_hex": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "ascii hello",
+      "input": "hello",
+      "expected_hex": "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
+    },
+    {
+      "name": "canonical empty object",
+      "input": "{}",
+      "expected_hex": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "name": "canonical single key",
+      "input": "{\"a\":1}",
+      "expected_hex": "015abd7f5cc57a2dd94b7590f04ad8084273905ee33ec5cebeae62276a97f862"
+    }
+  ]
+}

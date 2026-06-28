@@ -1,21 +1,14 @@
-/**
- * Receipt builder — converts a raw event into a signed, chained receipt.
- *
- * Process:
- *   1. Load the tenant's chain state (previous_receipt_hash, chain_height).
- *   2. Construct the receipt body referencing the previous hash.
- *   3. Canonicalize the receipt body (RFC 8785).
- *   4. Compute SHA-256 — this is the receipt_hash, written into integrity.
- *   5. Re-canonicalize the full receipt body with the populated integrity.
- *   6. Sign that canonical form with Ed25519.
- *   7. Persist updated chain state.
- *   8. Return the SignedReceipt envelope.
- */
+// Receipt builder. Pipeline: load chain head -> build body with placeholder
+// receipt_hash -> canonicalize -> hash -> populate -> canonicalize -> sign
+// -> persist new head. The two-pass canonicalization is required because
+// receipt_hash is part of the body we sign over.
 
 import { v7 as uuidv7 } from "uuid";
 import { canonicalize, canonicalizeBytes } from "./canonicalize.js";
 import { sha256, sign } from "./crypto.js";
 import { loadChainState, saveChainState, advanceChain } from "./chain.js";
+import { validateEvent, validateKeyPair } from "./validate.js";
+import { recordSign, recordChainWrite, startSpan } from "./observability/otel.js";
 import type {
   RawEvent,
   Receipt,
@@ -34,63 +27,55 @@ interface SignReceiptOptions {
   issuedAt?: string;
 }
 
-/**
- * Build, hash-chain, and sign a receipt for a single event.
- */
 export function signReceipt(opts: SignReceiptOptions): SignedReceipt {
   const { event, keypair, decision, provenance, issuedAt } = opts;
+  const span = startSpan("pl.sign", { tenant_id: event.tenant_id, kid: keypair.kid });
+  const t0 = performance.now();
+  let ok = false;
+  try {
+    validateEvent(event);
+    validateKeyPair(keypair);
 
-  // 1. Load chain state
-  const prevState = loadChainState(event.tenant_id);
+    const prev = loadChainState(event.tenant_id);
+    const receiptId = uuidv7();
 
-  // 2. Construct receipt body with placeholder receipt_hash
-  const receiptId = uuidv7();
-  const receiptBody: Receipt = {
-    schema_version: "1.0",
-    receipt_id: receiptId,
-    tenant_id: event.tenant_id,
-    issued_at: issuedAt ?? new Date().toISOString(),
-    event,
-    ...(decision !== undefined && { decision }),
-    ...(provenance !== undefined && { provenance }),
-    integrity: {
-      previous_receipt_hash: prevState.previous_receipt_hash,
-      receipt_hash: "PENDING",
-      chain_height: prevState.chain_height + 1,
-    },
-  };
-
-  // 3. Canonicalize the receipt body with PENDING receipt_hash and compute true hash
-  // We compute the hash over the body with receipt_hash set to a placeholder
-  // (empty string), so any verifier reproduces the same hash deterministically.
-  const bodyForHashing = JSON.parse(JSON.stringify(receiptBody)) as Receipt;
-  bodyForHashing.integrity.receipt_hash = "";
-  const canonicalForHash = canonicalizeBytes(bodyForHashing);
-  const receiptHash = sha256(canonicalForHash);
-
-  // 4. Populate the real receipt_hash
-  receiptBody.integrity.receipt_hash = receiptHash;
-
-  // 5. Canonicalize the FULL body (with populated receipt_hash) and sign
-  const canonicalForSigning = canonicalizeBytes(receiptBody);
-  const signatureBase64 = sign(canonicalForSigning, keypair);
-
-  // 6. Persist updated chain state
-  const newState = advanceChain(prevState, receiptHash, receiptId);
-  saveChainState(newState);
-
-  // 7. Return the signed envelope
-  return {
-    receipt: receiptBody,
-    signatures: [
-      {
-        alg: "EdDSA",
-        kid: keypair.kid,
-        sig: signatureBase64,
+    const body: Receipt = {
+      schema_version: "1.0",
+      receipt_id: receiptId,
+      tenant_id: event.tenant_id,
+      issued_at: issuedAt ?? new Date().toISOString(),
+      event,
+      ...(decision !== undefined && { decision }),
+      ...(provenance !== undefined && { provenance }),
+      integrity: {
+        previous_receipt_hash: prev.previous_receipt_hash,
+        receipt_hash: "",
+        chain_height: prev.chain_height + 1,
       },
-    ],
-    // Placeholder for RFC 3161 TSA tokens — production wires in real TSAs.
-  };
+    };
+
+    const receiptHash = sha256(canonicalizeBytes(body));
+    body.integrity.receipt_hash = receiptHash;
+
+    const sig = sign(canonicalizeBytes(body), keypair);
+
+    try {
+      saveChainState(advanceChain(prev, receiptHash, receiptId));
+      recordChainWrite({ tenantId: event.tenant_id, ok: true });
+    } catch (err) {
+      recordChainWrite({ tenantId: event.tenant_id, ok: false });
+      throw err;
+    }
+
+    ok = true;
+    return {
+      receipt: body,
+      signatures: [{ alg: "EdDSA", kid: keypair.kid, sig }],
+    };
+  } finally {
+    recordSign({ durationMs: performance.now() - t0, tenantId: event.tenant_id, kid: keypair.kid, ok });
+    span.end();
+  }
 }
 
 /**
