@@ -3,7 +3,7 @@
 Wire-format-compatible Go implementation of the Project Ledger Receipts protocol. Receipts signed in Go verify in TypeScript and Python, and vice versa.
 
 ```bash
-go get github.com/askledger/receipts-sdk-go
+go get github.com/askledger/receipts-sdk/go-sdk
 ```
 
 ```go
@@ -11,7 +11,7 @@ package main
 
 import (
     "fmt"
-    receipts "github.com/askledger/receipts-sdk-go"
+    receipts "github.com/askledger/receipts-sdk/go-sdk"
 )
 
 func main() {
