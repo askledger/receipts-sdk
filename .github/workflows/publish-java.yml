@@ -1,0 +1,49 @@
+name: Publish Java SDK to Maven Central
+
+# TEMPLATE — needs extra setup before it will work. See PUBLISHING.md.
+# Prerequisites:
+#   1. Fix java-sdk/pom.xml groupId: currently "io.projectledger" (stale, pre-rename).
+#      Change to a namespace you can VERIFY on Sonatype Central, e.g. "io.github.askledger"
+#      (auto-verified via GitHub) or a domain you own (e.g. "org.askledger").
+#   2. Add the maven-gpg-plugin + central-publishing-maven-plugin (or nexus-staging) to pom.xml.
+#   3. Repo secrets: CENTRAL_TOKEN_USER, CENTRAL_TOKEN_PASS (Sonatype Central portal token),
+#      MAVEN_GPG_PRIVATE_KEY (ASCII-armored), MAVEN_GPG_PASSPHRASE.
+# Triggers on a tag like `java-v0.1.0`.
+
+on:
+  push:
+    tags:
+      - "java-v*"
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: Build + publish receipts-sdk to Maven Central
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: java-sdk
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17 + Maven settings
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+          server-id: central
+          server-username: CENTRAL_TOKEN_USER
+          server-password: CENTRAL_TOKEN_PASS
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+      - name: Build + verify
+        run: mvn -B --no-transfer-progress verify
+
+      - name: Deploy to Maven Central
+        env:
+          CENTRAL_TOKEN_USER: ${{ secrets.CENTRAL_TOKEN_USER }}
+          CENTRAL_TOKEN_PASS: ${{ secrets.CENTRAL_TOKEN_PASS }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+        run: mvn -B --no-transfer-progress -Dgpg.passphrase="$MAVEN_GPG_PASSPHRASE" deploy
