@@ -1,6 +1,6 @@
 # Chrome Web Store · Publishing kit
 
-End-to-end checklist to get the Project Ledger browser extension from
+End-to-end checklist to get the AskLedger browser extension from
 unsigned source to officially-published, enterprise-deployable extension.
 
 ## 1 · Developer account
@@ -17,7 +17,7 @@ unsigned source to officially-published, enterprise-deployable extension.
 
 ## 3 · Listing assets
 
-- [ ] App name: **Project Ledger — AI Receipts**
+- [ ] App name: **AskLedger — AI Receipts**
 - [ ] Short description (132 chars): *Cryptographic receipts for every AI interaction. Built for IT, Compliance, HR, Legal, Finance.*
 - [ ] Detailed description (Markdown rendered): paste from `browser-extension/store-listing.md` (to be generated).
 - [ ] Icon: 128×128 PNG. Match the brand mark used on the site.

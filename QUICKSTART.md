@@ -1,4 +1,4 @@
-# Quickstart · See Project Ledger in 60 seconds
+# Quickstart · See AskLedger in 60 seconds
 
 Three paths. Pick whichever lands fastest for your audience.
 

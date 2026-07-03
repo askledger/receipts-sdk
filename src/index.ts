@@ -1,5 +1,5 @@
 /**
- * Project Ledger — Receipts SDK
+ * AskLedger — Receipts SDK
  *
  * Cryptographic AI Decision Receipts for enterprise AI.
  *

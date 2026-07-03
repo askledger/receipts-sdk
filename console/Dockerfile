@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.7
-# Multi-stage Dockerfile for the Project Ledger admin console.
+# Multi-stage Dockerfile for the AskLedger admin console.
 
 FROM node:20-alpine AS deps
 WORKDIR /app

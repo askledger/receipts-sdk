@@ -1,6 +1,6 @@
 // AI SBOM generator. Walks an AI deployment's MCP servers, skills,
 // agent manifests, and model attachments, and produces a CycloneDX 1.5
-// document where every component carries a Project Ledger receipt id
+// document where every component carries a AskLedger receipt id
 // attesting its discovery time + provenance.
 //
 // Cisco Model Provenance Kit + Palo Alto Protect AI are positioning

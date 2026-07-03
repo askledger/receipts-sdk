@@ -6,13 +6,13 @@
 ## 1 · Purpose
 
 Define the byte-exact serialization used as the input to every SHA-256
-hash and Ed25519 signature in the Project Ledger protocol. Without a
+hash and Ed25519 signature in the AskLedger protocol. Without a
 canonical form, two implementations of `signReceipt` cannot agree on a
 receipt's hash and cross-language conformance is impossible.
 
 ## 2 · Algorithm
 
-Project Ledger adopts **RFC 8785 (JSON Canonicalization Scheme, JCS)**
+AskLedger adopts **RFC 8785 (JSON Canonicalization Scheme, JCS)**
 without modification. Implementations **MUST** produce the same byte
 sequence as the JCS reference implementations for any well-formed JSON
 input.
@@ -44,7 +44,7 @@ sequence output **MUST** be identical, regardless of:
 
 ## 5 · Hash and signature input
 
-Throughout the Project Ledger protocol:
+Throughout the AskLedger protocol:
 
 - SHA-256 hash inputs **MUST** be the canonical bytes of the JSON value, not the JSON value's reparsed form.
 - Ed25519 signature inputs **MUST** be the canonical bytes of the Receipt body, including a populated `integrity.receipt_hash`.

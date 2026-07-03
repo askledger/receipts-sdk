@@ -70,7 +70,7 @@ function writeJSON(filepath: string, value: unknown): void {
 const program = new Command();
 program
   .name("ledger-cli")
-  .description("Project Ledger Receipts SDK · cryptographic AI decision receipts")
+  .description("AskLedger Receipts SDK · cryptographic AI decision receipts")
   .version("0.1.0");
 
 // ---------- keygen ----------
@@ -184,7 +184,7 @@ program
 
     console.log("");
     console.log(rule());
-    console.log(`  ${paint(c.gold + c.bold, "Project Ledger")} ${paint(c.gray, "·")} ${paint(c.bold, "Receipts SDK Live Demo")}`);
+    console.log(`  ${paint(c.gold + c.bold, "AskLedger")} ${paint(c.gray, "·")} ${paint(c.bold, "Receipts SDK Live Demo")}`);
     console.log(`  ${paint(c.gray, "Cryptographic AI Decision Receipts · v0.3 · Apache-2.0")}`);
     console.log(rule());
     await sleep(pause);

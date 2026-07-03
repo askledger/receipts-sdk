@@ -24,7 +24,7 @@ export function Sidebar() {
       aria-label="Primary navigation"
     >
       <div className="px-6 py-6 border-b" style={{ borderColor: "rgba(255,255,255,.08)" }}>
-        <div className="text-xl font-bold tracking-tight">Project Ledger</div>
+        <div className="text-xl font-bold tracking-tight">AskLedger</div>
         <div className="text-xs mt-1 opacity-80">Admin Console · v0.3</div>
       </div>
       <nav className="px-3 py-4">

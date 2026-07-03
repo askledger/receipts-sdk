@@ -1,4 +1,4 @@
-# Project Ledger · Production Security Hardening Checklist
+# AskLedger · Production Security Hardening Checklist
 
 > Every item is auditable. Every item maps to a control in our SOC 2 / ISO
 > 27001 framework. An item without `[x]` cannot ship to production.

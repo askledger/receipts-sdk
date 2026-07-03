@@ -124,15 +124,15 @@ echo "  If you've decided to rebrand (e.g. AskLedger / askledger.org),"
 echo "  this step does the find-and-replace across the repo."
 
 if confirm "Rebrand to a new name now?"; then
-  read -r -p "  New brand name (e.g. AskLedger; ENTER to keep Project Ledger): " NEW_BRAND
+  read -r -p "  New brand name (e.g. AskLedger; ENTER to keep AskLedger): " NEW_BRAND
   read -r -p "  New npm scope (e.g. askledger; ENTER to keep askledger): " NEW_SCOPE
   read -r -p "  New GitHub org (e.g. askledger; ENTER to keep askledger): " NEW_ORG
   read -r -p "  New domain root (e.g. askledger.org; ENTER to keep github.com/askledger/receipts-sdk): " NEW_DOMAIN
 
   if [ -n "$NEW_BRAND" ]; then
-    grep -rlE --include="*.md" --include="*.html" "Project Ledger" . 2>/dev/null \
+    grep -rlE --include="*.md" --include="*.html" "AskLedger" . 2>/dev/null \
       | grep -v node_modules | grep -v .next | grep -v dist \
-      | xargs -I{} sed -i '' "s/Project Ledger/$NEW_BRAND/g" {} 2>/dev/null || true
+      | xargs -I{} sed -i '' "s/AskLedger/$NEW_BRAND/g" {} 2>/dev/null || true
     ok "brand name updated"
   fi
 

@@ -1,5 +1,5 @@
 <!--
-Thanks for contributing to Project Ledger Receipts SDK.
+Thanks for contributing to AskLedger Receipts SDK.
 
 Before opening this PR, please make sure:
 - npm run lint && npm test pass locally

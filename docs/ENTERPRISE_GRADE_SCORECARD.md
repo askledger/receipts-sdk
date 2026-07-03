@@ -1,4 +1,4 @@
-# Project Ledger · Enterprise-grade scorecard
+# AskLedger · Enterprise-grade scorecard
 
 **Date:** 2026-06-13
 **Verifier output:** `npm test` → 213/213 pass · `npm run verify:hardening` → 66/66 pass

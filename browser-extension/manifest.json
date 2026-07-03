@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "Project Ledger · AI Activity Receipts",
+  "name": "AskLedger · AI Activity Receipts",
   "version": "0.1.0",
   "description": "Captures every AI prompt you send to ChatGPT, Claude, Gemini, Bedrock and signs a cryptographic receipt locally. Stays on your machine. Optional ship-to-corp-IT for shadow-AI visibility.",
-  "author": "Project Ledger",
+  "author": "AskLedger",
   "homepage_url": "https://github.com/askledger/receipts-sdk",
   "permissions": ["storage", "webRequest", "activeTab", "scripting"],
   "host_permissions": [
@@ -37,7 +37,7 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Project Ledger · AI Activity Receipts"
+    "default_title": "AskLedger · AI Activity Receipts"
   },
   "icons": {
     "16": "icons/icon-16.png",

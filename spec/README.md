@@ -1,4 +1,4 @@
-# Project Ledger Specifications
+# AskLedger Specifications
 
 This directory contains the normative specifications for the Project
 Ledger AI Decision Receipts protocol. Each document is versioned,
@@ -45,7 +45,7 @@ An implementation that passes all three earns the right to display the
 These specifications are licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 Implementations are licensed under Apache-2.0 (see `LICENSE`).
 
-The specification is governed by the Project Ledger Technical Steering
+The specification is governed by the AskLedger Technical Steering
 Committee (see `MAINTAINERS.md`) with the explicit intent to transfer
 stewardship to the Linux Foundation AI & Data project upon acceptance.
 
@@ -53,13 +53,13 @@ stewardship to the Linux Foundation AI & Data project upon acceptance.
 
 Cite a specific draft as:
 
-> Project Ledger Working Group. *Project Ledger Receipt Schema*. PL-RFC-001, Draft v0.1. 2026. https://github.com/askledger/receipts-sdk/tree/main/spec/PL-RFC-001
+> AskLedger Working Group. *AskLedger Receipt Schema*. PL-RFC-001, Draft v0.1. 2026. https://github.com/askledger/receipts-sdk/tree/main/spec/PL-RFC-001
 
 A bibliographic export (BibTeX, RIS) is provided in the rendered site.
 
 ## Interoperability with existing standards
 
-| Standard | Project Ledger relationship |
+| Standard | AskLedger relationship |
 |---|---|
 | RFC 8785 (JSON Canonicalization Scheme) | Adopted as the canonical-bytes algorithm (PL-RFC-002) |
 | RFC 3161 (TSA) | Optional countersignature (PL-RFC-005) |
@@ -69,9 +69,9 @@ A bibliographic export (BibTeX, RIS) is provided in the rendered site.
 | RFC 7644 (SCIM 2.0) | Identity binding source for the actor block (PL-RFC-006) |
 | RFC 9457 (Problem Details) | Error envelope for verification failure responses |
 | W3C Trace Context | Trace propagation in receipt context block |
-| Sigstore / OpenSSF Model Signing | Project Ledger sits ABOVE OMS at the runtime layer |
-| in-toto / SLSA | Project Ledger sits ABOVE SLSA at the AI-runtime layer |
+| Sigstore / OpenSSF Model Signing | AskLedger sits ABOVE OMS at the runtime layer |
+| in-toto / SLSA | AskLedger sits ABOVE SLSA at the AI-runtime layer |
 
-Project Ledger explicitly does NOT duplicate these standards — it
+AskLedger explicitly does NOT duplicate these standards — it
 composes them for the runtime-AI-accountability layer that none of them
 target.

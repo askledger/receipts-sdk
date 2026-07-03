@@ -61,7 +61,7 @@ A real audit's first question — "how many stubs are still in the code?" — an
 ### Hosted product — **F** (literally never deployed)
 - No `staging.github.com/askledger/receipts-sdk`. No real cluster. No real Trillian. No real Prometheus scraping.
 - Helm chart exists, Dockerfile exists, docker-compose.prod.yml exists — none of them have been run against a real cluster.
-- **Customer benefit at this moment: zero.** A customer cannot buy hosted Project Ledger because hosted Project Ledger does not exist.
+- **Customer benefit at this moment: zero.** A customer cannot buy hosted AskLedger because hosted AskLedger does not exist.
 
 ### Vendor integrations — **B+** (3 shipped, 17+ named pending)
 - LiteLLM callback: upstream-PR-ready, but not yet PR-ed.
@@ -119,7 +119,7 @@ That is unambiguously useful, real, and free. **For an individual developer or a
 ### Mid-market companies benefit in 4 weeks
 
 A mid-market company gets value when:
-- They run `docker compose up` and have a single-tenant Project Ledger running on their cluster against their own LLM gateway.
+- They run `docker compose up` and have a single-tenant AskLedger running on their cluster against their own LLM gateway.
 - They see real receipts in their compliance / HR / legal / finance dashboards.
 - They generate a signed evidence pack for an internal audit.
 
@@ -156,7 +156,7 @@ Today, a regulator can:
 
 If a sharp buyer wrote a one-paragraph diligence note today, it would say:
 
-> Project Ledger has an unusually mature cryptographic substrate, an unusually disciplined set of operational and governance artifacts, a clean specification stack, and a real conformance program. What it does not yet have is a hosted product, an external pen-test, a SOC 2 report, or a paying customer reference. The roadmap to all four exists, is named, and is costed. The risk is execution, not architecture.
+> AskLedger has an unusually mature cryptographic substrate, an unusually disciplined set of operational and governance artifacts, a clean specification stack, and a real conformance program. What it does not yet have is a hosted product, an external pen-test, a SOC 2 report, or a paying customer reference. The roadmap to all four exists, is named, and is costed. The risk is execution, not architecture.
 
 That assessment is fair. It is also better than 90% of open-source AI-governance projects could honestly claim today.
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Project Ledger · 60-second installer.
+# AskLedger · 60-second installer.
 #
 # Usage (post-launch, once npm package is published):
 #   curl -sSL https://github.com/askledger/receipts-sdk | bash
@@ -65,7 +65,7 @@ run_quickstart() {
 }
 
 say ""
-say "Project Ledger · installing in $PL_INSTALL_DIR"
+say "AskLedger · installing in $PL_INSTALL_DIR"
 say "────────────────────────────────────────────"
 require_node
 install_cli

@@ -98,7 +98,7 @@ export function renderHTML(b: BenchmarkReport): string {
     .join("");
 
   return `<!doctype html><html lang="en"><head><meta charset="utf-8">
-<title>Project Ledger · Quarterly AI Vendor Benchmark</title>
+<title>AskLedger · Quarterly AI Vendor Benchmark</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
   body{font:14px/1.5 ui-sans-serif,system-ui,sans-serif;margin:60px auto;max-width:960px;padding:0 16px;color:#0b1c2c}
@@ -110,7 +110,7 @@ export function renderHTML(b: BenchmarkReport): string {
   footer{margin-top:40px;color:#64748b;font-size:12px}
   code{background:#f1f5f9;padding:1px 6px;border-radius:4px}
 </style></head><body>
-<h1>Project Ledger · Quarterly AI Vendor Benchmark</h1>
+<h1>AskLedger · Quarterly AI Vendor Benchmark</h1>
 <p class="lede">Composite scoring derived from ${b.sample_size.toLocaleString()} anonymised receipts. Methodology: <a href="${b.methodology_url}">methodology.md</a>.</p>
 <table><thead><tr>
   <th>Vendor</th><th>Model</th><th class="r">Invocations</th>

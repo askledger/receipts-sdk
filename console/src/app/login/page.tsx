@@ -2,7 +2,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen grid place-items-center" style={{ background: "var(--pl-surface-0)" }}>
       <div className="w-full max-w-md p-8 rounded-lg border" style={{ background: "var(--pl-surface-1)", borderColor: "var(--pl-border)" }}>
-        <h1 className="text-2xl font-bold mb-2">Sign in to Project Ledger</h1>
+        <h1 className="text-2xl font-bold mb-2">Sign in to AskLedger</h1>
         <p className="text-sm mb-6" style={{ color: "var(--pl-text-secondary)" }}>
           Enterprise SSO via OIDC. WebAuthn MFA required.
         </p>

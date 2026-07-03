@@ -1,4 +1,4 @@
-//! Project Ledger Receipts — wire-format compatible Rust SDK.
+//! AskLedger Receipts — wire-format compatible Rust SDK.
 //!
 //! The receipts produced here are byte-identical to those produced by
 //! the TypeScript reference SDK, the Python SDK, and the Go SDK. The

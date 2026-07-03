@@ -1,6 +1,6 @@
-# Project Ledger Receipts — Python SDK
+# AskLedger Receipts — Python SDK
 
-Wire-format-compatible Python SDK for [Project Ledger Receipts](../README.md). Receipts signed by this SDK verify with the TypeScript reference SDK and vice versa. Cross-language conformance is enforced via shared test vectors in [`../test/conformance/`](../test/conformance/).
+Wire-format-compatible Python SDK for [AskLedger Receipts](../README.md). Receipts signed by this SDK verify with the TypeScript reference SDK and vice versa. Cross-language conformance is enforced via shared test vectors in [`../test/conformance/`](../test/conformance/).
 
 ## Install
 

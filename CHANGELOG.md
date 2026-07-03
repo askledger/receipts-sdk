@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the Project Ledger Receipts SDK will be documented in this file.
+All notable changes to the AskLedger Receipts SDK will be documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (with the caveat that until v1.0, breaking changes may occur between minor versions).
 
@@ -9,7 +9,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Become-the-default release
 
 This release lowers the install friction to zero so any developer or
-company can adopt Project Ledger receipts without thinking.
+company can adopt AskLedger receipts without thinking.
 
 #### Added
 - **`@askledger/receipts-sdk/vendor-kit`** — one-call auto-
@@ -77,7 +77,7 @@ company can adopt Project Ledger receipts without thinking.
 ## [0.1.0] — 2026-05-13
 
 ### Added
-- Initial reference TypeScript implementation of the Project Ledger Receipts protocol
+- Initial reference TypeScript implementation of the AskLedger Receipts protocol
 - RFC 8785 canonical JSON via `canonicalize` library
 - JWS Ed25519 signing via `@noble/ed25519`
 - SHA-256 hashing via `@noble/hashes`

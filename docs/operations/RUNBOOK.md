@@ -1,7 +1,7 @@
-# Project Ledger · Operations Runbook
+# AskLedger · Operations Runbook
 
 > Authoritative on-call reference for SRE / Platform engineers running the
-> Project Ledger hosted SaaS. Every alert listed here MUST have a runbook
+> AskLedger hosted SaaS. Every alert listed here MUST have a runbook
 > entry. If you get paged for something not in here, file a PR.
 
 **Audience:** SRE, on-call platform engineer.

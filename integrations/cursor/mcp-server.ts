@@ -1,4 +1,4 @@
-// Cursor MCP server that emits a Project Ledger receipt for every model
+// Cursor MCP server that emits a AskLedger receipt for every model
 // invocation Cursor makes. Drop into `~/.cursor/mcp.json` as a stdio
 // server.
 //
@@ -94,7 +94,7 @@ rl.on("line", async (line) => {
     return reply(id, {
       tools: [{
         name: "pl_record_completion",
-        description: "Emit a Project Ledger receipt for a Cursor completion",
+        description: "Emit a AskLedger receipt for a Cursor completion",
         inputSchema: {
           type: "object",
           required: ["prompt", "completion", "model"],

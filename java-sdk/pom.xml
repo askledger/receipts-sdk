@@ -9,7 +9,7 @@
   <version>0.1.0</version>
   <packaging>jar</packaging>
 
-  <name>Project Ledger Receipts SDK</name>
+  <name>AskLedger Receipts SDK</name>
   <description>Wire-format compatible Java SDK for the AI Decision Receipt protocol.</description>
   <url>https://github.com/projectledger/receipts-sdk-ts</url>
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Project Ledger · Executive Briefing</title>
+<title>AskLedger · Executive Briefing</title>
 <meta name="description" content="The open-source runtime trust substrate for enterprise AI. Cryptographically verifiable receipts of every AI invocation — for regulators, auditors, customers, and insurers." />
 <meta name="theme-color" content="#0a1530" />
 <style>
@@ -257,7 +257,7 @@
 
 <header class="brief-header">
   <div class="eyebrow">Executive Briefing · v1.2</div>
-  <h1 class="title">Project Ledger</h1>
+  <h1 class="title">AskLedger</h1>
   <p class="subtitle">The open-source runtime trust substrate for enterprise AI</p>
   <p class="lede">Every AI invocation inside a company produces a cryptographically signed, hash-chained, transparency-log-backed receipt — independently verifiable in a browser with the public key alone. No platform dependency. Apache-2.0. Built to the standard top regulators, auditors, customers, and insurers will require by 2026.</p>
   <p class="audience-note">A briefing for Solution Architects, CTOs, CISOs, Heads of Risk, Heads of Compliance, OSS standards reviewers, and infrastructure investors evaluating runtime-trust infrastructure for the AI era.</p>
@@ -304,7 +304,7 @@
 </table>
 
 <h2 id="s2"><span class="sec-num">2</span>Thesis</h2>
-<p>The AI infrastructure stack is consolidating from the inside out. Model identity is being locked down (Sigstore, OpenSSF Model Signing, Cisco Model Provenance Kit). Build provenance is being locked down (in-toto, SLSA). Gateway-level guardrails are being locked down (Portkey-Palo Alto, LiteLLM, Cisco AI Defense). <strong>Runtime accountability — what the model actually did, when, under what policy, and what evidence survives the vendor relationship — has no incumbent.</strong> That is the category Project Ledger occupies, with a 12-18 month window before strategic consolidators arrive.</p>
+<p>The AI infrastructure stack is consolidating from the inside out. Model identity is being locked down (Sigstore, OpenSSF Model Signing, Cisco Model Provenance Kit). Build provenance is being locked down (in-toto, SLSA). Gateway-level guardrails are being locked down (Portkey-Palo Alto, LiteLLM, Cisco AI Defense). <strong>Runtime accountability — what the model actually did, when, under what policy, and what evidence survives the vendor relationship — has no incumbent.</strong> That is the category AskLedger occupies, with a 12-18 month window before strategic consolidators arrive.</p>
 
 <h2 id="s3"><span class="sec-num">3</span>Why now · 2025-2026 market signals</h2>
 
@@ -385,7 +385,7 @@
          · chain linkage is intact
          · transparency-log inclusion proof is valid
        Verification requires only the receipt + the public key. No
-       call to Project Ledger. No subscription. No vendor lookup.</pre>
+       call to AskLedger. No subscription. No vendor lookup.</pre>
 <div class="callout">The substrate does not block, judge, or guardrail the AI call. It <strong>records what happened, signed, in a format that survives the vendor relationship.</strong> That separation is intentional and is what makes it deployable inside regulated enterprises without operational risk.</div>
 
 <h2 id="s5"><span class="sec-num">5</span>What we built</h2>
@@ -452,7 +452,7 @@
   <li><strong>HSM-backed signing.</strong> Private keys never leave the HSM. Four drivers shipped: AWS KMS, Azure Key Vault, GCP KMS, PKCS#11. FIPS 140-3 path documented for federal customers.</li>
   <li><strong>Strict transport security.</strong> HSTS 2-year preload-eligible. CSP with per-request nonce. X-Frame-Options DENY. Cross-Origin policies pinned to same-origin.</li>
   <li><strong>Auditable platform.</strong> Every privileged action — key rotation, role change, plan change, support impersonation, deployment — produces a signed receipt on the platform's own audit chain.</li>
-  <li><strong>No lock-in.</strong> Every receipt is verifiable independently with the public key alone. A customer leaving Project Ledger retains their evidence permanently.</li>
+  <li><strong>No lock-in.</strong> Every receipt is verifiable independently with the public key alone. A customer leaving AskLedger retains their evidence permanently.</li>
 </ul>
 
 <h2 id="s9"><span class="sec-num">9</span>Customers by readiness</h2>
@@ -571,7 +571,7 @@
   <div class="contact-row"><span class="contact-label">Specification</span><span><a href="https://github.com/askledger/receipts-sdk/tree/main/spec/">github.com/askledger/receipts-sdk/tree/main/spec</a> (PL-RFC-001 through PL-RFC-010)</span></div>
   <div class="contact-row"><span class="contact-label">General enquiries</span><a href="https://github.com/askledger/receipts-sdk/discussions">GitHub Discussions</a></div>
   <div class="contact-row"><span class="contact-label">Security disclosures</span><a href="https://github.com/askledger/receipts-sdk/security/advisories/new">GitHub Security Advisories</a></div>
-  <div style="margin-top:18px;color:var(--ink-400);font-size:12px">Project Ledger · Document v1.2 · June 2026 · Licensed CC-BY-4.0</div>
+  <div style="margin-top:18px;color:var(--ink-400);font-size:12px">AskLedger · Document v1.2 · June 2026 · Licensed CC-BY-4.0</div>
 </footer>
 
 </div>

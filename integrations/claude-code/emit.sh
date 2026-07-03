@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Project Ledger receipt emitter for Claude Code skill hooks.
+# AskLedger receipt emitter for Claude Code skill hooks.
 # Reads a JSON event from stdin and POSTs it to the configured ingest.
 # Non-blocking: never fails the host workflow.
 

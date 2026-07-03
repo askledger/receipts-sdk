@@ -1,5 +1,5 @@
 // Portkey guardrail provider. Portkey supports custom guardrails as
-// Node callbacks; this one emits a Project Ledger receipt per call.
+// Node callbacks; this one emits a AskLedger receipt per call.
 //
 //   import { plPortkeyGuardrail } from "@askledger/portkey-guardrail";
 //   portkey.use(plPortkeyGuardrail({ tenantId: "acme", keypair }));

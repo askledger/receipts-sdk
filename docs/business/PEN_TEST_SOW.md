@@ -1,6 +1,6 @@
 # Penetration Test · Scope of Work (SOW)
 
-**Engaging party:** Project Ledger, Inc. (or successor entity)
+**Engaging party:** AskLedger, Inc. (or successor entity)
 **Target firms:** Bishop Fox · NCC Group · Trail of Bits · Cure53 · Doyensec
 **Engagement type:** Full-stack penetration test + secure-code review
 **Estimated duration:** 4-6 weeks
@@ -10,7 +10,7 @@
 
 ## 1 · Objective
 
-Independent attestation that the Project Ledger receipts substrate +
+Independent attestation that the AskLedger receipts substrate +
 hosted console + browser extension are free of high-impact vulnerabilities
 that would block enterprise customer adoption.
 
@@ -49,7 +49,7 @@ that would block enterprise customer adoption.
   Findings about their default configuration should be reported but not
   exploited.
 - DoS via overwhelming volume from a single source.
-- Social engineering of Project Ledger staff or customers.
+- Social engineering of AskLedger staff or customers.
 
 ## 4 · Test categories (minimum coverage required)
 
@@ -112,7 +112,7 @@ that would block enterprise customer adoption.
 
 ## 6 · Severity targets at handoff
 
-- **Zero Critical** open at sign-off (or accepted by Project Ledger CTO with documented compensating control).
+- **Zero Critical** open at sign-off (or accepted by AskLedger CTO with documented compensating control).
 - **Zero High** open at sign-off.
 - All Medium findings either fixed or scheduled with named owner + due date.
 

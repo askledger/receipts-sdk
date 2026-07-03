@@ -1,4 +1,4 @@
-# Project Ledger · One-page brief
+# AskLedger · One-page brief
 
 ### Open-source runtime trust substrate for enterprise AI
 

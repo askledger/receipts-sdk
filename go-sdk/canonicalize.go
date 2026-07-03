@@ -1,4 +1,4 @@
-// Package receipts implements the Project Ledger AI Decision Receipt
+// Package receipts implements the AskLedger AI Decision Receipt
 // protocol — wire-format compatible with the TypeScript reference SDK.
 package receipts
 

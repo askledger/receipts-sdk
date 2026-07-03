@@ -106,5 +106,5 @@
     true
   );
 
-  console.info("[Project Ledger] extension active on", VENDOR);
+  console.info("[AskLedger] extension active on", VENDOR);
 })();

@@ -8,7 +8,7 @@
 
 ## What we built
 
-A formal **open-source adapter shell** for Bandar Naghi's three published frameworks — QAG, QAIS, and AI Agency — that plugs into Project Ledger as a composable industry framework.
+A formal **open-source adapter shell** for Bandar Naghi's three published frameworks — QAG, QAIS, and AI Agency — that plugs into AskLedger as a composable industry framework.
 
 - **`src/frameworks/bandar-naghi.ts`** — typed framework definitions
 - **`src/frameworks/index.ts`** — `frameworkAlignment()` walks a receipt and returns which Bandar pillars / towers the receipt contributes evidence to
@@ -47,10 +47,10 @@ That ask is concrete. It produces a named artifact under joint credit. It costs 
 
 ### The proposed published artifact
 
-> **Bandar Naghi Frameworks · Project Ledger Adapter v1.0**
+> **Bandar Naghi Frameworks · AskLedger Adapter v1.0**
 > *by Bandar Naghi (frameworks) and Rashed Ali Khan + Mahamed Arif (substrate)*
 >
-> The first cryptographically verifiable implementation of QAG, QAIS, and AI Agency on top of the Project Ledger Receipts protocol. Every receipt produced under this adapter automatically cites which QAG pillars, QAIS towers, and AI Agency pillars it contributes evidence toward. Apache-2.0, open spec, byte-identical across 5 SDKs.
+> The first cryptographically verifiable implementation of QAG, QAIS, and AI Agency on top of the AskLedger Receipts protocol. Every receipt produced under this adapter automatically cites which QAG pillars, QAIS towers, and AI Agency pillars it contributes evidence toward. Apache-2.0, open spec, byte-identical across 5 SDKs.
 
 This is the artifact we drop into the meeting. It's already on GitHub. It compiles. It runs. It needs his pillar text and his blessing to become v1.0.
 
@@ -75,7 +75,7 @@ Concretely, three things — in ascending difficulty:
 
 | Bandar's interest | What this delivers |
 |---|---|
-| His books selling | Every customer who installs Project Ledger sees QAG / QAIS / AI Agency in their receipts and pulls up the Amazon link |
+| His books selling | Every customer who installs AskLedger sees QAG / QAIS / AI Agency in their receipts and pulls up the Amazon link |
 | His reputation as the originator of the frameworks | Cryptographically signed attribution in every receipt that cites his work |
 | His operating principle "Impossible only means we haven't found the solution yet!" | The adapter is the solution to a problem his frameworks define |
 | His commitment to "creating intelligent systems that learn, adapt and potentially act autonomously" | The adapter is the cryptographic substrate for exactly that |

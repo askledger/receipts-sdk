@@ -1,4 +1,4 @@
-# Project Ledger · Outreach email templates
+# AskLedger · Outreach email templates
 
 Six calibrated templates. Replace `[name]`, `[company]`, `[mutual
 connection if any]`, `[brief / one-pager link]`, and signoff. Keep
@@ -55,7 +55,7 @@ internal evaluation.
 
 ## 3 · Investor
 
-**Subject:** Project Ledger — runtime trust substrate for enterprise AI
+**Subject:** AskLedger — runtime trust substrate for enterprise AI
 
 Hi [name],
 
@@ -169,5 +169,5 @@ No reply needed unless useful.
 
 ---
 
-Project Ledger Project · Email templates v1.0 · June 2026 ·
+AskLedger Project · Email templates v1.0 · June 2026 ·
 Licensed CC-BY-4.0

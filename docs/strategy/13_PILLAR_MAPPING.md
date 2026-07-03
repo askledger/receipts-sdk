@@ -1,6 +1,6 @@
-# The 13 Pillars · Mapping current code to the canonical Project Ledger strategy
+# The 13 Pillars · Mapping current code to the canonical AskLedger strategy
 
-Source: `uploads/Project Ledger.html` — the canonical 13-pillar product
+Source: `uploads/AskLedger.html` — the canonical 13-pillar product
 architecture. Bandar Naghi's QAG / QAIS / AI Agency frameworks are
 **additive thought-leadership layers**, not the 13 pillars themselves.
 
@@ -247,4 +247,4 @@ Bandar Naghi's QAG (5) / QAIS (3) / AI Agency (7) / Executive Philosophy (6) fra
 - **`frameworkAlignment()`** in `src/frameworks/index.ts` — every receipt produced under any pillar auto-cites which Bandar pillar it contributes evidence toward.
 - **`applyAuthorContribution()`** — when Bandar supplies his pillar text, his contribution is signed and published as the verified mapping.
 
-So the relationship is: **Project Ledger 13 pillars = what we build.** **Bandar frameworks = the executive language we use to describe it to BFSI buyers.**
+So the relationship is: **AskLedger 13 pillars = what we build.** **Bandar frameworks = the executive language we use to describe it to BFSI buyers.**

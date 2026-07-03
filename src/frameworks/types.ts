@@ -76,7 +76,7 @@ export interface IndustryFramework {
   /** Components in published order. */
   components: FrameworkComponent[];
   /** What kind of demand this framework is on the supply side. */
-  composes_with: ("Project Ledger Records Plane" | "Project Ledger Decision Plane" | "Project Ledger Telemetry Ingest" | "Project Ledger Evidence Engine" | "Project Ledger Console")[];
+  composes_with: ("AskLedger Records Plane" | "AskLedger Decision Plane" | "AskLedger Telemetry Ingest" | "AskLedger Evidence Engine" | "AskLedger Console")[];
   /** When this framework was last reviewed for accuracy. */
   last_reviewed_at: string;
 }

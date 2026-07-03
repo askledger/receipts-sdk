@@ -48,7 +48,7 @@ const session = {
 const value = Buffer.from(JSON.stringify(session)).toString("base64");
 
 console.log("");
-console.log("Project Ledger · dev login cookie");
+console.log("AskLedger · dev login cookie");
 console.log("───────────────────────────────────────────────────────────────────");
 console.log("  Cookie name:  pl_session");
 console.log("  Cookie value:");

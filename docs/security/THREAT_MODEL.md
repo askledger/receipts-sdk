@@ -1,4 +1,4 @@
-# Threat Model — Project Ledger Receipts SDK + Platform
+# Threat Model — AskLedger Receipts SDK + Platform
 
 **Version:** 1.0 · v0.3 codebase
 **Methodology:** STRIDE + LINDDUN (privacy) + adversarial review per OWASP AI Security & Privacy Guide
@@ -10,7 +10,7 @@ This is the artifact a Trail-of-Bits-style audit firm expects to see on day 1 of
 
 ## 1. System under threat
 
-Project Ledger is composed of two layers (see [ARCHITECTURE](../ARCHITECTURE.md)):
+AskLedger is composed of two layers (see [ARCHITECTURE](../ARCHITECTURE.md)):
 
 1. **The Receipts SDKs** (TypeScript, Python, Go, Rust, Java) — a cryptographic substrate that produces signed, hash-chained receipts for AI runtime events.
 2. **The Platform** (hosted cloud + on-prem self-deploy reference): a multi-tenant SaaS that stores, indexes, batch-commits, verifies, and exports receipts.
@@ -40,7 +40,7 @@ The threat model covers both. Some threats only apply to the platform; some only
                                   │ TB-2 (mTLS, JWT, OIDC)
                                   ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│ Project Ledger Platform (multi-tenant cloud OR customer-deployed)   │
+│ AskLedger Platform (multi-tenant cloud OR customer-deployed)   │
 │  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐    │
 │  │ Ingest API │─▶│ Verifier   │─▶│ Storage    │─▶│ Console    │    │
 │  └────────────┘  └────────────┘  └────────────┘  └────────────┘    │

@@ -75,7 +75,7 @@ function sampleEvent(tenant, i) {
 }
 
 function main() {
-  console.log("Project Ledger Receipts SDK — benchmark");
+  console.log("AskLedger Receipts SDK — benchmark");
   console.log(`Node ${process.version} · ${process.platform}/${process.arch}`);
   console.log(`Iterations per measurement: ${ITERATIONS} (after ${WARMUP} warmup)`);
   console.log();

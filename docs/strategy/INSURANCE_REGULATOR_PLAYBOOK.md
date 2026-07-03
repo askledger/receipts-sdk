@@ -37,13 +37,13 @@ AI deployment requires liability cover (model errors, biased decisions, PII leak
 ### What we offer insurers
 
 1. **Cryptographically verified incident data** — they can underwrite based on real evidence, not surveys
-2. **Counterfactual analysis** — receipts let them say "this incident would have been blocked if Project Ledger safety layer was active"
+2. **Counterfactual analysis** — receipts let them say "this incident would have been blocked if AskLedger safety layer was active"
 3. **Per-deployment Receipt Score** — like a credit score for AI risk, drives premium pricing
 4. **Joint underwriting guideline** — co-published, becomes the industry baseline
 
 ### The pitch in one paragraph
 
-> "Today you price AI liability blind. Project Ledger receipts make every AI incident reproducible from the cryptographic record. Pilot with one customer: they install our SDK, you get 90 days of receipt data, you build a baseline model, you discount their premium based on their Receipt Score. We publish the case study with you, named, in 2027. Then every other insured in your book wants the same discount."
+> "Today you price AI liability blind. AskLedger receipts make every AI incident reproducible from the cryptographic record. Pilot with one customer: they install our SDK, you get 90 days of receipt data, you build a baseline model, you discount their premium based on their Receipt Score. We publish the case study with you, named, in 2027. Then every other insured in your book wants the same discount."
 
 ### Sequence (per insurer)
 
@@ -63,7 +63,7 @@ AI deployment requires liability cover (model errors, biased decisions, PII leak
 
 ### Why regulators matter
 
-A regulator citing our spec **once** flips the market. Banks regulated by that authority must implement us. The sales motion becomes "we don't choose Project Ledger; the regulator chose Project Ledger and we comply."
+A regulator citing our spec **once** flips the market. Banks regulated by that authority must implement us. The sales motion becomes "we don't choose AskLedger; the regulator chose AskLedger and we comply."
 
 ### Named targets (priority order)
 
@@ -89,7 +89,7 @@ A regulator citing our spec **once** flips the market. Banks regulated by that a
 
 ### The pitch to a regulator in one paragraph
 
-> "Your inspection teams will be asked to verify AI compliance starting in 2026. They need a format that is vendor-neutral, mathematically verifiable, and that a regulated firm cannot game. Project Ledger is open standard, open source, and verifiable in your browser with no Project Ledger account. We are not asking you to endorse a company — we are offering you to anchor on a published cryptographic format you can name in your guidance. We have already mapped CBUAE's five principles into the template. Will you let us walk your inspection team through the verifier?"
+> "Your inspection teams will be asked to verify AI compliance starting in 2026. They need a format that is vendor-neutral, mathematically verifiable, and that a regulated firm cannot game. AskLedger is open standard, open source, and verifiable in your browser with no AskLedger account. We are not asking you to endorse a company — we are offering you to anchor on a published cryptographic format you can name in your guidance. We have already mapped CBUAE's five principles into the template. Will you let us walk your inspection team through the verifier?"
 
 ### Sequence (per regulator)
 

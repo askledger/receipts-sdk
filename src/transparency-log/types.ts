@@ -10,7 +10,7 @@
  *   - Verify consistency between two STHs (no rewrites)
  *   - Audit the entire log retrospectively
  *
- * The transparency log is the property that makes Project Ledger
+ * The transparency log is the property that makes AskLedger
  * non-repudiable even by US. We cannot rewrite history because the
  * world has the STH chain.
  */

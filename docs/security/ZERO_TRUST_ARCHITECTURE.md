@@ -1,20 +1,20 @@
-# Zero Trust Architecture — Project Ledger
+# Zero Trust Architecture — AskLedger
 
 **Version:** 1.0
 **Framework alignment:** NIST SP 800-207 (Zero Trust Architecture), CISA ZTMM v2.0, DoD Zero Trust Reference Architecture v2.0
-**Applies to:** Project Ledger SaaS hosted tier AND customer self-deploy reference architecture
+**Applies to:** AskLedger SaaS hosted tier AND customer self-deploy reference architecture
 
-This document is the Zero Trust reference design for any deployment of Project Ledger — hosted, customer-self-managed, or hybrid. It is the architecture review document a CISO presents to their board when greenlighting Project Ledger for regulated workloads.
+This document is the Zero Trust reference design for any deployment of AskLedger — hosted, customer-self-managed, or hybrid. It is the architecture review document a CISO presents to their board when greenlighting AskLedger for regulated workloads.
 
 ---
 
 ## 1. Zero Trust foundational principles
 
-NIST SP 800-207 §2.1 — Project Ledger implements all seven tenets:
+NIST SP 800-207 §2.1 — AskLedger implements all seven tenets:
 
 | Tenet | Implementation |
 |---|---|
-| All data sources and computing services are considered resources | Every Project Ledger service, every Postgres row, every S3 object, every TSA call is treated as an addressable resource with its own policy. |
+| All data sources and computing services are considered resources | Every AskLedger service, every Postgres row, every S3 object, every TSA call is treated as an addressable resource with its own policy. |
 | All communication is secured regardless of network location | mTLS everywhere via SPIFFE SVID-bound certificates; no plaintext intra-service traffic. |
 | Access to individual enterprise resources is granted on a per-session basis | Short-lived SVIDs (≤1h) + per-request OPA decision; no long-lived intra-service credentials. |
 | Access to resources is determined by dynamic policy | OPA policy bundles with risk score inputs (device posture, geo, time, anomaly score). |
@@ -96,7 +96,7 @@ NIST SP 800-207 §2.1 — Project Ledger implements all seven tenets:
 
 ### 4.1 Policy decisions are receipts
 
-Every meaningful authorization decision in the platform is itself logged as a Project Ledger receipt with a `decision` block, exactly as defined in the [Receipts Protocol Spec §4.3](../RECEIPTS_PROTOCOL.md#43-decision-block). This means:
+Every meaningful authorization decision in the platform is itself logged as a AskLedger receipt with a `decision` block, exactly as defined in the [Receipts Protocol Spec §4.3](../RECEIPTS_PROTOCOL.md#43-decision-block). This means:
 
 - **Every access decision is cryptographically attested**
 - **Every policy bundle is content-addressed by sha256** (the `policy_bundle_hash` in the decision block)
@@ -209,7 +209,7 @@ All admin operations require:
 
 ## 9. CISA Zero Trust Maturity Model alignment
 
-| Pillar | Project Ledger maturity |
+| Pillar | AskLedger maturity |
 |---|---|
 | Identity | **Advanced** (phishing-resistant MFA, federated SSO, JIT) |
 | Devices | **Advanced** for managed corp devices; **Initial** for customer-side (customer responsibility) |
@@ -224,7 +224,7 @@ All admin operations require:
 
 ## 10. Customer self-deploy reference architecture
 
-For customers running Project Ledger in their own environment (on-prem or own cloud), this section is the prescriptive Zero Trust deployment guide.
+For customers running AskLedger in their own environment (on-prem or own cloud), this section is the prescriptive Zero Trust deployment guide.
 
 | Component | Recommended |
 |---|---|

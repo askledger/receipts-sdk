@@ -1,13 +1,13 @@
 ---
 name: pl-receipts
-description: Emit a Project Ledger receipt for every Claude Code action — tool calls, file edits, prompt completions. Use when the project requires cryptographically signed audit evidence of AI-assisted development.
+description: Emit a AskLedger receipt for every Claude Code action — tool calls, file edits, prompt completions. Use when the project requires cryptographically signed audit evidence of AI-assisted development.
 ---
 
-# Project Ledger Receipts · Claude Code Skill
+# AskLedger Receipts · Claude Code Skill
 
 This skill turns every Claude Code action in a project into a signed,
 chained, cryptographically-verifiable receipt. The receipts feed your
-Project Ledger admin console so IT / Compliance / HR / Legal / Finance
+AskLedger admin console so IT / Compliance / HR / Legal / Finance
 see what AI did in the codebase.
 
 ## Setup
@@ -44,7 +44,7 @@ NEVER sent to the ingest endpoint.
 
 ## Verification
 
-Receipts are verifiable from the Project Ledger public verifier:
+Receipts are verifiable from the AskLedger public verifier:
 `https://askledger.github.io/receipts-sdk/verify.html?receipt=<id>`.
 
 ## Privacy

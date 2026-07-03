@@ -6,7 +6,7 @@
  * back an inclusion proof, and query the signed STH chain to verify
  * the log has not been rewritten.
  *
- * The transparency log is what makes Project Ledger non-repudiable
+ * The transparency log is what makes AskLedger non-repudiable
  * even by us. We don't have to be trusted — we publish.
  */
 

@@ -1,6 +1,6 @@
 # askledger-agents (Python)
 
-Project Ledger receipts for the major Python agent frameworks.
+AskLedger receipts for the major Python agent frameworks.
 
 ```
 pip install askledger-agents
@@ -33,7 +33,7 @@ install_smolagents(sink)
 ```
 
 Every agent reply, task, run, or tool call from that point forward
-emits a Project Ledger receipt. The wrappers are idempotent and
+emits a AskLedger receipt. The wrappers are idempotent and
 non-blocking — a receipt-emit failure never breaks the agent.
 
 LangChain / LangGraph callers should use the existing

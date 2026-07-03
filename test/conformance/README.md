@@ -1,7 +1,7 @@
 # Conformance test vectors
 
 These vectors are the **wire-format contract** for any language
-implementation of the Project Ledger Receipts protocol. Any SDK in any
+implementation of the AskLedger Receipts protocol. Any SDK in any
 language must produce identical bytes for the canonicalize and sha256
 test vectors, and must verify the pre-signed receipts in this folder
 against the public keys provided.

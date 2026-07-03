@@ -1,9 +1,9 @@
 # Linux Foundation AI &amp; Data Foundation — Hosted Project Submission
 
 **Submission target:** LF AI &amp; Data Foundation Technical Advisory Council (TAC)
-**Project name:** Project Ledger Receipts Protocol &amp; Reference Implementations
+**Project name:** AskLedger Receipts Protocol &amp; Reference Implementations
 **Submission level:** Sandbox → Incubating → Graduated
-**Submitter:** Rashed Ali Khan · Founder & CEO · Project Ledger
+**Submitter:** Rashed Ali Khan · Founder & CEO · AskLedger
 **Status:** Draft — ready for TAC outreach Q3 2026
 **Owner:** Rashed Ali Khan
 
@@ -37,7 +37,7 @@ This is the single highest-leverage move for becoming the global standard.
 | 5 pre-built regulator policy templates | CC-BY-4.0 | CBUAE, EU AI Act, SAMA, ISO 42001, NIST RMF |
 | Adapters: OpenAI, Anthropic, fetch, LangChain | Apache-2.0 | Auto-capture for 11 vendors |
 
-**No proprietary components are retained.** The substrate is the public good. Project Ledger's commercial value lives entirely in the hosted Cloud + Evidence Engine + Console + customer-success layers, not in the protocol.
+**No proprietary components are retained.** The substrate is the public good. AskLedger's commercial value lives entirely in the hosted Cloud + Evidence Engine + Console + customer-success layers, not in the protocol.
 
 ---
 
@@ -69,13 +69,13 @@ This is the single highest-leverage move for becoming the global standard.
 **Decision-making:** lazy consensus over 72 hours on the project mailing list. Disputed decisions escalate to a steering committee.
 
 **Steering committee:** 5 seats. Initial:
-1. Rashed Ali Khan (Project Ledger)
-2. Mahamed Arif (Project Ledger)
+1. Rashed Ali Khan (AskLedger)
+2. Mahamed Arif (AskLedger)
 3. Independent BFSI representative (target: Lloyd's of London or Munich Re)
 4. Independent regulatory representative (target: CBUAE / SAMA / EU AI Office liaison)
 5. Independent cryptography representative (target: Sigstore TAC member or academic)
 
-Project Ledger holds ≤ 40% of seats by design — this is what gives a regulator the confidence to cite the spec.
+AskLedger holds ≤ 40% of seats by design — this is what gives a regulator the confidence to cite the spec.
 
 **Wire-format changes:** require steering committee unanimous vote + 30-day public comment period.
 

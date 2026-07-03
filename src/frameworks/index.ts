@@ -5,7 +5,7 @@
  * industry frameworks are voluntary publications by named authors that
  * customers adopt to structure their AI program.
  *
- * Project Ledger ships verified outer structures. Specific pillar text
+ * AskLedger ships verified outer structures. Specific pillar text
  * is loaded from author-supplied JSON or marked [AWAITING_AUTHOR_VERIFICATION]
  * — we never reverse-engineer copyrighted book content.
  */

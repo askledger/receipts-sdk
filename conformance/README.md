@@ -1,6 +1,6 @@
 # @askledger/conformance
 
-Conformance test corpus + runner for the Project Ledger AI Decision
+Conformance test corpus + runner for the AskLedger AI Decision
 Receipts protocol (PL-RFC-001…010).
 
 Three conformance levels, mirroring the SLSA pattern:

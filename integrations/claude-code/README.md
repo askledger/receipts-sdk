@@ -1,7 +1,7 @@
 # @askledger/claude-code-skill
 
 Claude Code skill that turns every AI action in a project — tool calls,
-file edits, plan steps — into a cryptographically signed Project Ledger
+file edits, plan steps — into a cryptographically signed AskLedger
 receipt.
 
 ## Install

@@ -1,4 +1,4 @@
-# Prometheus alerting rules · Project Ledger
+# Prometheus alerting rules · AskLedger
 #
 # Every alert here has a corresponding runbook entry in
 # docs/operations/RUNBOOK.md. CI verifies the link via

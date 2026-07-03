@@ -1,4 +1,4 @@
-# Project Ledger · FAQ
+# AskLedger · FAQ
 
 Prepared answers to the questions a serious reader will ask after
 reading the brief. Use directly in calls, emails, and Q&A.
@@ -96,7 +96,7 @@ are blocked, audit-logged, and trigger a P0 security event.
 ### 10. What's the customer's lock-in if they adopt this?
 
 None. Every receipt is verifiable independently using the public
-key alone. A customer who leaves Project Ledger retains their full
+key alone. A customer who leaves AskLedger retains their full
 evidence permanently and can verify it forever using any
 implementation of the open specification. The chain itself is the
 record; the substrate provider is replaceable.
@@ -120,11 +120,11 @@ particularly those with portfolio relationships in BFSI, insurance,
 or AI infrastructure. We are not running a competitive process at
 this time.
 
-### 13. What happens to my receipts if Project Ledger shuts down or is acquired?
+### 13. What happens to my receipts if AskLedger shuts down or is acquired?
 
 The receipts remain valid permanently. Verification requires only
 the receipt body, the signature, and the public key — none of which
-depend on Project Ledger's continued operation. Customers who use
+depend on AskLedger's continued operation. Customers who use
 the hosted transparency log can also operate or migrate to an
 independent log; the log's signed tree heads are archived to
 immutable storage (S3 Object Lock, 10-year retention) and remain
@@ -143,4 +143,4 @@ self-sustaining.
 
 ---
 
-Project Ledger Project · FAQ v1.0 · June 2026 · CC-BY-4.0
+AskLedger Project · FAQ v1.0 · June 2026 · CC-BY-4.0

@@ -7,7 +7,7 @@
  *   - (optionally) the previous receipt to check chain continuity
  *
  * can verify cryptographic integrity end-to-end with no Ledger dependency.
- * This is the property that makes Project Ledger regulator-grade.
+ * This is the property that makes AskLedger regulator-grade.
  */
 
 import { sha256, verify as verifySig } from "./crypto.js";

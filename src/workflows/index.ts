@@ -2,7 +2,7 @@
  * End-to-end workflow primitives.
  *
  * The receipt pipeline (capture → policy → sign → timestamp → persist
- * → notify) is the spine of every Project Ledger deployment. Approval
+ * → notify) is the spine of every AskLedger deployment. Approval
  * workflows wrap high-risk operations.
  */
 

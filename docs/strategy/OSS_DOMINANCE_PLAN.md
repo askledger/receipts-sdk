@@ -1,4 +1,4 @@
-# How Project Ledger becomes THE open-source AI receipts standard
+# How AskLedger becomes THE open-source AI receipts standard
 
 The canonical doc says "Open spec → Linux Foundation AI (Year 2)". Winning
 OSS infrastructure is not about feature count — it's about **becoming the
@@ -37,7 +37,7 @@ Ship under `/spec/` in the repo, also at `github.com/askledger/receipts-sdk/tree
 The doc names this as Year 2. We have the prerequisites (Apache-2.0, CHANGELOG, SECURITY, CODEOWNERS, MAINTAINERS, real CI, signed releases). Ship the application package now.
 
 ### 4 · Co-author with OpenSSF Model Signing
-The competitor doc names them explicitly. We solve "what did the model do" they solve "where did the model come from". A joint document positioning Project Ledger as the runtime layer on top of OMS is the most underpriced strategic move available.
+The competitor doc names them explicitly. We solve "what did the model do" they solve "where did the model come from". A joint document positioning AskLedger as the runtime layer on top of OMS is the most underpriced strategic move available.
 
 ---
 
@@ -90,10 +90,10 @@ The doc names Portkey, LiteLLM, Cloudflare, Kong, Bedrock. Today we sit above an
 ## Tier 3 · Governance + adoption — the moves that make us irreplaceable
 
 ### 5 · Multi-stakeholder maintainer council
-CODEOWNERS already shows the discipline. The next step is naming maintainer leads from organizations outside Project Ledger Inc. so the project is not single-vendor. Target: by year-end, ≥ 3 organizations with merge rights.
+CODEOWNERS already shows the discipline. The next step is naming maintainer leads from organizations outside AskLedger Inc. so the project is not single-vendor. Target: by year-end, ≥ 3 organizations with merge rights.
 
 ### 6 · A public transparency log anyone can query
-Today the Trillian client is shipped; the log is not deployed. Stand up `log.github.com/askledger/receipts-sdk` publicly. Receipt id → inclusion proof endpoint. Mirror Sigstore Rekor's pattern. This is the artifact that lets a CISO say "I can prove our AI history without trusting Project Ledger Inc."
+Today the Trillian client is shipped; the log is not deployed. Stand up `log.github.com/askledger/receipts-sdk` publicly. Receipt id → inclusion proof endpoint. Mirror Sigstore Rekor's pattern. This is the artifact that lets a CISO say "I can prove our AI history without trusting AskLedger Inc."
 
 ### 7 · Reference verifier as a Lambda / Cloudflare Worker / static page
 Three deployments of the same verifier so a customer's auditor can run it themselves. Already shipped as a static `site/verifier.html`; add the Worker + Lambda + CLI variants.

@@ -1,4 +1,4 @@
-# SOC 2 Type II Control Framework — Project Ledger
+# SOC 2 Type II Control Framework — AskLedger
 
 **Version:** 1.0
 **Framework:** AICPA Trust Services Criteria (TSC) 2017, as amended
@@ -6,7 +6,7 @@
 **Optional categories:** Processing Integrity, Privacy (added on customer request)
 **Intended audience:** SOC 2 audit firms (Schellman, Prescient, A-LIGN, Sensiba), regulator security teams, customer InfoSec teams reviewing the platform.
 
-This document is the audit-ready map of every Trust Services Criterion to its implementing controls and evidence sources inside Project Ledger. A SOC 2 Type II audit firm uses this as the starting point of their evidence collection.
+This document is the audit-ready map of every Trust Services Criterion to its implementing controls and evidence sources inside AskLedger. A SOC 2 Type II audit firm uses this as the starting point of their evidence collection.
 
 ---
 

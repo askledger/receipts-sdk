@@ -1,4 +1,4 @@
-# Project Ledger · Receipts SDK
+# AskLedger · Receipts SDK
 
 Open-source, vendor-neutral cryptographic trust substrate for enterprise AI. Every AI invocation produces a signed, hash-chained, tamper-evident receipt that auditors, regulators, and insurers verify independently with only the public key. No platform dependency.
 
@@ -103,7 +103,7 @@ You'll see output like:
 
 ```
 ────────────────────────────────────────────────────────────────────────
-Project Ledger — Receipts SDK · Demo
+AskLedger — Receipts SDK · Demo
 ────────────────────────────────────────────────────────────────────────
 
 1. Generating Ed25519 keypair…
@@ -121,7 +121,7 @@ Project Ledger — Receipts SDK · Demo
 ✓ RECEIPT VALID
 ```
 
-That's it. The receipt is in `.ledger/last-receipt.json`. The keypair is in `.ledger/keys/default.json`. The chain state is in `.ledger/chains/`. **None of this required a network call to Project Ledger.** A regulator verifying this receipt only needs the public key.
+That's it. The receipt is in `.ledger/last-receipt.json`. The keypair is in `.ledger/keys/default.json`. The chain state is in `.ledger/chains/`. **None of this required a network call to AskLedger.** A regulator verifying this receipt only needs the public key.
 
 ---
 
@@ -400,7 +400,7 @@ Note: Ed25519 numbers reflect pure-TypeScript `@noble/ed25519` (zero native depe
 
 ## Ecosystem · related open-source projects
 
-Project Ledger is not the only effort in cryptographic AI receipts. The following projects address overlapping problems and we acknowledge them openly:
+AskLedger is not the only effort in cryptographic AI receipts. The following projects address overlapping problems and we acknowledge them openly:
 
 | Project | Focus area |
 |---|---|
@@ -410,7 +410,7 @@ Project Ledger is not the only effort in cryptographic AI receipts. The followin
 | [OpenTelemetry GenAI](https://opentelemetry.io/docs/specs/semconv/gen-ai/) | Runtime telemetry conventions |
 | AgentMint, OrgKernel, Pipelock, ArkForge, Garl Protocol, AEGIS, Nono | Independent receipts/audit SDKs (various states of completeness) |
 
-**How we differentiate.** This SDK focuses on the **runtime AI decision receipt** — the cryptographic envelope that binds a single AI event to a tenant, a policy, a model identity, and a hash-chained position. We compose with build-time attestation (Sigstore, in-toto, SLSA), with the OWASP AIBOM, and with OpenTelemetry GenAI semantic conventions. The commercial Project Ledger platform layers a verifier model, a regulator portal, evidence packs, and BFSI-MENA-specific framework mappings on top — open-core, Datadog / HashiCorp / Sentry pattern.
+**How we differentiate.** This SDK focuses on the **runtime AI decision receipt** — the cryptographic envelope that binds a single AI event to a tenant, a policy, a model identity, and a hash-chained position. We compose with build-time attestation (Sigstore, in-toto, SLSA), with the OWASP AIBOM, and with OpenTelemetry GenAI semantic conventions. The commercial AskLedger platform layers a verifier model, a regulator portal, evidence packs, and BFSI-MENA-specific framework mappings on top — open-core, Datadog / HashiCorp / Sentry pattern.
 
 ---
 
@@ -512,7 +512,7 @@ Rows marked 🔴 require external parties (audit firms, CPA firms). The code and
 If you reference this protocol or implementation in research or industry writing:
 
 ```
-Khan, R. A., & Arif, M. (2026). Project Ledger Receipts SDK:
+Khan, R. A., & Arif, M. (2026). AskLedger Receipts SDK:
 Cryptographic AI Decision Receipts for enterprise AI.
 https://github.com/askledger/receipts-sdk
 ```
@@ -523,7 +523,7 @@ https://github.com/askledger/receipts-sdk
 
 [Apache-2.0](LICENSE).
 
-The open-source license is deliberate: receipts are a moat through adoption, not lock-in. The commercial layer of Project Ledger (verifier model, regulator portal, evidence packs, vendor benchmark data) is proprietary. **The protocol substrate is open.**
+The open-source license is deliberate: receipts are a moat through adoption, not lock-in. The commercial layer of AskLedger (verifier model, regulator portal, evidence packs, vendor benchmark data) is proprietary. **The protocol substrate is open.**
 
 ---
 

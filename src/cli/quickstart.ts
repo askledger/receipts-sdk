@@ -22,7 +22,7 @@ const dim   = (s: string) => color(2, s);
 const bold  = (s: string) => color(1, s);
 
 export async function quickstart(): Promise<number> {
-  process.stdout.write(`\n${bold("Project Ledger · quickstart")}\n`);
+  process.stdout.write(`\n${bold("AskLedger · quickstart")}\n`);
   process.stdout.write(`${dim("────────────────────────────────")}\n\n`);
 
   ensureDir(KEYS_DIR);

@@ -1,5 +1,5 @@
 /**
- * Project Ledger Chrome Extension · service worker.
+ * AskLedger Chrome Extension · service worker.
  *
  * Maintains the keypair (local-only by default), signs receipts the
  * content scripts produce, persists them to chrome.storage.local, and
@@ -122,6 +122,6 @@ chrome.runtime.onMessage.addListener((msg, sender, send) => {
 });
 
 chrome.runtime.onInstalled.addListener(() => {
-  console.log("[Project Ledger] extension installed");
+  console.log("[AskLedger] extension installed");
   ensureKey();
 });

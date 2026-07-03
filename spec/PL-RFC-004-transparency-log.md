@@ -5,13 +5,13 @@
 
 ## 1 · Purpose
 
-Define how Project Ledger Receipts are committed to an append-only,
+Define how AskLedger Receipts are committed to an append-only,
 publicly-witnessed transparency log, and how third parties verify
 inclusion without trusting any single operator.
 
 ## 2 · Underlying primitive
 
-Project Ledger adopts **RFC 9162 (Certificate Transparency Version 2.0)**
+AskLedger adopts **RFC 9162 (Certificate Transparency Version 2.0)**
 Merkle log semantics: every entry is hashed into a tip Merkle tree;
 the log periodically publishes a Signed Tree Head (STH) signed by the
 log operator's key; inclusion proofs are O(log n) Merkle audit paths.

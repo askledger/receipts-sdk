@@ -4,7 +4,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { TopBar } from "@/components/TopBar";
 
 export const metadata: Metadata = {
-  title: "Project Ledger · Admin Console",
+  title: "AskLedger · Admin Console",
   description: "Cryptographic AI Decision Receipts — enterprise admin console",
 };
 

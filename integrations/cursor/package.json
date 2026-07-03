@@ -1,7 +1,7 @@
 {
   "name": "@askledger/cursor-receipts",
   "version": "0.1.0",
-  "description": "MCP server that emits Project Ledger receipts for every Cursor completion",
+  "description": "MCP server that emits AskLedger receipts for every Cursor completion",
   "license": "Apache-2.0",
   "type": "module",
   "bin": { "pl-cursor": "./dist/mcp-server.js" },

@@ -1,5 +1,5 @@
 // Cloudflare Worker that fronts any AI Gateway endpoint and emits a
-// Project Ledger receipt per call. Deploy with `wrangler publish`.
+// AskLedger receipt per call. Deploy with `wrangler publish`.
 //
 // Bindings expected:
 //   PL_INGEST_URL   — ingest endpoint

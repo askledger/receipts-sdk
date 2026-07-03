@@ -1,8 +1,8 @@
 # Industry Playbook · Adapt the SDK to Your Industry in 60 Minutes
 
-Project Ledger ships nine pre-built regulator templates and four AI vendor adapters. Your industry-specific deployment usually needs three things on top: an industry-specific event shape, a use-case registry, and a custom regulator template if your industry has one not yet bundled.
+AskLedger ships nine pre-built regulator templates and four AI vendor adapters. Your industry-specific deployment usually needs three things on top: an industry-specific event shape, a use-case registry, and a custom regulator template if your industry has one not yet bundled.
 
-This guide is for engineers and compliance leads adapting Project Ledger to a new industry. Healthcare, government, pharma, manufacturing, education, legal, telecom, retail, insurance — same pattern.
+This guide is for engineers and compliance leads adapting AskLedger to a new industry. Healthcare, government, pharma, manufacturing, education, legal, telecom, retail, insurance — same pattern.
 
 ---
 

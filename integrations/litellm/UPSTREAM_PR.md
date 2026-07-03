@@ -1,8 +1,8 @@
-# LiteLLM upstream PR · Project Ledger Receipts Callback
+# LiteLLM upstream PR · AskLedger Receipts Callback
 
 **Target repo:** https://github.com/BerriAI/litellm
 **Branch:** `feat/askledger-receipts-callback`
-**Title:** *feat(callbacks): Project Ledger cryptographic receipts callback*
+**Title:** *feat(callbacks): AskLedger cryptographic receipts callback*
 
 ---
 
@@ -10,7 +10,7 @@
 
 A new optional success callback class, `PLReceiptsCallback`, that emits
 a cryptographically-signed receipt for every LiteLLM completion to a
-Project Ledger ingest endpoint. The callback is non-blocking — failures
+AskLedger ingest endpoint. The callback is non-blocking — failures
 to ship a receipt never fail the upstream LLM call.
 
 ## Why upstream merge is appropriate
@@ -21,7 +21,7 @@ to ship a receipt never fail the upstream LLM call.
 - **Zero-dep, non-blocking.** Uses only stdlib; failures are logged not
   raised; budget on `success_callback` execution is preserved.
 - **Vendor-neutral.** The callback POSTs to any URL the operator
-  configures. Project Ledger is the reference receiver but any HTTP
+  configures. AskLedger is the reference receiver but any HTTP
   endpoint conforming to PL-RFC-001 works.
 
 ## Files changed
@@ -45,7 +45,7 @@ litellm.success_callback = [PLReceiptsCallback(
 ```
 
 The callback file is bundled at `integrations/litellm/pl_receipts_callback.py`
-in the Project Ledger repository for reference; the PR vendors it under
+in the AskLedger repository for reference; the PR vendors it under
 `litellm/integrations/askledger.py` with the proper docstring header
 and the BerriAI copyright block per LiteLLM contribution guidelines.
 

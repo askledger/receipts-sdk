@@ -1,5 +1,5 @@
 """
-Shared base for emitting Project Ledger receipts from any agent
+Shared base for emitting AskLedger receipts from any agent
 framework. Concrete shims for AutoGen, CrewAI, smolagents, Pydantic
 AI live alongside this module.
 """

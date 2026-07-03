@@ -1,12 +1,12 @@
 # Maintainers
 
-This file lists the current maintainers of Project Ledger. Maintainers are
+This file lists the current maintainers of AskLedger. Maintainers are
 responsible for code review, releases, security incident response, and
 governance.
 
 ## Governance model
 
-Project Ledger follows a **lightweight technical-steering committee (TSC)
+AskLedger follows a **lightweight technical-steering committee (TSC)
 model**:
 
 - **Maintainers** — merge access. Each is the named owner of one or more

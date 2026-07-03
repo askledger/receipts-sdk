@@ -2,7 +2,7 @@
 
 **Version:** 0.1 (draft)
 **Status:** Open for public review · subject to change before v1.0
-**Editors:** Rashed Ali Khan, Mahamed Arif (Project Ledger)
+**Editors:** Rashed Ali Khan, Mahamed Arif (AskLedger)
 **Authors of source implementation:** see [CONTRIBUTORS](../CONTRIBUTORS.md)
 
 ---
@@ -279,7 +279,7 @@ Tenants MAY require a second signature on every receipt from a customer-controll
 
 - **v0.2 (Q3 2026):** RFC 3161 timestamping, Merkle batch commitments, transparency log integration, Rust + Python SDKs.
 - **v0.3 (Q1 2027):** Customer-managed keys, more language SDKs, conformance test suite.
-- **v1.0 (target Year 2 of Project Ledger):** Stable wire format, Linux Foundation AI hosted, third-party verifier ecosystem.
+- **v1.0 (target Year 2 of AskLedger):** Stable wire format, Linux Foundation AI hosted, third-party verifier ecosystem.
 
 ---
 

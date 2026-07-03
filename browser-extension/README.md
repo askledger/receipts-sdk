@@ -1,4 +1,4 @@
-# Project Ledger · Chrome Extension
+# AskLedger · Chrome Extension
 
 > Captures every AI prompt you send to ChatGPT, Claude, Gemini, Bedrock, Copilot, Perplexity, Hugging Face — signs a cryptographic receipt locally — keeps the audit trail under your control.
 
@@ -6,7 +6,7 @@
 
 Every developer uses consumer AI for work. Every CISO worries about shadow AI. The standard answer is to install a network DLP appliance, terminate TLS, and inspect everything. That's an ugly compromise.
 
-Project Ledger's extension takes the opposite stance:
+AskLedger's extension takes the opposite stance:
 
 - **Default mode is private.** Every receipt stays on your machine. The private key is generated locally and never leaves.
 - **Corporate visibility is opt-in.** With your explicit consent, the extension can ship signed receipts to your corporate ingest URL. Metadata only — your prompt text never leaves the browser.

@@ -1,8 +1,8 @@
 /**
- * Project Ledger — Receipts SDK
+ * AskLedger — Receipts SDK
  * Type definitions for the AI Decision Receipt envelope.
  *
- * This implements the receipt schema defined in the Project Ledger
+ * This implements the receipt schema defined in the AskLedger
  * Technical Architecture v0.2 — Plane 5 (Records).
  *
  * Stable until the spec reaches v1.0 (target: Year 2, Linux Foundation AI).

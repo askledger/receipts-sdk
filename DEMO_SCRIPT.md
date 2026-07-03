@@ -1,6 +1,6 @@
 # Demo Script · 5-minute walkthrough
 
-For Rashed (founder demo) and anyone showing Project Ledger to a customer, partner, regulator, or investor. Use the exact sequence and the exact talking points below. Each block has been timed.
+For Rashed (founder demo) and anyone showing AskLedger to a customer, partner, regulator, or investor. Use the exact sequence and the exact talking points below. Each block has been timed.
 
 ---
 
@@ -26,7 +26,7 @@ Optional: open the receipt JSON file in a side panel so you can show what's actu
 >
 > Every enterprise asks the same question back: how? They fall back to spreadsheets, screenshots, self-attestation. Then the regulator asks for cryptographic proof and they can't produce it.
 >
-> Project Ledger is the substrate that closes that gap."
+> AskLedger is the substrate that closes that gap."
 
 Point at the three regulator cards. Don't dwell — move on.
 
@@ -46,7 +46,7 @@ Narrate as it animates:
 
 When the chain finishes:
 
-> "All five receipts verify independently. The verifier needs only the public key — no call to Project Ledger, no platform dependency."
+> "All five receipts verify independently. The verifier needs only the public key — no call to AskLedger, no platform dependency."
 
 Click **Tamper receipt #3**.
 
@@ -62,7 +62,7 @@ Pause on the red banner.
 
 **Open:** `site/verify.html`
 
-> "And this is what we'd give a regulator. Same SDK, same primitives, runs in their browser, no Project Ledger account."
+> "And this is what we'd give a regulator. Same SDK, same primitives, runs in their browser, no AskLedger account."
 
 Click **Load valid sample**, then **Verify**.
 
@@ -152,7 +152,7 @@ For a customer:
 
 For a regulator:
 
-> "The verifier you just used is the same one we'd give your inspection team. Every receipt your supervised entities produce is independently verifiable with no Project Ledger dependency. Our protocol is open. Our cryptography is auditable. We've structured the platform so you can demand evidence packs from regulated firms and verify them offline. Would you like a copy of our threat model and Zero Trust architecture documents?"
+> "The verifier you just used is the same one we'd give your inspection team. Every receipt your supervised entities produce is independently verifiable with no AskLedger dependency. Our protocol is open. Our cryptography is auditable. We've structured the platform so you can demand evidence packs from regulated firms and verify them offline. Would you like a copy of our threat model and Zero Trust architecture documents?"
 
 ---
 

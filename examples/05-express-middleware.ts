@@ -40,7 +40,7 @@ interface MiddlewareOptions {
 /**
  * Reference Express middleware. Treat as a starting point — production
  * deployments will wire onReceipt to ship the receipt to durable storage
- * (Postgres, S3, Kafka, the Project Ledger cloud, etc.).
+ * (Postgres, S3, Kafka, the AskLedger cloud, etc.).
  */
 export function receiptsMiddleware(opts: MiddlewareOptions) {
   return function (req: any, res: any, next: any) {

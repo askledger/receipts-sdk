@@ -149,8 +149,8 @@ export function renderBadgeSvg(score: ReceiptScore, tenantName: string): string 
     F: "#5a1414",
   };
   const color = gradeColor[score.grade];
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="220" height="64" viewBox="0 0 220 64" role="img" aria-label="Project Ledger Receipt Score ${score.grade} for ${tenantName}">
-    <title>Project Ledger Receipt Score ${score.grade} (${score.score}) for ${tenantName}</title>
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="220" height="64" viewBox="0 0 220 64" role="img" aria-label="AskLedger Receipt Score ${score.grade} for ${tenantName}">
+    <title>AskLedger Receipt Score ${score.grade} (${score.score}) for ${tenantName}</title>
     <rect width="220" height="64" rx="8" fill="#0a1530"/>
     <rect x="1" y="1" width="218" height="62" rx="7" fill="none" stroke="${color}" stroke-width="2"/>
     <g transform="translate(14,12)">

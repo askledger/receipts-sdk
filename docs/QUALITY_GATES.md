@@ -1,4 +1,4 @@
-# Project Ledger · Quality gates
+# AskLedger · Quality gates
 
 A change cannot ship to `main` unless every gate is green. CI enforces this.
 This document tells you what the gates are and how to debug them locally.

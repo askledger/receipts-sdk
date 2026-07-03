@@ -1,11 +1,11 @@
-# Project Ledger · Enterprise Design System
+# AskLedger · Enterprise Design System
 
 **Version:** 1.0
 **Applies to:** Admin Console, Customer Console, Regulator Verifier UI, Documentation site, Marketing site
 **Tokens:** CSS custom properties + Tailwind config
 **Accessibility:** WCAG 2.2 Level AA enforced; AAA where reasonable
 
-This is the contract every Project Ledger UI surface must follow. A feature that does not follow it is not done.
+This is the contract every AskLedger UI surface must follow. A feature that does not follow it is not done.
 
 ---
 

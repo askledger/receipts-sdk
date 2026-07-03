@@ -1,6 +1,6 @@
-# Project Ledger · Admin Console
+# AskLedger · Admin Console
 
-Enterprise-grade admin console for Project Ledger. Next.js 14 (App Router), TypeScript strict, Tailwind, full WCAG 2.2 AA.
+Enterprise-grade admin console for AskLedger. Next.js 14 (App Router), TypeScript strict, Tailwind, full WCAG 2.2 AA.
 
 ```bash
 cd console

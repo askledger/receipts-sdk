@@ -1,4 +1,4 @@
-# Project Ledger Receipts — Java SDK
+# AskLedger Receipts — Java SDK
 
 Wire-format compatible. Cross-verified via shared conformance vectors. Apache-2.0.
 

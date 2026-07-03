@@ -1,6 +1,6 @@
-# Project Ledger Receipts — Go SDK
+# AskLedger Receipts — Go SDK
 
-Wire-format-compatible Go implementation of the Project Ledger Receipts protocol. Receipts signed in Go verify in TypeScript and Python, and vice versa.
+Wire-format-compatible Go implementation of the AskLedger Receipts protocol. Receipts signed in Go verify in TypeScript and Python, and vice versa.
 
 ```bash
 go get github.com/askledger/receipts-sdk/go-sdk

@@ -1,4 +1,4 @@
--- Project Ledger — initial schema.
+-- AskLedger — initial schema.
 -- Convention: every table includes tenant_id, every read+write path sets
 -- pl.current_tenant via SET LOCAL, and RLS policies enforce equality.
 

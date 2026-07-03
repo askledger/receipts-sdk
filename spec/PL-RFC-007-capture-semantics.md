@@ -24,7 +24,7 @@ Every captured event maps to one of the canonical types:
 | `ai.audio_generation` | TTS / audio synthesis |
 | `ai.fine_tune_request` | Fine-tuning job submitted |
 | `ai.guardrail_block` | Vendor or first-party guardrail blocked the call |
-| `ai.model_invocation_blocked` | Project Ledger policy blocked the call |
+| `ai.model_invocation_blocked` | AskLedger policy blocked the call |
 
 Implementations **MAY** add vendor-specific subtype identifiers but
 **MUST** carry one of the canonical `event_type` values.

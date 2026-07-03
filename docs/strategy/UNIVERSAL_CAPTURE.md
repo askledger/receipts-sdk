@@ -1,6 +1,6 @@
 # Universal Capture Architecture
 
-**Vision:** Every AI invocation that happens in any company — by any user, on any device, through any vendor — produces a Project Ledger receipt. The admin sees everything.
+**Vision:** Every AI invocation that happens in any company — by any user, on any device, through any vendor — produces a AskLedger receipt. The admin sees everything.
 
 **Status:** Strategic roadmap · the substrate is universal today. The capture layer is partially universal. This document explains where each surface stands and what closes the gaps.
 
@@ -127,7 +127,7 @@ For *every* surface above, the admin in the hosted Console eventually sees:
 | Cost attribution | "Show me $$ per team per AI vendor" |
 | Real-time alerting | "Tell me when someone leaks PII to ChatGPT.com" |
 
-**This is the universal admin experience that turns Project Ledger from "infrastructure" into "must-have for every CISO."**
+**This is the universal admin experience that turns AskLedger from "infrastructure" into "must-have for every CISO."**
 
 ---
 

@@ -1,4 +1,4 @@
-# Project Ledger
+# AskLedger
 
 ### The open-source runtime trust substrate for enterprise AI
 
@@ -41,7 +41,7 @@ Cisco Model Provenance Kit). Build provenance is being locked down
 (Portkey-Palo Alto, LiteLLM, Cisco AI Defense). **Runtime
 accountability — what the model actually did, when, under what policy,
 and what evidence survives the vendor relationship — has no
-incumbent.** That is the category Project Ledger occupies, with a
+incumbent.** That is the category AskLedger occupies, with a
 12-18 month window before strategic consolidators arrive.
 
 ---
@@ -145,7 +145,7 @@ not in the code path.
          · chain linkage is intact
          · transparency-log inclusion proof is valid
        Verification requires only the receipt + the public key. No
-       call to Project Ledger. No subscription. No vendor lookup.
+       call to AskLedger. No subscription. No vendor lookup.
 ```
 
 The substrate does not block, judge, or guardrail the AI call. It
@@ -240,7 +240,7 @@ For CISO and Head of Risk audiences:
   change, plan change, support impersonation, deployment — produces a
   signed receipt on the platform's own audit chain.
 - **No lock-in.** Every receipt is verifiable independently with the
-  public key alone. A customer leaving Project Ledger retains their
+  public key alone. A customer leaving AskLedger retains their
   evidence permanently.
 
 ---
@@ -398,4 +398,4 @@ will move toward it carefully and transparently.
 **General enquiries** · GitHub Discussions (https://github.com/askledger/receipts-sdk/discussions)
 **Security disclosures** · GitHub Security Advisories (https://github.com/askledger/receipts-sdk/security/advisories/new)
 
-Project Ledger Project · Document v1.2 · June 2026 · CC-BY-4.0
+AskLedger Project · Document v1.2 · June 2026 · CC-BY-4.0

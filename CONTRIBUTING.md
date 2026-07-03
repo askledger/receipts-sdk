@@ -1,4 +1,4 @@
-# Contributing to Project Ledger Receipts SDK
+# Contributing to AskLedger Receipts SDK
 
 Thank you for considering a contribution. The receipts substrate is intended to become an open standard for AI runtime accountability — and that only happens with community participation.
 
@@ -70,4 +70,4 @@ By contributing, you agree your contributions will be licensed under Apache-2.0.
 
 ---
 
-Built by Rashed Ali Khan & Mahamed Arif · Project Ledger
+Built by Rashed Ali Khan & Mahamed Arif · AskLedger

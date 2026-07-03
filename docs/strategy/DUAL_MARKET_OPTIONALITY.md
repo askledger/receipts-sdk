@@ -70,8 +70,8 @@ index (`spec/README.md`) does not link to it.
 - Add a credentials page to `site/index.html`.
 - Pitch the substrate as a document-verification platform.
 - Talk to any document-verification customer.
-- Talk to any W3C VC working group as Project Ledger.
-- Position Project Ledger as anything other than "the cryptographic
+- Talk to any W3C VC working group as AskLedger.
+- Position AskLedger as anything other than "the cryptographic
   substrate for AI receipts" in 2026.
 
 ## Graduation conditions

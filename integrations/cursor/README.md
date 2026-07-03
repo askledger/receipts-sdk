@@ -1,6 +1,6 @@
 # @askledger/cursor-receipts
 
-MCP server that emits a Project Ledger receipt for every Cursor
+MCP server that emits a AskLedger receipt for every Cursor
 completion — drop-in audit evidence for AI-assisted code.
 
 ## Install
@@ -29,7 +29,7 @@ Add to `~/.cursor/mcp.json`:
 ```
 
 Restart Cursor. Every completion now produces a cryptographically-signed
-receipt visible in your Project Ledger console.
+receipt visible in your AskLedger console.
 
 ## Privacy
 

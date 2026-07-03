@@ -1,7 +1,7 @@
 /**
  * Zero Trust Architecture module.
  *
- * Reference implementation of the ZTA building blocks Project Ledger
+ * Reference implementation of the ZTA building blocks AskLedger
  * deployments use:
  *   - SPIFFE workload identity helpers
  *   - OPA policy decision client (every decision becomes a receipt)

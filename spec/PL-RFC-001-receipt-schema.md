@@ -1,7 +1,7 @@
 # PL-RFC-001 · Receipt Schema
 
 **Status:** Draft v0.1
-**Editor:** Project Ledger Working Group
+**Editor:** AskLedger Working Group
 **Date:** 2026-06-13
 **Supersedes:** none
 

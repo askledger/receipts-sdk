@@ -1,5 +1,5 @@
 -- Kong plug-in: pl-receipts
--- Emits a Project Ledger receipt for every upstream LLM call routed
+-- Emits a AskLedger receipt for every upstream LLM call routed
 -- through Kong. Body capture happens in the response phase so we
 -- carry tokens, latency, and status.
 

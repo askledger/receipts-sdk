@@ -84,7 +84,7 @@ const sbom = {
     timestamp: new Date().toISOString(),
     tools: [
       {
-        vendor: "Project Ledger",
+        vendor: "AskLedger",
         name: "generate-sbom.mjs",
         version: ours.version,
       },

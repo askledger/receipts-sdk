@@ -1,4 +1,4 @@
-# Project Ledger Receipts — Rust SDK
+# AskLedger Receipts — Rust SDK
 
 Wire-format compatible. Cross-verified via shared conformance vectors. Apache-2.0.
 

@@ -56,7 +56,7 @@ const VERIFY_INSTRUCTIONS = `
 HOW TO VERIFY THIS EVIDENCE PACK
 
 Prerequisites:
-  - The Project Ledger Receipts verifier (any language SDK passing the
+  - The AskLedger Receipts verifier (any language SDK passing the
     cross-language conformance vectors at test/conformance/).
   - The list of trusted public keys (included in this pack under
     \`trusted_keys\`).

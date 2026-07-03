@@ -16,7 +16,7 @@ them; do not optimise further.
 
 | Decision | Recommendation | Why |
 |---|---|---|
-| Brand name | **AskLedger** (per your other product family) — "Project Ledger" stays the technical project name | Portfolio consistency; minor semantic friction is acceptable |
+| Brand name | **AskLedger** (per your other product family) — "AskLedger" stays the technical project name | Portfolio consistency; minor semantic friction is acceptable |
 | Primary TLD | **`.org`** (~$10) | Standards-body credibility; same TLD as openssf.org, w3c.org |
 | GitHub org | `askledger` (or `askledger` if taken) | Match the brand or stay independent — both work |
 | npm org | `askledger` (or `askledger`) | Same |
@@ -76,10 +76,10 @@ Open the repo locally. Run:
 ```bash
 cd "/Users/alirashedkhan/Desktop/project ledger/receipts-sdk"
 
-# Replace the brand name everywhere (Project Ledger → AskLedger)
+# Replace the brand name everywhere (AskLedger → AskLedger)
 find . -type f \( -name "*.md" -o -name "*.html" -o -name "*.ts" -o -name "*.tsx" -o -name "*.json" \) \
   -not -path "./node_modules/*" -not -path "./.next/*" -not -path "./dist/*" -not -path "./console/.next/*" \
-  -exec sed -i '' 's/Project Ledger/AskLedger/g' {} +
+  -exec sed -i '' 's/AskLedger/AskLedger/g' {} +
 
 # Replace the package scope (@askledger → @askledger)
 find . -type f \( -name "*.json" -o -name "*.md" -o -name "*.ts" \) \
@@ -97,7 +97,7 @@ find . -type f \( -name "*.md" -o -name "*.html" -o -name "*.ts" \) \
   -exec sed -i '' 's/askledger\.io/askledger.org/g' {} +
 ```
 
-If you keep "Project Ledger" as the project name (recommended in the
+If you keep "AskLedger" as the project name (recommended in the
 dual-brand model), skip the first command — leave the technical name
 intact and only change `@askledger` → `@askledger` for npm and
 `github.com/askledger/receipts-sdk` → `askledger.org` for the domain.

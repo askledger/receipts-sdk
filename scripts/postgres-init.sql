@@ -1,4 +1,4 @@
--- Project Ledger · initial Postgres schema.
+-- AskLedger · initial Postgres schema.
 --
 -- Run automatically by the docker-compose Postgres container on first
 -- boot. Production deployments run this via the SDK's migration tooling.

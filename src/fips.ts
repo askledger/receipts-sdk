@@ -26,7 +26,7 @@
  *      to fail-fast if the environment is not FIPS-ready.
  *
  * Bottom line: this code path is what lets a regulated buyer deploy
- * Project Ledger in a FIPS-compliant configuration. The validation
+ * AskLedger in a FIPS-compliant configuration. The validation
  * certificates belong to the underlying provider (AWS, Azure, GCP,
  * Thales, Entrust, OpenSSL).
  */

@@ -1,5 +1,5 @@
 """
-LiteLLM success_callback for Project Ledger receipts.
+LiteLLM success_callback for AskLedger receipts.
 
 Drop into a LiteLLM deployment to emit a signed receipt for every LLM
 call without changing application code. Upstream PR target:

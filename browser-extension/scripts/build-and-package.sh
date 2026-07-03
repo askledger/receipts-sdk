@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build + sign + package the Project Ledger browser extension for Chrome
+# Build + sign + package the AskLedger browser extension for Chrome
 # Web Store upload.
 #
 # Steps:

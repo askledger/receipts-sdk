@@ -45,7 +45,7 @@ describe("SPIFFE helpers", () => {
 });
 
 describe("OpaDecisionClient", () => {
-  it("emits a Project Ledger receipt for every decision", async () => {
+  it("emits a AskLedger receipt for every decision", async () => {
     const kp = generateKeyPair();
     const got: unknown[] = [];
 

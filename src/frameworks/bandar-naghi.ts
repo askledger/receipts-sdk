@@ -59,9 +59,9 @@ export const QAG_FRAMEWORK: IndustryFramework = {
   structure_source:
     "https://bandarnaghi.com (homepage AI Governance section: 'The 5-Pillar Framework to Scale AI with Unbreakable Trust · Quantitative AI Governance (QAG) framework for Fortune 100 companies')",
   composes_with: [
-    "Project Ledger Records Plane",
-    "Project Ledger Evidence Engine",
-    "Project Ledger Decision Plane",
+    "AskLedger Records Plane",
+    "AskLedger Evidence Engine",
+    "AskLedger Decision Plane",
   ],
   components: [
     {
@@ -147,9 +147,9 @@ export const QAIS_FRAMEWORK: IndustryFramework = {
   structure_source:
     "https://bandarnaghi.com (homepage AI Security section: 'Three Towers to Protect the Castle - Breach-Proof AI · Quantitative AI Security (QAIS) Framework')",
   composes_with: [
-    "Project Ledger Decision Plane",
-    "Project Ledger Telemetry Ingest",
-    "Project Ledger Records Plane",
+    "AskLedger Decision Plane",
+    "AskLedger Telemetry Ingest",
+    "AskLedger Records Plane",
   ],
   components: [
     {
@@ -222,9 +222,9 @@ export const AI_AGENCY_FRAMEWORK: IndustryFramework = {
   structure_source:
     "https://bandarnaghi.com (homepage AI Agency section: 'The 7-Pillar Framework for Exponential Experience · Blueprint for deploying AI agents achieving 10x productivity')",
   composes_with: [
-    "Project Ledger Telemetry Ingest",
-    "Project Ledger Records Plane",
-    "Project Ledger Console",
+    "AskLedger Telemetry Ingest",
+    "AskLedger Records Plane",
+    "AskLedger Console",
   ],
   components: Array.from({ length: 7 }, (_, i) => ({
     id: `AGENCY-P${i + 1}`,
@@ -245,7 +245,7 @@ export const AI_AGENCY_FRAMEWORK: IndustryFramework = {
 
 /**
  * Six executive priorities Bandar publishes on bandarnaghi.com under
- * "Executive Philosophy". Receipts produced under Project Ledger
+ * "Executive Philosophy". Receipts produced under AskLedger
  * contribute measurable evidence to each priority.
  *
  * VERIFIED directly from the homepage as of 2026-06-10.

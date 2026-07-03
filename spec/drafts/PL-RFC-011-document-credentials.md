@@ -1,12 +1,12 @@
 # PL-RFC-011 · Document Credentials (Draft · Internal)
 
 **Status:** Internal draft. NOT in the public spec index. NOT published.
-**Owner:** Project Ledger TSC
+**Owner:** AskLedger TSC
 **Last reviewed:** 2026-06-13
 
 ## Purpose
 
-Codify how the Project Ledger receipt protocol extends to non-AI signed
+Codify how the AskLedger receipt protocol extends to non-AI signed
 records — employment letters, salary slips, bank statements, KYC
 attestations, education credentials — without changing the existing
 spec stack (PL-RFC-001 … 010).
