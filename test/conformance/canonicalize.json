@@ -1,6 +1,6 @@
 {
   "$schema": "https://github.com/askledger/receipts-sdk/conformance/canonicalize.v1.json",
-  "description": "RFC 8785 canonicalize vectors. Any compliant implementation must produce these exact strings.",
+  "description": "RFC 8785 (JCS) canonicalize vectors. Parse `input`, canonicalize it, and the UTF-8 output MUST equal `expected` byte-for-byte in every SDK. Covers number formatting (ES6 Number::toString), string escaping (only \", \\ and C0 controls; <>&/ and non-ASCII stay raw), and UTF-16 key ordering.",
   "vectors": [
     {
       "name": "empty object",
@@ -8,34 +8,333 @@
       "expected": "{}"
     },
     {
+      "name": "empty array",
+      "input": [],
+      "expected": "[]"
+    },
+    {
       "name": "single key",
-      "input": { "a": 1 },
+      "input": {
+        "a": 1
+      },
       "expected": "{\"a\":1}"
     },
     {
-      "name": "sorted by UTF-16 code units",
-      "input": { "b": 2, "a": 1, "c": 3 },
-      "expected": "{\"a\":1,\"b\":2,\"c\":3}"
+      "name": "key sorting basic",
+      "input": {
+        "b": 1,
+        "a": 2,
+        "c": 3
+      },
+      "expected": "{\"a\":2,\"b\":1,\"c\":3}"
     },
     {
-      "name": "nested",
-      "input": { "outer": { "z": 1, "a": 2 } },
-      "expected": "{\"outer\":{\"a\":2,\"z\":1}}"
+      "name": "nested key sorting",
+      "input": {
+        "z": {
+          "y": 1,
+          "x": 2
+        },
+        "a": [
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": "{\"a\":[3,2,1],\"z\":{\"x\":2,\"y\":1}}"
     },
     {
-      "name": "array order preserved",
-      "input": { "x": [3, 2, 1] },
-      "expected": "{\"x\":[3,2,1]}"
+      "name": "whitespace stripped",
+      "input": {
+        "a": 1,
+        "b": [
+          1,
+          2
+        ]
+      },
+      "expected": "{\"a\":1,\"b\":[1,2]}"
     },
     {
-      "name": "string escapes",
-      "input": { "s": "line1\nline2" },
-      "expected": "{\"s\":\"line1\\nline2\"}"
+      "name": "null value",
+      "input": {
+        "a": null
+      },
+      "expected": "{\"a\":null}"
     },
     {
-      "name": "booleans + null",
-      "input": { "a": true, "b": false, "c": null },
-      "expected": "{\"a\":true,\"b\":false,\"c\":null}"
+      "name": "booleans",
+      "input": {
+        "t": true,
+        "f": false
+      },
+      "expected": "{\"f\":false,\"t\":true}"
+    },
+    {
+      "name": "array of mixed",
+      "input": [
+        1,
+        "two",
+        true,
+        null,
+        3.5
+      ],
+      "expected": "[1,\"two\",true,null,3.5]"
+    },
+    {
+      "name": "unicode key sort",
+      "input": {
+        "2": 6,
+        "10": 5,
+        "é": 1,
+        "a": 2,
+        "Z": 3,
+        "": 4
+      },
+      "expected": "{\"\":4,\"10\":5,\"2\":6,\"Z\":3,\"a\":2,\"é\":1}"
+    },
+    {
+      "name": "emoji key vs bmp",
+      "input": {
+        "😀": 1,
+        "a": 2
+      },
+      "expected": "{\"a\":2,\"😀\":1}"
+    },
+    {
+      "name": "html chars raw",
+      "input": {
+        "s": "if x<1 && y>2"
+      },
+      "expected": "{\"s\":\"if x<1 && y>2\"}"
+    },
+    {
+      "name": "ampersand raw",
+      "input": {
+        "s": "a&b&c"
+      },
+      "expected": "{\"s\":\"a&b&c\"}"
+    },
+    {
+      "name": "forward slash raw",
+      "input": {
+        "s": "http://a/b/c"
+      },
+      "expected": "{\"s\":\"http://a/b/c\"}"
+    },
+    {
+      "name": "quote and backslash",
+      "input": {
+        "s": "he said \"hi\" \\ ok"
+      },
+      "expected": "{\"s\":\"he said \\\"hi\\\" \\\\ ok\"}"
+    },
+    {
+      "name": "control escapes",
+      "input": {
+        "s": "tab\tnl\ncr\rbell\u0007null\u0000"
+      },
+      "expected": "{\"s\":\"tab\\tnl\\ncr\\rbell\\u0007null\\u0000\"}"
+    },
+    {
+      "name": "backspace formfeed",
+      "input": {
+        "s": "\b\f"
+      },
+      "expected": "{\"s\":\"\\b\\f\"}"
+    },
+    {
+      "name": "unit separator",
+      "input": {
+        "s": "\u001f"
+      },
+      "expected": "{\"s\":\"\\u001f\"}"
+    },
+    {
+      "name": "del char raw 0x7f",
+      "input": {
+        "s": ""
+      },
+      "expected": "{\"s\":\"\"}"
+    },
+    {
+      "name": "non-ascii latin raw",
+      "input": {
+        "s": "café naïve"
+      },
+      "expected": "{\"s\":\"café naïve\"}"
+    },
+    {
+      "name": "non-ascii cjk raw",
+      "input": {
+        "s": "中文测试"
+      },
+      "expected": "{\"s\":\"中文测试\"}"
+    },
+    {
+      "name": "emoji raw surrogate",
+      "input": {
+        "s": "go 😀 now"
+      },
+      "expected": "{\"s\":\"go 😀 now\"}"
+    },
+    {
+      "name": "u2028 u2029 raw",
+      "input": {
+        "s": "a b c"
+      },
+      "expected": "{\"s\":\"a b c\"}"
+    },
+    {
+      "name": "int zero",
+      "input": {
+        "n": 0
+      },
+      "expected": "{\"n\":0}"
+    },
+    {
+      "name": "int one",
+      "input": {
+        "n": 1
+      },
+      "expected": "{\"n\":1}"
+    },
+    {
+      "name": "negative int",
+      "input": {
+        "n": -42
+      },
+      "expected": "{\"n\":-42}"
+    },
+    {
+      "name": "simple decimal",
+      "input": {
+        "n": 1.5
+      },
+      "expected": "{\"n\":1.5}"
+    },
+    {
+      "name": "decimal 0.1",
+      "input": {
+        "n": 0.1
+      },
+      "expected": "{\"n\":0.1}"
+    },
+    {
+      "name": "decimal repeating",
+      "input": {
+        "n": 123.456
+      },
+      "expected": "{\"n\":123.456}"
+    },
+    {
+      "name": "tiny exp 1e-7",
+      "input": {
+        "n": 1e-7
+      },
+      "expected": "{\"n\":1e-7}"
+    },
+    {
+      "name": "boundary 1e-6",
+      "input": {
+        "n": 0.000001
+      },
+      "expected": "{\"n\":0.000001}"
+    },
+    {
+      "name": "boundary 1e20",
+      "input": {
+        "n": 100000000000000000000
+      },
+      "expected": "{\"n\":100000000000000000000}"
+    },
+    {
+      "name": "big exp 1e21",
+      "input": {
+        "n": 1e+21
+      },
+      "expected": "{\"n\":1e+21}"
+    },
+    {
+      "name": "big exp 1e22",
+      "input": {
+        "n": 1e+22
+      },
+      "expected": "{\"n\":1e+22}"
+    },
+    {
+      "name": "huge 1e100",
+      "input": {
+        "n": 1e+100
+      },
+      "expected": "{\"n\":1e+100}"
+    },
+    {
+      "name": "min subnormal 5e-324",
+      "input": {
+        "n": 5e-324
+      },
+      "expected": "{\"n\":5e-324}"
+    },
+    {
+      "name": "max double",
+      "input": {
+        "n": 1.7976931348623157e+308
+      },
+      "expected": "{\"n\":1.7976931348623157e+308}"
+    },
+    {
+      "name": "neg exp small",
+      "input": {
+        "n": -2.5e-10
+      },
+      "expected": "{\"n\":-2.5e-10}"
+    },
+    {
+      "name": "large int exact",
+      "input": {
+        "n": 9007199254740992
+      },
+      "expected": "{\"n\":9007199254740992}"
+    },
+    {
+      "name": "fraction 0.000001",
+      "input": {
+        "n": 0.000001
+      },
+      "expected": "{\"n\":0.000001}"
+    },
+    {
+      "name": "thousand",
+      "input": {
+        "n": 1000
+      },
+      "expected": "{\"n\":1000}"
+    },
+    {
+      "name": "million float",
+      "input": {
+        "n": 1000000
+      },
+      "expected": "{\"n\":1000000}"
+    },
+    {
+      "name": "receipt-like payload",
+      "input": {
+        "event": {
+          "prompt": "summarize if a<b & c>d",
+          "cost_usd": 0.00042,
+          "latency_ms": 1234.5,
+          "lang": "café"
+        },
+        "decision": {
+          "reason_codes": [
+            "ok"
+          ],
+          "score": 0.97
+        },
+        "chain_height": 42
+      },
+      "expected": "{\"chain_height\":42,\"decision\":{\"reason_codes\":[\"ok\"],\"score\":0.97},\"event\":{\"cost_usd\":0.00042,\"lang\":\"café\",\"latency_ms\":1234.5,\"prompt\":\"summarize if a<b & c>d\"}}"
     }
   ]
 }
