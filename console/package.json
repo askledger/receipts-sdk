@@ -1,0 +1,37 @@
+{
+  "name": "@askledger/console",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AskLedger enterprise admin console — Next.js 14 App Router",
+  "scripts": {
+    "dev": "next dev",
+    "prebuild": "node scripts/generate-demo-receipts.mjs",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "demo:gen": "node scripts/generate-demo-receipts.mjs",
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install --with-deps"
+  },
+  "dependencies": {
+    "next": "14.2.5",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "@askledger/receipts-sdk": "file:..",
+    "clsx": "^2.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.41",
+    "tailwindcss": "^3.4.10",
+    "typescript": "^5.5.0",
+    "eslint": "^9.9.0",
+    "eslint-config-next": "14.2.5",
+    "@playwright/test": "^1.47.0",
+    "@axe-core/playwright": "^4.10.0"
+  }
+}

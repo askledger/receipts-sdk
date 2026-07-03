@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="color-scheme" content="dark" />
+<title>Verify a Receipt · AskLedger</title>
+<meta name="description" content="Verify any AskLedger AI Decision Receipt entirely in your browser. No login. No server call. Just public-key cryptography." />
+<meta name="theme-color" content="#0a1530" />
+<style>
+:root {
+  --navy-950: #060d22;
+  --navy-900: #0a1530;
+  --navy-800: #11203f;
+  --navy-700: #172547;
+  --gold: #c79b3c;
+  --gold-300: #e8c878;
+  --ink-100: #eef1fa;
+  --ink-300: #c5cae0;
+  --ink-400: #a8b1cf;
+  --ink-500: #8a93b6;
+  --line: rgba(232,200,120,.12);
+  --line-strong: rgba(232,200,120,.28);
+  --green: #4dd0a0;
+  --green-bg: rgba(77,208,160,.10);
+  --red: #ff6b6b;
+  --red-bg: rgba(255,107,107,.10);
+  --amber: #ffba59;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', SFMono-Regular, ui-monospace, Menlo, monospace;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: radial-gradient(900px 500px at 90% -10%, rgba(199,155,60,.08), transparent 60%),
+              linear-gradient(180deg, var(--navy-950) 0%, var(--navy-900) 100%);
+  color: var(--ink-100);
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  line-height: 1.55;
+}
+a { color: var(--gold-300); text-decoration: none; }
+a:hover { color: var(--gold); }
+a:focus-visible, button:focus-visible, textarea:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+header.nav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(10,21,48,0.72);
+  backdrop-filter: saturate(140%) blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.nav-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; }
+.brand-mark { width: 26px; height: 26px; border-radius: 6px; background: linear-gradient(135deg, var(--gold), var(--gold-300)); position: relative; }
+.brand-mark::after { content: ""; position: absolute; inset: 4px; border-radius: 3px; background: var(--navy-900); }
+.brand-mark::before { content: ""; position: absolute; left: 8px; right: 8px; top: 12px; height: 2px; background: var(--gold-300); z-index: 2; border-radius: 2px; }
+.nav-links { display: flex; gap: 22px; font-size: 14px; }
+.nav-links a { color: var(--ink-300); }
+.nav-links a:hover { color: var(--ink-100); }
+
+main { padding: 48px 0 96px; }
+.eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px;
+  background: rgba(232,200,120,.08); border: 1px solid var(--line-strong);
+  font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--gold-300); }
+.eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+h1 { font-size: clamp(28px, 4vw, 42px); letter-spacing: -.018em; margin: 16px 0 12px; font-weight: 800; }
+.lead { font-size: 17px; color: var(--ink-300); max-width: 760px; }
+.privacy {
+  display: inline-flex; gap: 10px; padding: 10px 14px; margin-top: 20px; font-size: 13px;
+  background: var(--green-bg); border: 1px solid rgba(77,208,160,.3); color: var(--green);
+  border-radius: 8px; font-weight: 500;
+}
+
+.grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 28px; margin-top: 32px; }
+@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+@media (max-width: 640px) {
+  .container { padding: 0 14px; }
+  main { padding: 32px 0 56px; }
+  h1 { font-size: 24px; line-height: 1.2; }
+  .lead { font-size: 14.5px; }
+  .panel { padding: 18px; }
+  .label { font-size: 11px; }
+  textarea { min-height: 140px; font-size: 12px; }
+  input[type=text] { font-size: 12px; }
+  .btn { font-size: 13px; padding: 0 14px; height: 42px; }
+  .actions { flex-direction: column; align-items: stretch; }
+  .actions .btn { width: 100%; justify-content: center; }
+  .checks li { grid-template-columns: 18px 1fr; gap: 8px; }
+  .checks .desc { font-size: 11.5px; word-break: break-all; }
+  .result-head { padding: 12px 14px; font-size: 14px; }
+  .samples { gap: 6px; }
+  .samples button { font-size: 11.5px; padding: 5px 8px; }
+  .recipe ol { font-size: 13px; padding-left: 18px; }
+  .privacy { font-size: 12px; }
+  .nav-links { gap: 14px; font-size: 13px; }
+}
+@media (hover: none) and (pointer: coarse) {
+  .btn, textarea, input { min-height: 44px; }
+}
+
+.panel {
+  background: rgba(255,255,255,.03);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 24px;
+}
+.panel h2 { font-size: 16px; font-weight: 700; margin: 0 0 14px; letter-spacing: -.005em; }
+.label { display: block; font-size: 12px; font-weight: 600; color: var(--ink-400); text-transform: uppercase; letter-spacing: .04em; margin: 18px 0 8px; }
+.label:first-child { margin-top: 0; }
+textarea {
+  width: 100%; min-height: 180px;
+  background: var(--navy-950); color: var(--ink-100);
+  border: 1px solid var(--line); border-radius: 10px; padding: 14px;
+  font-family: var(--font-mono); font-size: 12.5px; resize: vertical;
+}
+textarea::placeholder { color: var(--ink-500); }
+input[type=text] {
+  width: 100%;
+  background: var(--navy-950); color: var(--ink-100);
+  border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+  font-family: var(--font-mono); font-size: 12.5px;
+}
+
+.actions { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
+.btn { display: inline-flex; align-items: center; gap: 8px; height: 42px; padding: 0 18px; border-radius: 8px;
+  font-size: 14px; font-weight: 600; border: 1px solid var(--line-strong); background: transparent;
+  color: var(--ink-100); cursor: pointer; transition: transform .12s ease, background .15s ease; }
+.btn:hover:not(:disabled) { background: rgba(232,200,120,.08); transform: translateY(-1px); }
+.btn-primary { background: var(--gold); color: var(--navy-900); border-color: var(--gold); }
+.btn-primary:hover:not(:disabled) { background: var(--gold-300); border-color: var(--gold-300); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn-ghost { border-color: transparent; color: var(--ink-300); }
+.btn-ghost:hover { background: rgba(255,255,255,.04); }
+
+.result {
+  margin-top: 16px;
+}
+.result-head { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 10px;
+  font-weight: 600; font-size: 15px; }
+.result-head.ok { background: var(--green-bg); color: var(--green); border: 1px solid rgba(77,208,160,.3); }
+.result-head.fail { background: var(--red-bg); color: var(--red); border: 1px solid rgba(255,107,107,.3); }
+.result-head .glyph { font-size: 20px; }
+
+.checks { list-style: none; margin: 18px 0 0; padding: 0; font-size: 14px; }
+.checks li { display: grid; grid-template-columns: 24px 1fr; gap: 12px; align-items: start;
+  padding: 10px 0; border-top: 1px dashed var(--line); }
+.checks li:first-child { border-top: none; }
+.checks .pass { color: var(--green); font-weight: 700; }
+.checks .fail { color: var(--red); font-weight: 700; }
+.checks .skip { color: var(--ink-500); font-weight: 700; }
+.checks .name { color: var(--ink-100); font-weight: 600; }
+.checks .desc { color: var(--ink-400); font-size: 13px; margin-top: 2px; font-family: var(--font-mono); }
+
+.recipe {
+  margin-top: 24px;
+}
+.recipe h2 { margin-bottom: 14px; }
+.recipe ol { margin: 0; padding-left: 22px; color: var(--ink-300); font-size: 14px; line-height: 1.7; }
+.recipe ol li { margin: 6px 0; }
+.recipe code { font-family: var(--font-mono); font-size: 12.5px; background: rgba(232,200,120,.08); padding: 2px 6px; border-radius: 4px; color: var(--gold-300); }
+
+.errors { margin-top: 14px; padding: 12px 14px; background: rgba(255,107,107,.08); border: 1px solid rgba(255,107,107,.3); border-radius: 8px; }
+.errors b { color: var(--red); font-size: 13px; }
+.errors ul { margin: 6px 0 0; padding-left: 20px; font-family: var(--font-mono); font-size: 12px; color: var(--ink-300); }
+
+.samples { margin-top: 18px; display: flex; gap: 8px; flex-wrap: wrap; }
+.samples button { font-size: 12px; padding: 6px 10px; border-radius: 6px;
+  border: 1px solid var(--line); background: transparent; color: var(--ink-300); cursor: pointer; }
+.samples button:hover { color: var(--ink-100); border-color: var(--line-strong); }
+
+footer { padding: 32px 0; border-top: 1px solid var(--line); color: var(--ink-500); font-size: 12.5px; text-align: center; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-inner">
+    <a href="index.html" class="brand" style="color:inherit">
+      <div class="brand-mark" aria-hidden="true"></div>
+      <span>AskLedger</span>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="playground.html">Playground</a>
+      <a href="https://github.com/askledger/receipts-sdk">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="eyebrow"><span class="dot"></span> Public verifier · runs in your browser</div>
+    <h1>Verify any AskLedger receipt.</h1>
+    <p class="lead">Paste a signed receipt and the public key it was signed with. The verifier runs entirely in your browser using the published <a href="https://github.com/askledger/receipts-sdk/blob/main/docs/RECEIPTS_PROTOCOL.md">Receipts Protocol v0.1</a> — no server call, no login, no AskLedger dependency at runtime. This is what "openly verifiable" actually means.</p>
+    <div class="privacy">
+      <span aria-hidden>🔒</span>
+      <span>Your receipt never leaves this tab. All cryptographic work happens locally via audited Ed25519 + SHA-256 primitives.</span>
+    </div>
+
+    <div class="grid">
+      <section class="panel">
+        <h2>Input</h2>
+
+        <label class="label" for="receipt">Signed receipt JSON</label>
+        <textarea id="receipt" spellcheck="false" placeholder='Paste the SignedReceipt envelope, e.g. { "receipt": {...}, "signatures": [...] }'></textarea>
+
+        <label class="label" for="pubkey">Public key (base64, 32 bytes) — and optional key id</label>
+        <input id="kid" type="text" placeholder="kid (must match signatures[].kid) — optional" />
+        <input id="pubkey" type="text" placeholder="base64 32-byte Ed25519 public key" style="margin-top:8px" />
+
+        <label class="label" for="previous">Previous receipt (optional, for chain link check)</label>
+        <textarea id="previous" spellcheck="false" placeholder='Paste the immediately-preceding SignedReceipt to verify the chain link' style="min-height:120px"></textarea>
+
+        <div class="samples">
+          <span style="font-size:12px;color:var(--ink-500);align-self:center">Samples:</span>
+          <button type="button" onclick="loadSample(0)">Valid receipt</button>
+          <button type="button" onclick="loadSample(1)">Tampered receipt</button>
+          <button type="button" onclick="loadSample(2)">Chained pair</button>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="verifyBtn">
+            Verify
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+          </button>
+          <button class="btn btn-ghost" type="button" onclick="clearAll()">Clear</button>
+          <span id="status" style="align-self:center;font-size:13px;color:var(--ink-400)"></span>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <h2>Result</h2>
+        <div id="result"><p style="color:var(--ink-400);font-size:14px;margin:0">Paste a receipt and click <b>Verify</b>. The full verification trace will appear here.</p></div>
+      </aside>
+    </div>
+
+    <section class="recipe panel" style="margin-top:28px">
+      <h2>Verification recipe — the same one the SDK uses</h2>
+      <ol>
+        <li>Take the <code>receipt</code> object and set <code>integrity.receipt_hash = ""</code>.</li>
+        <li>Canonicalize per <a href="https://datatracker.ietf.org/doc/html/rfc8785">RFC 8785</a> (sorted keys by UTF-16 code units, no whitespace, RFC 8259 escapes).</li>
+        <li>Compute SHA-256 hex of the canonical bytes. This is the <code>expected_receipt_hash</code>.</li>
+        <li>Compare to the original <code>integrity.receipt_hash</code>. They must match.</li>
+        <li>Canonicalize the full receipt (with the populated <code>receipt_hash</code>) — these are the bytes that were signed.</li>
+        <li>Ed25519-verify <code>signatures[0].sig</code> against those bytes and the supplied 32-byte public key. Must verify.</li>
+        <li>If a previous receipt is supplied, check <code>integrity.previous_receipt_hash</code> equals the previous receipt's <code>integrity.receipt_hash</code>.</li>
+      </ol>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    AskLedger · open spec · <a href="https://github.com/askledger/receipts-sdk/blob/main/docs/RECEIPTS_PROTOCOL.md">Receipts Protocol v0.1</a> · <a href="https://github.com/askledger/receipts-sdk">@askledger/receipts-sdk</a>
+  </div>
+</footer>
+
+<script type="module">
+import { sha256 } from "https://esm.sh/@noble/hashes@1.4.0/sha2";
+import { sha512 } from "https://esm.sh/@noble/hashes@1.4.0/sha2";
+import * as ed from "https://esm.sh/@noble/ed25519@2.1.0";
+import canonicalize from "https://esm.sh/canonicalize@2.0.0";
+
+// Install sync SHA-512 for noble/ed25519
+function concatBytes(...arrs) {
+  let n = 0; for (const a of arrs) n += a.length;
+  const out = new Uint8Array(n); let off = 0;
+  for (const a of arrs) { out.set(a, off); off += a.length; }
+  return out;
+}
+ed.etc.sha512Sync = (...m) => sha512(concatBytes(...m));
+
+function bytesToHex(b) { return Array.from(b).map(x => x.toString(16).padStart(2, "0")).join(""); }
+function b64ToBytes(s) {
+  const bin = atob(s.replace(/\s+/g, ""));
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
+function canonicalizeBytes(v) {
+  return new TextEncoder().encode(canonicalize(v));
+}
+
+function deepCopy(v) { return JSON.parse(JSON.stringify(v)); }
+
+async function verifyReceipt(signed, publicKeys, previous) {
+  const checks = {
+    parse: { state: "skip", desc: "" },
+    schema: { state: "skip", desc: "" },
+    canonical_hash: { state: "skip", desc: "" },
+    signature: { state: "skip", desc: "" },
+    chain_link: { state: "skip", desc: "" },
+  };
+  const errors = [];
+
+  try {
+    if (!signed || typeof signed !== "object") throw new Error("receipt must be a JSON object");
+    if (!signed.receipt) throw new Error("missing top-level 'receipt' field");
+    if (!Array.isArray(signed.signatures) || signed.signatures.length === 0)
+      throw new Error("missing 'signatures' array");
+    checks.parse = { state: "pass", desc: "Envelope structure OK" };
+  } catch (e) {
+    checks.parse = { state: "fail", desc: e.message };
+    errors.push(e.message);
+    return { valid: false, checks, errors };
+  }
+
+  if (signed.receipt.schema_version !== "1.0") {
+    checks.schema = { state: "fail", desc: `expected "1.0", got "${signed.receipt.schema_version}"` };
+    errors.push("unsupported schema_version");
+  } else {
+    checks.schema = { state: "pass", desc: 'schema_version is "1.0"' };
+  }
+
+  // 1. Recompute receipt_hash
+  try {
+    const body = deepCopy(signed.receipt);
+    body.integrity.receipt_hash = "";
+    const canon = canonicalizeBytes(body);
+    const expected = bytesToHex(sha256(canon));
+    const got = signed.receipt.integrity?.receipt_hash;
+    if (expected === got) {
+      checks.canonical_hash = {
+        state: "pass",
+        desc: `RFC 8785 + SHA-256 = ${expected.slice(0, 12)}…${expected.slice(-6)}`,
+      };
+    } else {
+      checks.canonical_hash = {
+        state: "fail",
+        desc: `expected ${expected.slice(0, 12)}…  got ${(got ?? "(none)").slice(0, 12)}…`,
+      };
+      errors.push("canonical hash mismatch");
+    }
+  } catch (e) {
+    checks.canonical_hash = { state: "fail", desc: e.message };
+    errors.push("canonical hash check failed: " + e.message);
+  }
+
+  // 2. Signature verification
+  try {
+    const canonSign = canonicalizeBytes(signed.receipt);
+    let any = false;
+    for (const sig of signed.signatures) {
+      const pk = publicKeys[sig.kid] || publicKeys.__default;
+      if (!pk) {
+        errors.push(`no public key supplied for kid=${sig.kid}`);
+        continue;
+      }
+      const pkBytes = b64ToBytes(pk);
+      const sigBytes = b64ToBytes(sig.sig);
+      if (pkBytes.length !== 32) {
+        errors.push(`public key must be 32 bytes (got ${pkBytes.length})`);
+        continue;
+      }
+      if (sigBytes.length !== 64) {
+        errors.push(`signature must be 64 bytes (got ${sigBytes.length})`);
+        continue;
+      }
+      const ok = await ed.verifyAsync(sigBytes, canonSign, pkBytes);
+      if (ok) any = true;
+      else errors.push(`signature invalid for kid=${sig.kid}`);
+    }
+    checks.signature = any
+      ? { state: "pass", desc: `Ed25519 signature verifies against supplied public key` }
+      : { state: "fail", desc: "no valid signature" };
+  } catch (e) {
+    checks.signature = { state: "fail", desc: e.message };
+    errors.push("signature check failed: " + e.message);
+  }
+
+  // 3. Chain link
+  if (previous) {
+    try {
+      const prevHash = previous.receipt?.integrity?.receipt_hash;
+      const thisPrev = signed.receipt.integrity?.previous_receipt_hash;
+      if (prevHash === thisPrev) {
+        checks.chain_link = { state: "pass", desc: "previous_receipt_hash matches prior receipt" };
+      } else {
+        checks.chain_link = {
+          state: "fail",
+          desc: `expected previous_receipt_hash ${prevHash?.slice(0, 12)}…, got ${thisPrev?.slice(0, 12)}…`,
+        };
+        errors.push("chain link broken");
+      }
+    } catch (e) {
+      checks.chain_link = { state: "fail", desc: e.message };
+    }
+  }
+
+  const valid = checks.canonical_hash.state === "pass" &&
+                checks.signature.state === "pass" &&
+                checks.chain_link.state !== "fail";
+
+  return { valid, checks, errors };
+}
+
+function render(result) {
+  const root = document.getElementById("result");
+  if (!result) { root.innerHTML = ""; return; }
+  const ok = result.valid;
+  const head = ok
+    ? `<div class="result-head ok"><span class="glyph">✓</span><span>Receipt is <b>VALID</b></span></div>`
+    : `<div class="result-head fail"><span class="glyph">✕</span><span>Receipt is <b>INVALID</b></span></div>`;
+
+  const checkRows = Object.entries(result.checks).map(([key, c]) => {
+    const label = {
+      parse: "Envelope structure",
+      schema: "Schema version",
+      canonical_hash: "Canonical hash (RFC 8785 + SHA-256)",
+      signature: "Ed25519 signature",
+      chain_link: "Chain link to previous receipt",
+    }[key] ?? key;
+    const glyph = c.state === "pass" ? "✓" : c.state === "fail" ? "✕" : "—";
+    const tone = c.state === "pass" ? "pass" : c.state === "fail" ? "fail" : "skip";
+    const desc = c.desc ? `<div class="desc">${c.desc}</div>` : "";
+    return `<li><span class="${tone}">${glyph}</span><div><span class="name">${label}</span>${desc}</div></li>`;
+  }).join("");
+
+  const errs = result.errors.length
+    ? `<div class="errors"><b>Errors</b><ul>${result.errors.map(e => `<li>${e}</li>`).join("")}</ul></div>`
+    : "";
+
+  root.innerHTML = `${head}<ul class="checks">${checkRows}</ul>${errs}`;
+}
+
+async function doVerify() {
+  const btn = document.getElementById("verifyBtn");
+  const statusEl = document.getElementById("status");
+  btn.disabled = true;
+  statusEl.textContent = "verifying…";
+  try {
+    const receiptText = document.getElementById("receipt").value.trim();
+    if (!receiptText) throw new Error("Paste a receipt first.");
+    const signed = JSON.parse(receiptText);
+
+    const kid = document.getElementById("kid").value.trim();
+    const pk = document.getElementById("pubkey").value.trim();
+    if (!pk) throw new Error("Provide the public key (32-byte base64).");
+    const keys = kid ? { [kid]: pk } : { __default: pk };
+
+    const previousText = document.getElementById("previous").value.trim();
+    const previous = previousText ? JSON.parse(previousText) : null;
+
+    const t0 = performance.now();
+    const result = await verifyReceipt(signed, keys, previous);
+    const t1 = performance.now();
+    statusEl.textContent = `verified in ${(t1 - t0).toFixed(1)} ms`;
+    render(result);
+  } catch (e) {
+    statusEl.textContent = "";
+    render({
+      valid: false,
+      checks: { parse: { state: "fail", desc: e.message } },
+      errors: [e.message],
+    });
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function clearAll() {
+  document.getElementById("receipt").value = "";
+  document.getElementById("kid").value = "";
+  document.getElementById("pubkey").value = "";
+  document.getElementById("previous").value = "";
+  document.getElementById("result").innerHTML =
+    '<p style="color:var(--ink-400);font-size:14px;margin:0">Paste a receipt and click <b>Verify</b>. The full verification trace will appear here.</p>';
+  document.getElementById("status").textContent = "";
+}
+
+// Generate samples on-the-fly so they always verify against the live SDK
+async function generateSamples() {
+  const priv = ed.utils.randomPrivateKey();
+  const pub = await ed.getPublicKeyAsync(priv);
+  const kid = "demo-" + bytesToHex(crypto.getRandomValues(new Uint8Array(4)));
+
+  async function signOne(eventOverrides, previous) {
+    const event = {
+      schema_version: "1.0",
+      tenant_id: "demo-tenant",
+      event_type: "gateway.request",
+      source_system: "verifier-demo",
+      event_id: "evt-" + Math.random().toString(36).slice(2, 10),
+      captured_at: new Date().toISOString(),
+      context: { environment: "production" },
+      subject: { ai_vendor: "anthropic", ai_model: "claude-sonnet-4-6" },
+      payload: { input_classification: "internal", output_classification: "internal" },
+      ...eventOverrides,
+    };
+    const integrity = {
+      previous_receipt_hash: previous
+        ? previous.receipt.integrity.receipt_hash
+        : "0".repeat(64),
+      receipt_hash: "",
+      chain_height: previous ? previous.receipt.integrity.chain_height + 1 : 1,
+    };
+    const receipt = {
+      schema_version: "1.0",
+      receipt_id: "01J9X" + bytesToHex(crypto.getRandomValues(new Uint8Array(8))).toUpperCase(),
+      tenant_id: event.tenant_id,
+      issued_at: new Date().toISOString(),
+      event,
+      integrity,
+    };
+    const canonForHash = canonicalizeBytes(receipt);
+    const rhash = bytesToHex(sha256(canonForHash));
+    receipt.integrity.receipt_hash = rhash;
+    const canonSig = canonicalizeBytes(receipt);
+    const sig = await ed.signAsync(canonSig, priv);
+    return {
+      receipt,
+      signatures: [{ alg: "EdDSA", kid, sig: btoa(String.fromCharCode(...sig)) }],
+    };
+  }
+
+  const valid = await signOne();
+  const tampered = JSON.parse(JSON.stringify(valid));
+  tampered.receipt.event.subject.ai_model = "downgraded-model-7b";  // mutate without re-signing
+  const r1 = await signOne({ event_id: "evt-chain-1" });
+  const r2 = await signOne({ event_id: "evt-chain-2" }, r1);
+
+  return {
+    pub: btoa(String.fromCharCode(...pub)),
+    kid,
+    samples: [
+      { receipt: valid, label: "valid" },
+      { receipt: tampered, label: "tampered" },
+      { receipt: r2, previous: r1, label: "chain" },
+    ],
+  };
+}
+
+let SAMPLES = null;
+async function ensureSamples() {
+  if (!SAMPLES) {
+    document.getElementById("status").textContent = "preparing samples…";
+    SAMPLES = await generateSamples();
+    document.getElementById("status").textContent = "";
+  }
+}
+
+window.loadSample = async (idx) => {
+  await ensureSamples();
+  document.getElementById("receipt").value = JSON.stringify(SAMPLES.samples[idx].receipt, null, 2);
+  document.getElementById("kid").value = SAMPLES.kid;
+  document.getElementById("pubkey").value = SAMPLES.pub;
+  document.getElementById("previous").value = SAMPLES.samples[idx].previous
+    ? JSON.stringify(SAMPLES.samples[idx].previous, null, 2)
+    : "";
+  document.getElementById("status").textContent = `loaded sample: ${SAMPLES.samples[idx].label}`;
+};
+
+window.clearAll = clearAll;
+document.getElementById("verifyBtn").addEventListener("click", doVerify);
+
+// Pre-load SDK + samples in the background
+ensureSamples().catch(e => {
+  document.getElementById("status").textContent = "sample preparation failed: " + e.message;
+});
+</script>
+
+</body>
+</html>

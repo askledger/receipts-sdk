@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#060d22"/>
+      <stop offset="100%" stop-color="#0a1530"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c79b3c"/>
+      <stop offset="100%" stop-color="#e8c878"/>
+    </linearGradient>
+    <linearGradient id="hashline" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#e8c878" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#e8c878" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#e8c878" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Decorative chain pattern (subtle, lower right) -->
+  <g opacity="0.07" font-family="ui-monospace, monospace" font-size="14" fill="#e8c878">
+    <text x="780" y="100">a73f2ce5...8b3c1e</text>
+    <text x="780" y="130">92cd1a0b...d04e5e</text>
+    <text x="780" y="160">5f8a23e1...c7b209</text>
+    <text x="780" y="190">71d4ee92...a3f018</text>
+    <text x="780" y="220">b06c4317...e2d845</text>
+    <text x="780" y="250">3e8b71c9...0d4ac6</text>
+    <text x="780" y="280">d52f1980...69c437</text>
+  </g>
+
+  <!-- Brand mark (top left) -->
+  <g transform="translate(80, 80)">
+    <rect width="44" height="44" rx="9" fill="url(#gold)"/>
+    <rect x="5" y="5" width="34" height="34" rx="5" fill="#0a1530"/>
+    <rect x="11" y="21" width="22" height="3" rx="1.5" fill="#e8c878"/>
+    <text x="60" y="32" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="800" fill="#f6f7fb" letter-spacing="-0.5">AskLedger</text>
+  </g>
+
+  <!-- Eyebrow -->
+  <g transform="translate(80, 200)">
+    <circle cx="6" cy="6" r="4" fill="#4dd0a0"/>
+    <text x="18" y="11" font-family="Inter, system-ui, sans-serif" font-size="15" font-weight="600" fill="#c5cae0" letter-spacing="1.5">LIVE ON NPM · v0.6.0 · APACHE-2.0</text>
+  </g>
+
+  <!-- Headline -->
+  <g transform="translate(80, 240)">
+    <text font-family="Inter, system-ui, sans-serif" font-size="68" font-weight="800" fill="#f6f7fb" letter-spacing="-2">
+      <tspan x="0" y="60">Cryptographic evidence</tspan>
+      <tspan x="0" y="135">for enterprise AI.</tspan>
+    </text>
+  </g>
+
+  <!-- Subhead -->
+  <g transform="translate(80, 430)">
+    <text font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="400" fill="#a8b1cf">
+      <tspan x="0" y="0">Every AI invocation produces a signed, hash-chained,</tspan>
+      <tspan x="0" y="32">regulator-verifiable receipt. No platform dependency.</tspan>
+    </text>
+  </g>
+
+  <!-- Install command box -->
+  <g transform="translate(80, 510)">
+    <rect width="640" height="60" rx="10" fill="rgba(232,200,120,0.08)" stroke="rgba(232,200,120,0.32)" stroke-width="1"/>
+    <text x="24" y="39" font-family="ui-monospace, SFMono-Regular, monospace" font-size="22" fill="#e8c878">npm install @askledger/receipts-sdk</text>
+  </g>
+
+  <!-- Stats bar (bottom right) -->
+  <g transform="translate(750, 520)" font-family="Inter, system-ui, sans-serif">
+    <text x="0" y="20" font-size="13" font-weight="600" fill="#8a93b6" letter-spacing="1">TESTS</text>
+    <text x="0" y="55" font-size="34" font-weight="800" fill="#f6f7fb">280</text>
+
+    <text x="130" y="20" font-size="13" font-weight="600" fill="#8a93b6" letter-spacing="1">HARDENING</text>
+    <text x="130" y="55" font-size="34" font-weight="800" fill="#f6f7fb">66<tspan font-size="22" fill="#a8b1cf">/66</tspan></text>
+
+    <text x="290" y="20" font-size="13" font-weight="600" fill="#8a93b6" letter-spacing="1">SDKs</text>
+    <text x="290" y="55" font-size="34" font-weight="800" fill="#f6f7fb">5</text>
+  </g>
+
+  <!-- Bottom accent line -->
+  <rect x="0" y="618" width="1200" height="2" fill="url(#hashline)"/>
+</svg>

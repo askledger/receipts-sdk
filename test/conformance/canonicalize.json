@@ -1,0 +1,41 @@
+{
+  "$schema": "https://github.com/askledger/receipts-sdk/conformance/canonicalize.v1.json",
+  "description": "RFC 8785 canonicalize vectors. Any compliant implementation must produce these exact strings.",
+  "vectors": [
+    {
+      "name": "empty object",
+      "input": {},
+      "expected": "{}"
+    },
+    {
+      "name": "single key",
+      "input": { "a": 1 },
+      "expected": "{\"a\":1}"
+    },
+    {
+      "name": "sorted by UTF-16 code units",
+      "input": { "b": 2, "a": 1, "c": 3 },
+      "expected": "{\"a\":1,\"b\":2,\"c\":3}"
+    },
+    {
+      "name": "nested",
+      "input": { "outer": { "z": 1, "a": 2 } },
+      "expected": "{\"outer\":{\"a\":2,\"z\":1}}"
+    },
+    {
+      "name": "array order preserved",
+      "input": { "x": [3, 2, 1] },
+      "expected": "{\"x\":[3,2,1]}"
+    },
+    {
+      "name": "string escapes",
+      "input": { "s": "line1\nline2" },
+      "expected": "{\"s\":\"line1\\nline2\"}"
+    },
+    {
+      "name": "booleans + null",
+      "input": { "a": true, "b": false, "c": null },
+      "expected": "{\"a\":true,\"b\":false,\"c\":null}"
+    }
+  ]
+}

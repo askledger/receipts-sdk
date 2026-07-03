@@ -1,0 +1,65 @@
+# One-command AskLedger demo stack.
+#
+#   docker compose up
+#
+# Brings up:
+#   - Postgres 16 (chain state + receipts persistence)
+#   - The admin console (Next.js) — http://localhost:3000
+#   - A static file server for the public site — http://localhost:3001
+#
+# Default credentials are demo-only. Change ALL secrets before any
+# real deployment.
+
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ledger
+      POSTGRES_PASSWORD: change-me-demo-only
+      POSTGRES_DB: ledger
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ledger -d ledger"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./scripts/postgres-init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    # Postgres is reachable by other services over the compose network; do NOT
+    # publish it to the host. Uncomment only if you need a local DB client.
+    # ports:
+    #   - "5432:5432"
+
+  console:
+    build:
+      context: ./console
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # This is a LOCAL DEMO compose, not a production deployment. NODE_ENV is
+      # development so the dev-login helper works for browsing; production builds
+      # hard-disable dev login and require a real IdP. Change ALL secrets before
+      # any real use, and prefer deploy/docker-compose.prod.yml (Docker secrets).
+      NODE_ENV: development
+      DATABASE_URL: postgresql://ledger:change-me-demo-only@postgres:5432/ledger
+      CSRF_SECRET: demo-secret-change-me-32-chars-min
+      SESSION_SECRET: demo-secret-change-me-32-chars-min
+    ports:
+      - "3000:3000"
+
+  site:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    volumes:
+      - ./site:/usr/share/nginx/html:ro
+    ports:
+      - "3001:80"
+
+volumes:
+  pg_data:

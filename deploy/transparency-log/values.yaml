@@ -1,0 +1,38 @@
+trillian:
+  image:
+    logServer: gcr.io/trillian-opensource-ci/log_server:latest
+    logSigner: gcr.io/trillian-opensource-ci/log_signer:latest
+  replicas:
+    logServer: 2
+    logSigner: 1     # single leader writer; others stand by
+
+mysql:
+  image: mysql:8
+  storage: 50Gi
+  backup:
+    enabled: true
+    schedule: "0 3 * * *"
+    retention: 30d
+
+sth:
+  publishIntervalMinutes: 5
+  archive:
+    bucket: pl-sth-archive
+    region: us-east-1
+    objectLock:
+      enabled: true
+      retention:
+        mode: COMPLIANCE
+        years: 10
+
+ingress:
+  enabled: true
+  className: nginx
+  host: log.github.com/askledger/receipts-sdk
+  tls:
+    secretName: log-askledger-tls
+
+prometheus:
+  serviceMonitor:
+    enabled: true
+    namespace: monitoring

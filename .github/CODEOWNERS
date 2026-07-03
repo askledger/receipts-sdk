@@ -1,0 +1,44 @@
+# Code ownership — every change needs at least one owner of every touched area.
+# Format: glob  @owner1 @owner2
+
+# Default — every file has at least one reviewer.
+*                                   @projectledger/maintainers
+
+# Cryptographic core — TWO reviewers required, one must be from @crypto.
+/src/crypto.ts                      @projectledger/crypto @projectledger/maintainers
+/src/canonicalize.ts                @projectledger/crypto @projectledger/maintainers
+/src/receipt.ts                     @projectledger/crypto @projectledger/maintainers
+/src/verify.ts                      @projectledger/crypto @projectledger/maintainers
+/src/chain*.ts                      @projectledger/crypto @projectledger/maintainers
+/src/merkle.ts                      @projectledger/crypto @projectledger/maintainers
+/src/signing-provider.ts            @projectledger/crypto @projectledger/maintainers
+/src/fips.ts                        @projectledger/crypto @projectledger/maintainers
+/src/hsm/**                         @projectledger/crypto @projectledger/maintainers
+
+# Cross-language SDKs — at least one owner per language.
+/python/**                          @projectledger/sdk-python
+/go-sdk/**                          @projectledger/sdk-go
+/rust-sdk/**                        @projectledger/sdk-rust
+/java-sdk/**                        @projectledger/sdk-java
+
+# Policy templates — review by compliance + the originating regulator's owner.
+/src/policy-templates/**            @projectledger/compliance @projectledger/maintainers
+
+# Console — UI + RBAC.
+/console/src/lib/auth.ts            @projectledger/security
+/console/src/lib/rbac.ts            @projectledger/security
+/console/src/lib/tenant-context.ts  @projectledger/security
+/console/src/middleware.ts          @projectledger/security
+/console/**                         @projectledger/console
+
+# Browser extension.
+/browser-extension/**               @projectledger/extension @projectledger/security
+
+# Documentation.
+/docs/operations/**                 @projectledger/sre
+/docs/security/**                   @projectledger/security
+/docs/strategy/**                   @projectledger/maintainers
+
+# CI / supply chain.
+/.github/**                         @projectledger/sre
+/tools/**                           @projectledger/sre

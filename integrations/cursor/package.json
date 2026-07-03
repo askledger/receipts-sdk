@@ -1,0 +1,16 @@
+{
+  "name": "@askledger/cursor-receipts",
+  "version": "0.1.0",
+  "description": "MCP server that emits AskLedger receipts for every Cursor completion",
+  "license": "Apache-2.0",
+  "type": "module",
+  "bin": { "pl-cursor": "./dist/mcp-server.js" },
+  "files": ["dist/", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": ["cursor", "mcp", "ai", "receipts", "audit", "project-ledger"],
+  "repository": { "type": "git", "url": "https://github.com/askledger/receipts-sdk", "directory": "integrations/cursor" },
+  "engines": { "node": ">=18" }
+}

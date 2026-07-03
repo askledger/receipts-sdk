@@ -1,0 +1,864 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark light" />
+<title>AskLedger · Cryptographic AI Decision Receipts</title>
+<meta name="description" content="The cryptographic substrate for enterprise AI. RFC 8785 + Ed25519 + hash-chained receipts. Regulator-verifiable. Open standard. Production-grade." />
+<meta name="theme-color" content="#0a1530" />
+<link rel="canonical" href="https://askledger.github.io/receipts-sdk/" />
+<meta property="og:title" content="AskLedger · Cryptographic AI Decision Receipts" />
+<meta property="og:description" content="Every AI invocation produces a signed, hash-chained, regulator-verifiable receipt. RFC 8785 + Ed25519. Open standard. Apache-2.0. Live on npm." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://askledger.github.io/receipts-sdk/" />
+<meta property="og:image" content="https://askledger.github.io/receipts-sdk/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="AskLedger — Cryptographic evidence for enterprise AI" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="AskLedger · Cryptographic AI Decision Receipts" />
+<meta name="twitter:description" content="Every AI invocation produces a signed, hash-chained, regulator-verifiable receipt. npm install @askledger/receipts-sdk" />
+<meta name="twitter:image" content="https://askledger.github.io/receipts-sdk/og-image.png" />
+<style>
+:root {
+  --navy-950: #060d22;
+  --navy-900: #0a1530;
+  --navy-800: #11203f;
+  --navy-700: #172547;
+  --navy-600: #1d2f5f;
+  --navy-500: #2e4480;
+  --gold: #c79b3c;
+  --gold-300: #e8c878;
+  --ink-50: #f6f7fb;
+  --ink-100: #eef1fa;
+  --ink-300: #c5cae0;
+  --ink-400: #a8b1cf;
+  --ink-500: #8a93b6;
+  --ink-700: #4e5677;
+  --line: rgba(232,200,120,.12);
+  --line-strong: rgba(232,200,120,.28);
+  --green: #4dd0a0;
+  --red: #ff6b6b;
+  --amber: #ffba59;
+  --shadow: 0 30px 80px -30px rgba(0,0,0,.6);
+  --font-sans: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', SFMono-Regular, ui-monospace, Menlo, monospace;
+  --container: 1180px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--navy-950);
+  color: var(--ink-100);
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11","ss01","ss02";
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  line-height: 1.55;
+  min-height: 100vh;
+}
+.skip { position: absolute; left: -1000px; top: 0; }
+.skip:focus { left: 12px; top: 12px; background: var(--gold); color: var(--navy-900); padding: 8px 12px; border-radius: 6px; z-index: 100; }
+a { color: var(--gold-300); text-decoration: none; }
+a:hover { color: var(--gold); }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 4px; }
+.container { max-width: var(--container); margin: 0 auto; padding: 0 24px; }
+header.nav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(10,21,48,0.85);
+  backdrop-filter: saturate(140%) blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; height: 64px; }
+.nav-inner .brand { flex-shrink: 0; }
+.nav-cta { display: flex; gap: 10px; flex-shrink: 0; }
+.nav-toggle { display: none; background: transparent; border: 1px solid var(--line-strong); color: var(--ink-100); padding: 8px 12px; border-radius: 6px; font-size: 13px; cursor: pointer; font-family: inherit; }
+.nav-toggle:hover { background: rgba(232,200,120,.08); }
+@media (max-width: 980px) {
+  .nav-links { display: none !important; }
+  .nav-toggle { display: inline-flex; align-items: center; gap: 6px; }
+  .nav-links.open { display: flex !important; position: absolute; top: 64px; left: 0; right: 0; background: rgba(10,21,48,.96); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); padding: 16px 24px; flex-direction: column; gap: 14px; align-items: stretch; }
+  .nav-links.open a { padding: 6px 0; }
+}
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -.01em; }
+.brand-mark {
+  width: 26px; height: 26px; border-radius: 6px;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-300) 100%);
+  position: relative;
+}
+.brand-mark::after {
+  content: ""; position: absolute; inset: 4px; border-radius: 3px;
+  background: var(--navy-900);
+}
+.brand-mark::before {
+  content: ""; position: absolute; left: 8px; right: 8px; top: 12px; height: 2px;
+  background: var(--gold-300); z-index: 2; border-radius: 2px;
+}
+.nav-links { display: flex; gap: 22px; align-items: center; font-size: 14px; flex: 1; justify-content: center; }
+.nav-links a { color: var(--ink-300); white-space: nowrap; }
+.nav-links a:hover { color: var(--ink-100); }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 40px; padding: 0 16px; border-radius: 8px;
+  font-size: 14px; font-weight: 600; line-height: 1;
+  border: 1px solid var(--line-strong);
+  background: transparent; color: var(--ink-100);
+  cursor: pointer; transition: transform .12s ease, background .15s ease;
+}
+.btn:hover { background: rgba(232,200,120,.08); transform: translateY(-1px); }
+.btn-primary {
+  background: var(--gold); color: var(--navy-900); border-color: var(--gold);
+}
+.btn-primary:hover { background: var(--gold-300); border-color: var(--gold-300); }
+.btn-ghost { border-color: transparent; }
+.eyebrow {
+  display: inline-flex; gap: 8px; align-items: center;
+  padding: 5px 11px; border-radius: 4px;
+  background: transparent; border: 1px solid var(--line-strong);
+  font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ink-300);
+}
+.eyebrow .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold-300); }
+section { padding: 88px 0; }
+section.hero { padding-top: 88px; padding-bottom: 56px; }
+h1, h2, h3 { letter-spacing: -.022em; margin: 0; }
+h1 {
+  font-size: clamp(34px, 5vw, 52px);
+  line-height: 1.08; font-weight: 700;
+}
+h1 .accent { color: var(--gold-300); }
+h2 { font-size: clamp(26px, 3.2vw, 36px); font-weight: 600; line-height: 1.18; }
+h3 { font-size: 16px; font-weight: 600; letter-spacing: -0.005em; }
+.lead { font-size: 17px; color: var(--ink-300); max-width: 680px; line-height: 1.6; }
+.hero-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 56px; align-items: center; }
+@media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; gap: 32px; } }
+.hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+.hero-meta {
+  display: flex; gap: 20px; flex-wrap: wrap; margin-top: 28px;
+  font-size: 13px; color: var(--ink-400);
+}
+.hero-meta b { color: var(--ink-100); font-weight: 600; }
+.hero-card {
+  position: relative;
+  background: var(--navy-800);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 22px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+.hero-card .card-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px; padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.hero-card .pill { font-size: 10px; padding: 3px 8px; border-radius: 999px;
+  background: rgba(77,208,160,.12); color: var(--green); font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.kv { display: grid; grid-template-columns: 130px 1fr; gap: 6px 12px; font-size: 12px; }
+.kv b { color: var(--ink-400); font-weight: 500; }
+.kv span { color: var(--ink-100); word-break: break-all; }
+.code-row { color: var(--gold-300); }
+.metrics {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  margin-top: 56px;
+  border-top: 1px solid var(--line);
+}
+.metric { padding: 24px 28px; border-right: 1px solid var(--line); }
+.metric:last-child { border-right: none; }
+.metric .num { font-size: 26px; font-weight: 700; color: var(--ink-100); letter-spacing: -0.02em; }
+.metric .lbl { font-size: 11px; text-transform: uppercase; color: var(--ink-400); letter-spacing: .12em; margin-top: 6px; font-weight: 500; }
+@media (max-width: 720px) { .metrics { grid-template-columns: repeat(2, 1fr); } }
+
+.section-head { max-width: 700px; margin: 0 auto 56px; text-align: center; }
+.section-head .lead { margin: 16px auto 0; }
+
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+@media (max-width: 900px) { .cards { grid-template-columns: 1fr; } }
+.card {
+  background: rgba(255,255,255,.02);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 24px;
+  transition: border-color .15s ease;
+}
+.card:hover { border-color: var(--line-strong); }
+.card .icon {
+  width: 32px; height: 32px; border-radius: 6px; margin-bottom: 18px;
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  display: grid; place-items: center; color: var(--gold-300);
+  font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+  letter-spacing: 0;
+}
+.card p { color: var(--ink-300); font-size: 14.5px; line-height: 1.6; margin: 10px 0 0; }
+
+.regulators {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 32px;
+}
+@media (max-width: 900px) { .regulators { grid-template-columns: 1fr; } }
+.reg {
+  border: 1px solid var(--line); border-radius: 10px; padding: 22px;
+  background: rgba(255,255,255,.02);
+  transition: border-color .15s ease;
+}
+.reg:hover { border-color: var(--line-strong); }
+.reg b { color: var(--ink-400); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; }
+.reg h3 { margin: 10px 0 8px; }
+.reg p { color: var(--ink-300); font-size: 13.5px; line-height: 1.55; margin: 0; }
+
+.standards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+@media (max-width: 720px) { .standards { grid-template-columns: 1fr; } }
+.standard {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 14px 16px; border-radius: 10px;
+  background: rgba(255,255,255,.02); border: 1px solid var(--line);
+}
+.standard .tag {
+  font-family: var(--font-mono); font-size: 11px; color: var(--gold-300);
+  padding: 4px 8px; border-radius: 6px;
+  background: rgba(232,200,120,.08); border: 1px solid var(--line-strong);
+  flex-shrink: 0;
+}
+.standard .body { font-size: 13.5px; color: var(--ink-300); }
+.standard .body b { color: var(--ink-100); font-weight: 600; }
+
+.code {
+  background: var(--navy-950);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 24px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ink-100);
+  overflow-x: auto;
+  position: relative;
+}
+.code .cm { color: var(--ink-500); }
+.code .k { color: var(--gold-300); }
+.code .s { color: var(--green); }
+.code .n { color: var(--amber); }
+.code .fn { color: #9ab8ff; }
+
+.sdk-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+@media (max-width: 900px) { .sdk-grid { grid-template-columns: repeat(2, 1fr); } }
+
+/* ========================================================================== */
+/* RESPONSIVE LAYER — desktop / tablet / mobile / small mobile                 */
+/* ========================================================================== */
+
+/* Tablet · ≤ 980 px */
+@media (max-width: 980px) {
+  .container { padding: 0 20px; }
+  section { padding: 64px 0; }
+  section.hero { padding-top: 72px; padding-bottom: 48px; }
+  h1 { font-size: clamp(30px, 6vw, 44px); }
+  h2 { font-size: clamp(24px, 4vw, 32px); }
+  .lead { font-size: 16px; }
+  .hero-card { padding: 18px; font-size: 11.5px; }
+  .hero-card .kv { grid-template-columns: 110px 1fr; }
+  .metrics { padding: 18px; gap: 16px; }
+  .metric .num { font-size: 24px; }
+  .cta-bar { padding: 28px; }
+  .cta-bar h2 { font-size: 22px !important; }
+  .hero-ctas .btn, .nav-cta .btn { font-size: 13px; padding: 0 14px; height: 38px; }
+}
+
+/* Mobile · ≤ 720 px */
+@media (max-width: 720px) {
+  .container { padding: 0 16px; }
+  section { padding: 48px 0; }
+  section.hero { padding-top: 56px; padding-bottom: 36px; }
+  h1 { font-size: 28px; line-height: 1.15; letter-spacing: -0.01em; }
+  h2 { font-size: 22px; line-height: 1.2; }
+  h3 { font-size: 16px; }
+  .lead { font-size: 15px; }
+  .hero-meta { gap: 12px; font-size: 12px; }
+  .hero-meta b { font-size: 13px; }
+  .hero-ctas { flex-direction: column; align-items: stretch; gap: 10px; }
+  .hero-ctas .btn { width: 100%; justify-content: center; height: 44px; font-size: 14px; }
+  .hero-card { padding: 16px; }
+  .hero-card .kv { grid-template-columns: 100px 1fr; gap: 4px 10px; font-size: 11px; }
+  .metrics { grid-template-columns: repeat(2, 1fr); padding: 14px; gap: 12px; margin-top: 32px; }
+  .metric .num { font-size: 22px; }
+  .metric .lbl { font-size: 10.5px; }
+  .section-head { margin-bottom: 32px; }
+  .card { padding: 18px; }
+  .card .icon { width: 32px; height: 32px; font-size: 15px; margin-bottom: 12px; }
+  .standards { gap: 10px; }
+  .standard { padding: 12px 14px; }
+  .standard .tag { font-size: 10px; padding: 3px 7px; }
+  .standard .body { font-size: 12.5px; }
+  .sdk-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
+  .sdk { padding: 14px 8px; }
+  .sdk b { font-size: 13px; }
+  .sdk span { font-size: 10px; }
+  .reg { padding: 16px; }
+  .reg h3 { font-size: 15px; }
+  .reg p { font-size: 13px; }
+  .cta-bar {
+    flex-direction: column; align-items: flex-start; gap: 16px;
+    padding: 24px; border-radius: 14px;
+  }
+  .cta-bar h2 { font-size: 20px !important; }
+  .cta-bar p { font-size: 13.5px; }
+  .cta-bar > div:last-child { width: 100%; }
+  .cta-bar .btn { width: 100%; justify-content: center; height: 44px; }
+  .foot { flex-direction: column; gap: 28px; }
+  .foot .col h4 { margin-top: 0; }
+  footer { padding: 36px 0 24px; }
+  footer .legal { font-size: 11px; margin-top: 24px; line-height: 1.5; }
+}
+
+/* Small mobile · ≤ 380 px (iPhone SE, older devices) */
+@media (max-width: 380px) {
+  .container { padding: 0 14px; }
+  h1 { font-size: 24px; }
+  h2 { font-size: 20px; }
+  .lead { font-size: 14px; }
+  .nav-inner { gap: 12px; }
+  .nav-cta { gap: 6px; }
+  .nav-cta .btn { padding: 0 10px; height: 36px; font-size: 12px; }
+  .hero-meta { font-size: 11.5px; }
+  .metric .num { font-size: 20px; }
+  .cta-bar { padding: 20px; }
+}
+
+/* Touch-target safety on any small device */
+@media (hover: none) and (pointer: coarse) {
+  .btn, .nav-toggle { min-height: 44px; }
+  .nav-links a { padding: 8px 0; }
+}
+.sdk {
+  text-align: center; padding: 18px 12px; border-radius: 10px;
+  border: 1px solid var(--line); background: rgba(255,255,255,.02);
+}
+.sdk b { display: block; font-size: 15px; }
+.sdk span { display: block; font-size: 12px; color: var(--ink-400); margin-top: 2px; font-family: var(--font-mono); }
+
+.cta-bar {
+  background: var(--navy-800);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 36px;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  flex-wrap: wrap;
+}
+.cta-bar h2 { letter-spacing: -0.018em; }
+.cta-bar p { color: var(--ink-300); margin: 8px 0 0; max-width: 560px; font-size: 15px; line-height: 1.55; }
+
+footer {
+  padding: 48px 0 32px; border-top: 1px solid var(--line);
+  color: var(--ink-400); font-size: 13px;
+}
+.foot { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+.foot .col h4 { color: var(--ink-100); margin: 0 0 12px; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; }
+.foot .col a { display: block; color: var(--ink-300); margin: 4px 0; }
+.foot .legal { margin-top: 36px; font-size: 12px; color: var(--ink-500); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+
+<header class="nav">
+  <div class="container nav-inner">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true"></div>
+      <span>AskLedger</span>
+    </div>
+    <nav class="nav-links" id="nav-links" aria-label="Primary">
+      <a href="#how">How it works</a>
+      <a href="#stack">Stack</a>
+      <a href="#safety">Safety</a>
+      <a href="#log">Transparency</a>
+      <a href="#regulators">Regulators</a>
+      <a href="#standards">Standards</a>
+    </nav>
+    <div class="nav-cta">
+      <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="nav-links" onclick="(()=>{const n=document.getElementById('nav-links');const o=n.classList.toggle('open');this.setAttribute('aria-expanded',o);})()">Menu ▾</button>
+      <a class="btn" href="demo.html">Demo</a>
+      <a class="btn btn-primary" href="https://github.com/askledger/receipts-sdk">GitHub</a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow"><span class="dot"></span> Live on npm · v0.6.0 · Apache-2.0</div>
+        <h1 style="margin-top:20px">
+          Cryptographic evidence<br>for enterprise AI.
+        </h1>
+        <p class="lead" style="margin-top:20px">
+          Every AI invocation produces a signed, hash-chained, tamper-evident receipt. Auditors, regulators, and insurers verify it independently with only the public key — no platform dependency.
+        </p>
+        <div style="margin-top:24px;padding:14px 18px;border:1px solid var(--line-strong);border-radius:8px;background:rgba(232,200,120,.05);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <code style="font-family:var(--font-mono);font-size:14px;color:var(--gold-300);user-select:all;">npm install @askledger/receipts-sdk</code>
+          <a href="https://www.npmjs.com/package/@askledger/receipts-sdk" style="font-size:12px;color:var(--ink-400);white-space:nowrap;">View on npm →</a>
+        </div>
+        <div class="hero-ctas">
+          <a class="btn btn-primary" href="playground.html">
+            Try the playground · 60s
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </a>
+          <a class="btn" href="verify.html">Open the verifier</a>
+          <a class="btn btn-ghost" href="https://github.com/askledger/receipts-sdk">View on GitHub →</a>
+        </div>
+        <div class="hero-meta">
+          <span><b>5</b> language SDKs</span>
+          <span><b>280</b> tests passing</span>
+          <span><b>66/66</b> hardening controls</span>
+          <span><b>5</b> regulators · pre-mapped</span>
+          <span><b>RFC 9162</b> transparency log</span>
+        </div>
+      </div>
+
+      <aside class="hero-card" aria-label="Sample signed receipt">
+        <div class="card-head">
+          <span>signed-receipt.json</span>
+          <span class="pill">VERIFIED ✓</span>
+        </div>
+        <div class="kv">
+          <b>schema_version</b><span class="code-row">"1.0"</span>
+          <b>receipt_id</b><span>01J9X8VKHT…</span>
+          <b>tenant_id</b><span>acme-bank</span>
+          <b>event_type</b><span class="code-row">gateway.request</span>
+          <b>ai_model</b><span>claude-sonnet-4-6</span>
+          <b>chain_height</b><span class="code-row">12,487</span>
+          <b>prev_hash</b><span>92cd1a0b…d04e5e</span>
+          <b>receipt_hash</b><span>a73f2ce5…8b3c1e</span>
+          <b>kid</b><span>kms-prod-2026Q3</span>
+          <b>sig</b><span>MEUCIQDz9p…Q7Zc</span>
+          <b>tsa</b><span>DigiCert TSA · 2026-06-10T17:42Z</span>
+        </div>
+      </aside>
+    </div>
+
+    <div class="metrics" role="list">
+      <div class="metric" role="listitem">
+        <div class="num">&lt; 2 ms</div>
+        <div class="lbl">Sign + safety + cite</div>
+      </div>
+      <div class="metric" role="listitem">
+        <div class="num">100%</div>
+        <div class="lbl">Tampers detected · 200-mutation fuzz</div>
+      </div>
+      <div class="metric" role="listitem">
+        <div class="num">A+</div>
+        <div class="lbl">Public Receipt Score · embeddable</div>
+      </div>
+      <div class="metric" role="listitem">
+        <div class="num">0</div>
+        <div class="lbl">Calls to AskLedger to verify</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="why">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow"><span class="dot"></span> Why now</div>
+      <h2 style="margin-top:16px">The frameworks tell you what to do. The infrastructure to do it cryptographically did not exist — until now.</h2>
+      <p class="lead">EU AI Act, UAE CBUAE Federal Decree-Law No. 6, SAMA, NIST AI RMF, ISO 42001, SR 26-2, PRA SS1/23, RBI FREE-AI — all demand evidence of what AI did, by whom, under what policy. Most enterprises fall back to spreadsheets and self-attestation. Then the regulator asks for proof.</p>
+    </div>
+
+    <div class="regulators">
+      <div class="reg">
+        <b>UAE · CBUAE</b>
+        <h3>Sep 16, 2026 · AED 1 B fines</h3>
+        <p>Federal Decree-Law No. 6 of 2025 transitional deadline. Every UAE bank needs cryptographic AI evidence within weeks.</p>
+      </div>
+      <div class="reg">
+        <b>EU · AI Act</b>
+        <h3>Aug 2, 2026 · High-risk obligations</h3>
+        <p>Annex IV technical documentation becomes mandatory for high-risk AI systems. Audit-grade evidence required.</p>
+      </div>
+      <div class="reg">
+        <b>KSA · SAMA + Vision 2030</b>
+        <h3>$9.1 B AI investment · $20 B+ committed</h3>
+        <p>Saudi 2026 Year of AI. The largest concentrated buying wave in MENA history; every Tier-1 bank in scope.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow"><span class="dot"></span> How it works</div>
+      <h2 style="margin-top:16px">Three primitives. Mathematical guarantees.</h2>
+      <p class="lead">Wire-format compatible across five languages. Independent verifier ships with every SDK. No magic.</p>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="icon">01</div>
+        <h3>Canonical hashing</h3>
+        <p>RFC 8785 (JCS) gives every receipt a single deterministic byte representation. SHA-256 of those bytes is the <span style="font-family:var(--font-mono);color:var(--gold-300)">receipt_hash</span>. Any TypeScript, Python, Go, Rust, or Java client produces the same hash for the same input — proven by shared conformance vectors.</p>
+      </div>
+      <div class="card">
+        <div class="icon">02</div>
+        <h3>Per-tenant hash chain</h3>
+        <p>Every receipt's <span style="font-family:var(--font-mono);color:var(--gold-300)">previous_receipt_hash</span> binds it to the one before. Modify any historical receipt and every subsequent receipt's verification breaks. Periodic Merkle root commits to a transparency log make truncation detectable too.</p>
+      </div>
+      <div class="card">
+        <div class="icon">03</div>
+        <h3>HSM-backed signatures</h3>
+        <p>Ed25519 over the canonical bytes. Private key never leaves the HSM (AWS KMS, Azure Key Vault Managed HSM, GCP KMS, or PKCS#11 — Thales, Entrust, CloudHSM). Optional RFC 3161 timestamps tie each signature to absolute time.</p>
+      </div>
+      <div class="card" style="grid-column:span 3;background:linear-gradient(135deg, rgba(199,155,60,.07), rgba(46,68,128,.10));border-color:var(--line-strong)">
+        <div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap">
+          <div style="flex:1;min-width:280px">
+            <h3 style="margin:0 0 8px;font-size:18px">+ Cost discipline + ESG + insurance — <span style="color:var(--gold-300)">v0.7</span></h3>
+            <p style="margin:0">Every receipt now carries cost (USD), carbon (g CO₂e), and a cascade-savings ledger. Built-in modules: model-fit score, dedup cache, budget guard, recommendations engine, insurance underwriting bundle, MRM workpaper exporter, public benchmark scoring. <b style="color:var(--ink-100)">8 of 13 pillars shipping in code.</b></p>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <a class="btn" href="#safety">Safety layer →</a>
+            <a class="btn" href="#regulators">Regulator templates →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:48px">
+      <div class="code"><span class="cm">// v0.7 · one import. Every Anthropic + OpenAI call in this process</span>
+<span class="cm">// becomes a signed receipt. No other line of your code changes.</span>
+<span class="k">import</span> { installReceipts } <span class="k">from</span> <span class="s">"@askledger/receipts-sdk/vendor-kit"</span>;
+
+<span class="fn">installReceipts</span>({ tenantId: <span class="s">"acme"</span> });
+
+<span class="cm">// Prefer the manual path? Same as before.</span>
+<span class="k">import</span> { wrapOpenAI, generateKeyPair } <span class="k">from</span> <span class="s">"@askledger/receipts-sdk"</span>;
+<span class="k">const</span> client = <span class="fn">wrapOpenAI</span>(<span class="k">new</span> <span class="fn">OpenAI</span>({ apiKey }), { tenantId: <span class="s">"acme"</span>, keypair: <span class="fn">generateKeyPair</span>() });</div>
+    </div>
+  </div>
+</section>
+
+<section id="stack">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow"><span class="dot"></span> The stack</div>
+      <h2 style="margin-top:16px">Built like the platforms it sits next to.</h2>
+      <p class="lead">Open-core. Five language SDKs. Vendor-neutral HSM. Real workflows. Zero Trust ready.</p>
+    </div>
+
+    <h3 style="text-align:center;color:var(--ink-400);font-size:13px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;margin-bottom:16px">5 SDKs · wire-format conformant · CL1/CL2/CL3 conformance suite</h3>
+    <div class="sdk-grid">
+      <div class="sdk"><b>TypeScript</b><span>@askledger/receipts-sdk</span></div>
+      <div class="sdk"><b>Python</b><span>askledger-receipts</span></div>
+      <div class="sdk"><b>Go</b><span>receipts-sdk-go</span></div>
+      <div class="sdk"><b>Rust</b><span>askledger-receipts</span></div>
+      <div class="sdk"><b>Java</b><span>io.askledger:receipts-sdk</span></div>
+    </div>
+
+    <div style="display:flex;justify-content:center;margin:28px 0 8px"><pl-verifier receipt-id="01J9X8VK0001"></pl-verifier></div>
+
+    <h3 style="text-align:center;color:var(--ink-400);font-size:13px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;margin:36px 0 16px">9 native integrations · IDE · agents · gateways · one install per surface</h3>
+    <div class="sdk-grid" style="grid-template-columns:repeat(3,1fr);gap:10px">
+      <div class="sdk"><b>Cursor</b><span>@askledger/cursor-receipts</span></div>
+      <div class="sdk"><b>Claude Code</b><span>@askledger/claude-code-skill</span></div>
+      <div class="sdk"><b>OpenAI proxy</b><span>@askledger/openai-proxy · Aider · Cline · Windsurf · Codeium · Cody · Zed · Tabnine</span></div>
+      <div class="sdk"><b>LiteLLM</b><span>upstream callback · PR-ready</span></div>
+      <div class="sdk"><b>LangChain · LangGraph</b><span>ReceiptsCallbackHandler</span></div>
+      <div class="sdk"><b>Vercel AI SDK · Mastra · LlamaIndex</b><span>native middleware</span></div>
+      <div class="sdk"><b>AutoGen · CrewAI · Pydantic AI · smolagents</b><span>askledger-agents (PyPI)</span></div>
+      <div class="sdk"><b>Portkey · Cloudflare · Kong</b><span>gateway-native plug-ins</span></div>
+      <div class="sdk"><b>Chrome extension</b><span>MV3 · managed-policy identity binding</span></div>
+    </div>
+
+    <h3 style="text-align:center;color:var(--ink-400);font-size:13px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;margin:36px 0 16px">11 AI vendors · receipts emitted natively</h3>
+    <div class="sdk-grid" style="grid-template-columns:repeat(11,1fr);gap:8px">
+      <div class="sdk" style="padding:10px 4px"><b style="font-size:11px">OpenAI</b></div>
+      <div class="sdk" style="padding:10px 4px"><b style="font-size:11px">Anthropic</b></div>
+      <div class="sdk" style="padding:10px 4px"><b style="font-size:11px">Azure</b></div>
+      <div class="sdk" style="padding:10px 4px"><b style="font-size:11px">Bedrock</b></div>
+      <div class="sdk" style="padding:10px 4px"><b style="font-size:11px">Gemini</b></div>
+      <div class="sdk" style="padding:10px 4px"><b style="font-size:11px">Cohere</b></div>
+      <div class="sdk" style="padding:10px 4px"><b style="font-size:11px">HF</b></div>
+      <div class="sdk" style="padding:10px 4px"><b style="font-size:11px">Mistral</b></div>
+      <div class="sdk" style="padding:10px 4px"><b style="font-size:11px">Groq</b></div>
+      <div class="sdk" style="padding:10px 4px"><b style="font-size:11px">Together</b></div>
+      <div class="sdk" style="padding:10px 4px"><b style="font-size:11px">Vercel</b></div>
+    </div>
+
+    <h3 style="text-align:center;color:var(--ink-400);font-size:13px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;margin:36px 0 16px">4 HSM drivers · FIPS-validated providers</h3>
+    <div class="sdk-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="sdk"><b>AWS KMS</b><span>kms-fips endpoint</span></div>
+      <div class="sdk"><b>Azure Key Vault</b><span>Managed HSM · FIPS L3</span></div>
+      <div class="sdk"><b>Google Cloud KMS</b><span>protectionLevel HSM</span></div>
+      <div class="sdk"><b>PKCS#11</b><span>Thales · Entrust · CloudHSM</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="safety">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow"><span class="dot"></span> Safety layer</div>
+      <h2 style="margin-top:16px">Every receipt is content-checked before it's signed.</h2>
+      <p class="lead">Inline detection runs in &lt; 1 ms — pure heuristics, no LLM call, no third-party AI dependency. Findings flow into the receipt's <code style="font-family:var(--font-mono);color:var(--gold-300);background:rgba(232,200,120,.08);padding:1px 6px;border-radius:4px">payload.metadata.safety</code> block so the audit trail proves the bank caught the event.</p>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="icon">01</div>
+        <h3>PII detection</h3>
+        <p>Regex + checksum validation across 14 categories — emails, US SSN, credit cards (Luhn), IBAN (MOD-97), UAE Emirates ID, Saudi national ID, Indian Aadhaar, API keys, wire references, customer IDs. Inline. Deterministic. Auditable.</p>
+      </div>
+      <div class="card">
+        <div class="icon">02</div>
+        <h3>Prompt injection</h3>
+        <p>Twelve categories caught — instruction override, role injection, system-prompt leak, DAN jailbreaks, delimiter injection, encoded payloads, tool override, policy bypass. Deterministic. No second LLM in the loop.</p>
+      </div>
+      <div class="card">
+        <div class="icon">03</div>
+        <h3>Shadow AI</h3>
+        <p>Identifies AI calls bypassing the corporate gateway: consumer endpoints (chatgpt.com, claude.ai), unapproved vendors, unapproved model versions, unapproved source systems. Pillar 6 of the platform architecture.</p>
+      </div>
+    </div>
+
+    <div style="margin-top:32px;padding:24px 28px;border:1px solid var(--line-strong);border-radius:14px;background:rgba(232,200,120,.04)">
+      <div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap">
+        <div style="flex:1;min-width:280px">
+          <h3 style="font-size:18px;margin:0 0 6px">See it in the demo →</h3>
+          <p style="margin:0;color:var(--ink-300);font-size:14px">Click any receipt in the demo. You'll see PII matches highlighted, prompt-injection patterns called out, and a clear <b style="color:var(--green)">allow</b> / <b style="color:var(--amber)">flag</b> / <b style="color:var(--red)">block</b> verdict — each one signed into the receipt.</p>
+        </div>
+        <a class="btn btn-primary" href="demo.html">Run the demo</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="log">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow"><span class="dot"></span> Public transparency log</div>
+      <h2 style="margin-top:16px">Even <span class="accent">we</span> can't rewrite history.</h2>
+      <p class="lead">A public RFC 9162 append-only Merkle tree. Every receipt batch lands in the log. Every five minutes a Signed Tree Head is published. Inclusion proofs and consistency proofs are queryable by anyone.</p>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="icon">01</div>
+        <h3>Append-only</h3>
+        <p>RFC 9162 leaf/internal prefix scheme (second-preimage safe). Once a receipt's leaf hash is committed, removing it requires breaking SHA-256 — which has no known practical break.</p>
+      </div>
+      <div class="card">
+        <div class="icon">02</div>
+        <h3>Signed Tree Heads</h3>
+        <p>Every 5 minutes the log signs <code style="font-family:var(--font-mono);color:var(--gold-300);background:rgba(232,200,120,.08);padding:1px 6px;border-radius:4px">{tree_size, root_hash, timestamp, log_id}</code> with the operator key. Anyone holding any historical STH can detect log rewrites.</p>
+      </div>
+      <div class="card">
+        <div class="icon">03</div>
+        <h3>Independent verification</h3>
+        <p>Auditors paste a receipt + inclusion proof + the public STH chain. The verifier confirms inclusion mathematically. No call to the log operator required.</p>
+      </div>
+    </div>
+
+    <div style="margin-top:28px;padding:18px 24px;border-radius:12px;background:rgba(255,255,255,.02);border:1px solid var(--line);font-size:13.5px;color:var(--ink-300);line-height:1.6">
+      The Receipts Protocol is being proposed for hosted-project status under an independent open-source foundation. Receipts and Signed Tree Heads are verifiable forever — including the historical chain — using only public keys.
+    </div>
+  </div>
+</section>
+
+<section id="score">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow"><span class="dot"></span> Receipt Score</div>
+      <h2 style="margin-top:16px">The SSL Labs A+ for AI trust.</h2>
+      <p class="lead">A public 0-100 score + letter grade per tenant, computed from five weighted sub-scores: coverage, verification, safety hygiene, regulatory alignment, transparency log participation. Embeddable as an SVG badge in annual reports, RFP responses, AI disclosures.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:20px">
+      <div class="reg"><b>Coverage</b><h3>25%</h3><p style="font-size:13px">What share of AI traffic produces a receipt</p></div>
+      <div class="reg"><b>Verification</b><h3>25%</h3><p style="font-size:13px">What share of receipts pass independent verify</p></div>
+      <div class="reg"><b>Safety hygiene</b><h3>20%</h3><p style="font-size:13px">PII / injection / shadow-AI findings handled</p></div>
+      <div class="reg"><b>Regulatory align.</b><h3>15%</h3><p style="font-size:13px">How many of the 5 regulator templates the receipts cite</p></div>
+      <div class="reg"><b>Transparency log</b><h3>15%</h3><p style="font-size:13px">What share of receipts reach the public log</p></div>
+    </div>
+
+    <div style="margin-top:28px;display:flex;gap:24px;align-items:center;flex-wrap:wrap;padding:24px;border-radius:14px;background:linear-gradient(135deg,rgba(199,155,60,.07),rgba(46,68,128,.10));border:1px solid var(--line-strong)">
+      <div style="flex:1;min-width:280px">
+        <h3 style="margin:0 0 6px;font-size:18px">Sample embedded badge</h3>
+        <p style="margin:0;color:var(--ink-300);font-size:14px">Banks embed this SVG in their AI disclosure pages. Auditors click it to verify the underlying receipts. Boards reference it like an ESG rating.</p>
+      </div>
+      <svg width="220" height="64" viewBox="0 0 220 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Receipt Score A+ for ACME Bank">
+        <rect width="220" height="64" rx="8" fill="#0a1530"/>
+        <rect x="1" y="1" width="218" height="62" rx="7" fill="none" stroke="#1b7f55" stroke-width="2"/>
+        <g transform="translate(14,12)">
+          <text x="0" y="14" font-family="Inter,system-ui,sans-serif" font-size="11" font-weight="700" fill="#c79b3c" letter-spacing="0.06em">PROJECT LEDGER</text>
+          <text x="0" y="34" font-family="Inter,system-ui,sans-serif" font-size="13" font-weight="700" fill="#eef1fa">Receipt Score</text>
+        </g>
+        <g transform="translate(138,16)">
+          <text x="0" y="0" dy="22" font-family="Inter,system-ui,sans-serif" font-size="28" font-weight="800" fill="#1b7f55">A+</text>
+          <text x="46" y="0" dy="14" font-family="JetBrains Mono,monospace" font-size="11" fill="#a8b1cf">98</text>
+          <text x="46" y="0" dy="28" font-family="Inter,system-ui,sans-serif" font-size="9" fill="#8a93b6">/100</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section id="extension">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow"><span class="dot"></span> Chrome extension</div>
+      <h2 style="margin-top:16px">For developers. By default private.</h2>
+      <p class="lead">Captures every prompt you send to ChatGPT, Claude, Gemini, Copilot, Perplexity, Hugging Face. Signs a cryptographic receipt locally. Your private key never leaves the browser. Optional opt-in ship-to-corporate-IT for shadow-AI visibility — but the default is <b style="color:var(--ink-100)">stays on your machine.</b></p>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="icon">1</div>
+        <h3>Private by default</h3>
+        <p>Keypair generated locally. Receipts encrypted at rest. The raw prompt text never leaves your browser — only the SHA-256 hash is recorded. Same Ed25519 + RFC 8785 cryptography as the production SDK.</p>
+      </div>
+      <div class="card">
+        <div class="icon">2</div>
+        <h3>You see your AI footprint</h3>
+        <p>Click the extension icon — see every consumer-AI request you've made, which vendor, when, hash-chained. Export as JSON. Useful for self-attribution when reviewing pull requests or RFP responses.</p>
+      </div>
+      <div class="card">
+        <div class="icon">3</div>
+        <h3>CISO opt-in</h3>
+        <p>Configure a corporate ingest URL with your consent. Receipts are shipped (metadata only — never prompt text). Your CISO finally sees the shadow-AI inventory their network DLP cannot.</p>
+      </div>
+    </div>
+
+    <div style="margin-top:28px;padding:18px 24px;border-radius:12px;background:rgba(255,255,255,.02);border:1px solid var(--line);font-size:13.5px;color:var(--ink-300);line-height:1.6">
+      Manifest V3 · Chrome / Edge / Brave. Private key generated and stored locally. Optional corporate ingest is opt-in and HTTPS-only. <a href="https://github.com/askledger/receipts-sdk/tree/main/browser-extension">Source on GitHub</a>.
+    </div>
+  </div>
+</section>
+
+<section id="regulators">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow"><span class="dot"></span> Regulator templates</div>
+      <h2 style="margin-top:16px">Day-one compliance — five regulators, pre-mapped.</h2>
+      <p class="lead">Every receipt automatically cites the regulator articles it satisfies. No policy consulting. No template build-out. The receipt fields ARE the evidence the inspector reads.</p>
+    </div>
+
+    <div class="regulators">
+      <div class="reg">
+        <b>CBUAE</b>
+        <h3>Responsible AI · 5 principles + Article 184</h3>
+        <p>Maps to the Feb 2026 guidance. Sealed evidence pack ready for the <b>September 16, 2026</b> transitional inspection. Receipt fields auto-satisfy each principle.</p>
+      </div>
+      <div class="reg">
+        <b>EU AI Act</b>
+        <h3>Reg. 2024/1689 · 8 articles</h3>
+        <p>Article 9 risk management, Article 11 + Annex IV technical docs, Article 12 logs, Article 14 oversight, Article 15 robustness, Article 50 GenAI transparency. <b>Aug 2, 2026</b> high-risk deadline.</p>
+      </div>
+      <div class="reg">
+        <b>SAMA</b>
+        <h3>AI Adoption Framework · 5 tier controls</h3>
+        <p>Inventory · KSA data residency · decision logging · ECC-1 cybersecurity · customer recourse. Aligned with Saudi PDPL and Vision 2030.</p>
+      </div>
+      <div class="reg">
+        <b>ISO/IEC 42001</b>
+        <h3>AI Management Systems · 6 Annex A controls</h3>
+        <p>The international AI management standard. Already appearing in ~40% of EU enterprise AI RFPs. Receipts populate the AIMS documentation.</p>
+      </div>
+      <div class="reg">
+        <b>NIST AI RMF</b>
+        <h3>Voluntary · 5 mapped controls</h3>
+        <p>GOVERN · MAP · MEASURE · MANAGE. Used by US federal contractors and the CO / CA / NY state AI bills.</p>
+      </div>
+      <div class="reg">
+        <b>+</b>
+        <h3>SR 26-2 · PRA SS1/23 · RBI FREE-AI</h3>
+        <p>Shipped in v0.6 — HIPAA, FedRAMP, ISO 27001, GDPR · plus PR-ready scaffolds for SR 11-7, OSFI E-23, PRA SS1/23, RBI FREE-AI. Same template format — community contributions welcome.</p>
+      </div>
+    </div>
+
+    <div style="margin-top:32px;padding:18px 24px;border-radius:12px;background:rgba(255,255,255,.02);border:1px solid var(--line);font-size:13.5px;color:var(--ink-300);line-height:1.6">
+      Each template is content-addressed (SHA-256 of the canonical bytes), versioned through its own hash chain, and Apache-2.0 licensed. Receipts cite specific articles automatically. New templates ship in the same format.
+    </div>
+  </div>
+</section>
+
+<section id="standards">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow"><span class="dot"></span> Standards</div>
+      <h2 style="margin-top:16px">Open standards. Open code. Open verification.</h2>
+      <p class="lead">No vendor lock-in. No black box cryptography. Every claim verifiable against published RFCs and the public spec.</p>
+    </div>
+
+    <div class="standards">
+      <div class="standard"><span class="tag">RFC 8785</span><div class="body"><b>JSON Canonicalization Scheme.</b> The deterministic byte representation every receipt is hashed over.</div></div>
+      <div class="standard"><span class="tag">RFC 8032</span><div class="body"><b>Edwards-Curve Digital Signature Algorithm.</b> Ed25519 for non-repudiable signing.</div></div>
+      <div class="standard"><span class="tag">RFC 3161</span><div class="body"><b>Time-Stamp Protocol.</b> Independently verifiable absolute time anchoring for every receipt.</div></div>
+      <div class="standard"><span class="tag">RFC 9162</span><div class="body"><b>Certificate Transparency v2.</b> Merkle leaf/internal hashing scheme — second-preimage safe.</div></div>
+      <div class="standard"><span class="tag">RFC 9562</span><div class="body"><b>UUIDv7.</b> Time-ordered receipt identifiers.</div></div>
+      <div class="standard"><span class="tag">NIST SP 800-207</span><div class="body"><b>Zero Trust Architecture.</b> Every AskLedger deployment is ZTA-compliant.</div></div>
+      <div class="standard"><span class="tag">ISO/IEC 42001</span><div class="body"><b>AI Management Systems.</b> Receipts populate the runtime evidence the standard demands.</div></div>
+      <div class="standard"><span class="tag">OWASP AIBOM</span><div class="body"><b>AI Bill of Materials.</b> Receipts populate the runtime portion of the AIBOM.</div></div>
+      <div class="standard"><span class="tag">Sigstore OMS</span><div class="body"><b>Open Model Signing.</b> Receipts reference OMS-signed model artifacts in the subject block.</div></div>
+      <div class="standard"><span class="tag">in-toto / SLSA</span><div class="body"><b>Supply-chain attestation.</b> Receipts complement build-time attestation with runtime.</div></div>
+      <div class="standard"><span class="tag">SPIFFE / SPIRE</span><div class="body"><b>Workload identity.</b> Receipts bind to SPIFFE service IDs in the event context.</div></div>
+      <div class="standard"><span class="tag">OpenTelemetry GenAI</span><div class="body"><b>Semantic conventions.</b> Receipt fields align with OTel GenAI semantic conventions.</div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="cta-bar">
+      <div>
+        <h2 style="margin:0;font-size:28px">Verify a receipt yourself.</h2>
+        <p>No installation. No login. The verifier runs entirely in your browser using the same SDK every customer uses — because that is what "openly verifiable" actually means.</p>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a class="btn btn-primary" href="verify.html">Open the verifier</a>
+        <a class="btn" href="playground.html">Try the playground</a>
+        <a class="btn btn-ghost" href="https://github.com/askledger/receipts-sdk/blob/main/docs/RECEIPTS_PROTOCOL.md">Read the spec →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="container foot">
+    <div class="col">
+      <div class="brand"><div class="brand-mark" aria-hidden="true"></div><span>AskLedger</span></div>
+      <p style="margin-top:12px;color:var(--ink-400);max-width:300px;font-size:13px">Cryptographic AI Decision Receipts. Open standard. Production-grade.</p>
+    </div>
+    <div class="col">
+      <h4>Product</h4>
+      <a href="playground.html">Playground</a>
+      <a href="verify.html">Public verifier</a>
+      <a href="https://github.com/askledger/receipts-sdk">Receipts SDK</a>
+      <a href="#stack">Console</a>
+    </div>
+    <div class="col">
+      <h4>Specification</h4>
+      <a href="https://github.com/askledger/receipts-sdk/tree/main/spec/">Open spec · PL-RFC-001 … PL-RFC-010 (Draft v0.1)</a>
+      <a href="https://github.com/askledger/receipts-sdk/blob/main/docs/ARCHITECTURE.md">Architecture</a>
+      <a href="https://github.com/askledger/receipts-sdk/blob/main/docs/security/THREAT_MODEL.md">Threat model</a>
+      <a href="https://github.com/askledger/receipts-sdk/blob/main/docs/security/ZERO_TRUST_ARCHITECTURE.md">Zero Trust</a>
+    </div>
+    <div class="col">
+      <h4>Company</h4>
+      <a href="https://github.com/askledger/receipts-sdk/discussions">GitHub Discussions</a>
+      <a href="https://github.com/askledger/receipts-sdk/security/advisories/new">GitHub Security Advisories</a>
+      <a href="https://github.com/askledger">GitHub</a>
+    </div>
+  </div>
+  <div class="container legal">
+    © 2026 AskLedger · Apache-2.0 · Open spec (PL-RFC-001 … 010) · CL1/CL2/CL3 conformance program · 5 reference SDKs · 9 native integrations · v0.7.0
+  </div>
+</footer>
+
+<script src="verifier-widget/pl-verifier.js" defer></script>
+</body>
+</html>
