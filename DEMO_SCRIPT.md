@@ -1,6 +1,6 @@
 # Demo Script · 5-minute walkthrough
 
-For Rashed (founder demo) and anyone showing AskLedger to a customer, partner, regulator, or investor. Use the exact sequence and the exact talking points below. Each block has been timed.
+For the founder demo and anyone showing AskLedger to a customer, partner, regulator, or investor. Use the exact sequence and the exact talking points below. Each block has been timed.
 
 ---
 

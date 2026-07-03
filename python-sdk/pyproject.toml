@@ -9,8 +9,7 @@ description = "Cryptographic AI Decision Receipts — wire-format compatible Pyt
 readme = "README.md"
 license = { text = "Apache-2.0" }
 authors = [
-  { name = "Rashed Ali Khan" },
-  { name = "Mahamed Arif" }
+  { name = "AskLedger" }
 ]
 requires-python = ">=3.10"
 classifiers = [

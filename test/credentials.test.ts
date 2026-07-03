@@ -24,7 +24,7 @@ describe("Document credentials · employment salary slip", () => {
       slip: {
         employer_id: "tcs-payroll-mumbai",
         employee_id: "emp-90213",
-        employee_name: "Arif Khan",
+        employee_name: "Jordan Lee",
         period_start: "2026-05-01",
         period_end: "2026-05-31",
         gross_pay: 145_000,
@@ -48,7 +48,7 @@ describe("Document credentials · employment salary slip", () => {
     const slip = {
       employer_id: "tcs-payroll-mumbai",
       employee_id: "emp-90213",
-      employee_name: "Arif Khan",
+      employee_name: "Jordan Lee",
       period_start: "2026-05-01",
       period_end: "2026-05-31",
       gross_pay: 145_000,
@@ -67,7 +67,7 @@ describe("Document credentials · employment salary slip", () => {
     const slip = {
       employer_id: "tcs-payroll-mumbai",
       employee_id: "emp-90213",
-      employee_name: "Arif Khan",
+      employee_name: "Jordan Lee",
       period_start: "2026-05-01",
       period_end: "2026-05-31",
       gross_pay: 145_000,
@@ -83,7 +83,7 @@ describe("Document credentials · employment salary slip", () => {
   });
 
   it("name hash is NFKC-normalised + lowercased so equivalent renderings match", () => {
-    const a = hashName("Arif Khan");
+    const a = hashName("Jordan Lee");
     const b = hashName("  ARIF KHAN  ");
     expect(a).toBe(b);
   });

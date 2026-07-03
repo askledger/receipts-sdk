@@ -2,7 +2,7 @@
 
 **Version:** 0.1 (draft)
 **Status:** Open for public review · subject to change before v1.0
-**Editors:** Rashed Ali Khan, Mahamed Arif (AskLedger)
+**Editors:** AskLedger
 **Authors of source implementation:** see [CONTRIBUTORS](../CONTRIBUTORS.md)
 
 ---

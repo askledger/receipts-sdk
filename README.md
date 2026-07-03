@@ -512,7 +512,7 @@ Rows marked 🔴 require external parties (audit firms, CPA firms). The code and
 If you reference this protocol or implementation in research or industry writing:
 
 ```
-Khan, R. A., & Arif, M. (2026). AskLedger Receipts SDK:
+AskLedger. (2026). AskLedger Receipts SDK:
 Cryptographic AI Decision Receipts for enterprise AI.
 https://github.com/askledger/receipts-sdk
 ```

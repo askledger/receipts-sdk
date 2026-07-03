@@ -70,4 +70,4 @@ By contributing, you agree your contributions will be licensed under Apache-2.0.
 
 ---
 
-Built by Rashed Ali Khan & Mahamed Arif · AskLedger
+Built by the AskLedger team

@@ -73,4 +73,4 @@ We do not currently run a formal bug bounty program. We will offer recognition a
 
 ---
 
-Built by Rashed Ali Khan & Mahamed Arif · AskLedger
+Built by the AskLedger team
