@@ -1,0 +1,63 @@
+# Cross-language conformance: every SDK must produce byte-identical RFC 8785
+# canonical output for the shared vectors in test/conformance/. This is what
+# guarantees a receipt signed by one SDK verifies in every other. Runs the
+# Python / Go / Rust / Java conformance suites (the TS suite runs in ci.yml).
+name: Conformance (cross-language)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  python:
+    name: Python conformance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install SDK
+        working-directory: python-sdk
+        run: pip install -e . pytest
+      - name: Run conformance
+        working-directory: python-sdk
+        run: python -m pytest tests/ -q
+
+  go:
+    name: Go conformance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+      - name: Run conformance
+        working-directory: go-sdk
+        run: go test ./...
+
+  rust:
+    name: Rust conformance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Run conformance
+        working-directory: rust-sdk
+        run: cargo test
+
+  java:
+    name: Java conformance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Run conformance
+        working-directory: java-sdk
+        run: mvn -B --no-transfer-progress test
