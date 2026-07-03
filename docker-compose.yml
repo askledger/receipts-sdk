@@ -28,8 +28,10 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
       - ./scripts/postgres-init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
-    ports:
-      - "5432:5432"
+    # Postgres is reachable by other services over the compose network; do NOT
+    # publish it to the host. Uncomment only if you need a local DB client.
+    # ports:
+    #   - "5432:5432"
 
   console:
     build:
@@ -40,10 +42,14 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      NODE_ENV: production
+      # This is a LOCAL DEMO compose, not a production deployment. NODE_ENV is
+      # development so the dev-login helper works for browsing; production builds
+      # hard-disable dev login and require a real IdP. Change ALL secrets before
+      # any real use, and prefer deploy/docker-compose.prod.yml (Docker secrets).
+      NODE_ENV: development
       DATABASE_URL: postgresql://ledger:change-me-demo-only@postgres:5432/ledger
       CSRF_SECRET: demo-secret-change-me-32-chars-min
-      ALLOW_DEV_LOGIN: "true"
+      SESSION_SECRET: demo-secret-change-me-32-chars-min
     ports:
       - "3000:3000"
 

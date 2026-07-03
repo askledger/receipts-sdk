@@ -11,7 +11,7 @@ pip install askledger-receipts
 ## Quick start
 
 ```python
-from askledger.receipts import sign_receipt, verify_receipt, generate_keypair
+from projectledger.receipts import sign_receipt, verify_receipt, generate_keypair
 
 kp = generate_keypair()
 event = {

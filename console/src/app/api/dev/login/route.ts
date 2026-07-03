@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { signSession } from "@/lib/auth";
 
 /**
  * Dev-only login route.
@@ -28,7 +29,9 @@ const ROLES = [
 ] as const;
 
 export async function GET(req: NextRequest) {
-  if (process.env.NODE_ENV === "production" && process.env.ALLOW_DEV_LOGIN !== "true") {
+  // Fail closed: dev login is NEVER available in a production build, regardless
+  // of any env flag. Production must wire NextAuth / Clerk / WorkOS / Auth0.
+  if (process.env.NODE_ENV === "production") {
     return NextResponse.json(
       { error: "dev login disabled in production" },
       { status: 403 }
@@ -42,14 +45,14 @@ export async function GET(req: NextRequest) {
 
   const session = {
     sub: "dev-user-001",
-    email: "demo@github.com/askledger/receipts-sdk",
+    email: "demo@example.com",
     name: "Demo User",
     tenantId: "acme-bank",
     roles: [role],
     lastMfaAt: Date.now(),
     expiresAt: Date.now() + 8 * 60 * 60 * 1000,
   };
-  const value = Buffer.from(JSON.stringify(session)).toString("base64");
+  const value = signSession(session);
 
   const next = req.nextUrl.searchParams.get("next") ?? "/";
   const res = NextResponse.redirect(new URL(next, req.url));

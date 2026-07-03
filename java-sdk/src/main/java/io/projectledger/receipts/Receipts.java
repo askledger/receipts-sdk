@@ -1,4 +1,4 @@
-package io.askledger.receipts;
+package io.projectledger.receipts;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -160,17 +160,34 @@ public final class Receipts {
     ) {
         VerifyResult r = new VerifyResult();
 
+        // guard: receipt / integrity block must be present and well-formed
+        if (signed == null || signed.receipt == null) {
+            r.errors.add("receipt missing");
+            return r;
+        }
+        JsonNode integrityNode = signed.receipt.get("integrity");
+        if (integrityNode == null || !integrityNode.isObject()) {
+            r.errors.add("integrity block missing or not an object");
+            return r;
+        }
+
         // recompute receipt_hash
         ObjectNode body = signed.receipt.deepCopy();
         ((ObjectNode) body.get("integrity")).put("receipt_hash", "");
         String expected = Crypto.sha256Hex(Canonicalize.canonicalizeBytes(body));
-        String got = signed.receipt.get("integrity").get("receipt_hash").asText();
+        JsonNode receiptHashNode = integrityNode.get("receipt_hash");
+        String got = receiptHashNode != null ? receiptHashNode.asText() : "";
         if (expected.equals(got)) r.canonical_hash_matches = true;
         else r.errors.add("canonical hash mismatch: expected " + expected + ", got " + got);
 
         // verify signatures
         byte[] canonSign = Canonicalize.canonicalizeBytes(signed.receipt);
         boolean any = false;
+        if (signed.signatures == null) {
+            r.errors.add("signatures missing");
+            r.valid = false;
+            return r;
+        }
         for (Signature s : signed.signatures) {
             String pk = publicKeys.get(s.kid);
             if (pk == null) {
@@ -183,8 +200,8 @@ public final class Receipts {
         r.signature_valid = any;
 
         if (previousReceipt != null) {
-            String prevHash = previousReceipt.receipt.get("integrity").get("receipt_hash").asText();
-            String thisPrev = signed.receipt.get("integrity").get("previous_receipt_hash").asText();
+            String prevHash = textAt(previousReceipt.receipt, "integrity", "receipt_hash");
+            String thisPrev = textAt(signed.receipt, "integrity", "previous_receipt_hash");
             r.chain_link_valid = prevHash.equals(thisPrev);
             if (!r.chain_link_valid) r.errors.add("chain link broken");
         }
@@ -192,5 +209,15 @@ public final class Receipts {
         boolean chainOk = r.chain_link_valid == null || r.chain_link_valid;
         r.valid = r.canonical_hash_matches && r.signature_valid && chainOk;
         return r;
+    }
+
+    /** Null-safe nested text lookup: returns "" if the receipt, the object,
+     * or the field is missing/null rather than throwing on untrusted input. */
+    private static String textAt(JsonNode receipt, String objField, String field) {
+        if (receipt == null) return "";
+        JsonNode obj = receipt.get(objField);
+        if (obj == null) return "";
+        JsonNode val = obj.get(field);
+        return val != null ? val.asText() : "";
     }
 }

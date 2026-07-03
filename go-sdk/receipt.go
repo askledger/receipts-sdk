@@ -176,15 +176,27 @@ func VerifyReceipt(
 	result := VerifyResult{}
 
 	// 1. recompute receipt_hash
+	if signed.Receipt == nil {
+		result.Errors = append(result.Errors, "receipt missing")
+		return result
+	}
 	body := deepCopyMap(signed.Receipt)
-	body["integrity"].(map[string]interface{})["receipt_hash"] = ""
+	integrity, ok := body["integrity"].(map[string]interface{})
+	if !ok {
+		result.Errors = append(result.Errors, "integrity block missing or not an object")
+		return result
+	}
+	integrity["receipt_hash"] = ""
 	canon, err := CanonicalizeBytes(body)
 	if err != nil {
 		result.Errors = append(result.Errors, "canonicalize failed: "+err.Error())
 		return result
 	}
 	expected := SHA256Hex(canon)
-	got, _ := signed.Receipt["integrity"].(map[string]interface{})["receipt_hash"].(string)
+	var got string
+	if si, ok := signed.Receipt["integrity"].(map[string]interface{}); ok {
+		got, _ = si["receipt_hash"].(string)
+	}
 	if expected == got {
 		result.CanonicalHashMatches = true
 	} else {
@@ -210,8 +222,13 @@ func VerifyReceipt(
 
 	// 3. optional chain link
 	if previousReceipt != nil {
-		prevHash, _ := previousReceipt.Receipt["integrity"].(map[string]interface{})["receipt_hash"].(string)
-		thisPrev, _ := signed.Receipt["integrity"].(map[string]interface{})["previous_receipt_hash"].(string)
+		var prevHash, thisPrev string
+		if pi, ok := previousReceipt.Receipt["integrity"].(map[string]interface{}); ok {
+			prevHash, _ = pi["receipt_hash"].(string)
+		}
+		if ti, ok := signed.Receipt["integrity"].(map[string]interface{}); ok {
+			thisPrev, _ = ti["previous_receipt_hash"].(string)
+		}
 		ok := prevHash == thisPrev
 		result.ChainLinkValid = &ok
 		if !ok {
