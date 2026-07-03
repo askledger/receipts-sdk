@@ -84,7 +84,7 @@ describe("Document credentials · employment salary slip", () => {
 
   it("name hash is NFKC-normalised + lowercased so equivalent renderings match", () => {
     const a = hashName("Jordan Lee");
-    const b = hashName("  ARIF KHAN  ");
+    const b = hashName("  JORDAN LEE  ");
     expect(a).toBe(b);
   });
 
