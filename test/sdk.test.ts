@@ -113,6 +113,23 @@ describe("sign + verify roundtrip", () => {
     expect(result.errors).toHaveLength(0);
   });
 
+  it("rejects a signature whose alg is not EdDSA (algorithm-confusion)", () => {
+    const kp = generateKeyPair();
+    const signed = signReceipt({ event: sampleEvent(), keypair: kp });
+
+    // Rewrite the algorithm label; the signature bytes are unchanged and would
+    // still pass raw Ed25519 verification, but the verifier must refuse it.
+    signed.signatures[0].alg = "RS256" as typeof signed.signatures[0].alg;
+
+    const result = verifyReceipt(signed, {
+      publicKeys: { [kp.kid]: kp.public_key },
+    });
+
+    expect(result.valid).toBe(false);
+    expect(result.checks.signature_valid).toBe(false);
+    expect(result.errors.some((e) => e.includes("Unsupported signature alg"))).toBe(true);
+  });
+
   it("detects tampered receipt body", () => {
     const kp = generateKeyPair();
     const signed = signReceipt({ event: sampleEvent(), keypair: kp });

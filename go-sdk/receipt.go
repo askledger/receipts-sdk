@@ -207,6 +207,13 @@ func VerifyReceipt(
 	canonSign, _ := CanonicalizeBytes(signed.Receipt)
 	any := false
 	for _, sig := range signed.Signatures {
+		// Defense-in-depth (spec §3): reject any signature whose algorithm
+		// is not exactly "EdDSA" before running Ed25519 verification, to
+		// prevent algorithm-confusion. This does not change the signed bytes.
+		if sig.Alg != "EdDSA" {
+			result.Errors = append(result.Errors, "unsupported signature alg="+sig.Alg+" for kid="+sig.Kid)
+			continue
+		}
 		pk, ok := publicKeys[sig.Kid]
 		if !ok {
 			result.Errors = append(result.Errors, "no public key for kid="+sig.Kid)

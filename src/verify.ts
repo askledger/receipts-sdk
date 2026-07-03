@@ -69,6 +69,13 @@ export function verifyReceipt(
   // 2. Verify at least one signature is valid.
   let anySignatureValid = false;
   for (const sig of signed.signatures) {
+    // Algorithm allowlist: only Ed25519 (EdDSA) is supported. Reject any other
+    // `alg` explicitly rather than silently running Ed25519 — this closes the
+    // algorithm-confusion gap where a signature's alg could be rewritten.
+    if (sig.alg !== "EdDSA") {
+      result.errors.push(`Unsupported signature alg=${sig.alg} for kid=${sig.kid} (only EdDSA)`);
+      continue;
+    }
     const publicKey = opts.publicKeys[sig.kid];
     if (!publicKey) {
       result.errors.push(`No public key supplied for kid=${sig.kid}`);

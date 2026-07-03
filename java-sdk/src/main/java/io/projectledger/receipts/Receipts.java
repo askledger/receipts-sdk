@@ -189,6 +189,12 @@ public final class Receipts {
             return r;
         }
         for (Signature s : signed.signatures) {
+            // Reject unknown signature algorithms before Ed25519 verification
+            // (defense-in-depth against algorithm confusion). Per spec §3.
+            if (s.alg == null || !s.alg.equals("EdDSA")) {
+                r.errors.add("unsupported signature alg=" + s.alg + " for kid=" + s.kid);
+                continue;
+            }
             String pk = publicKeys.get(s.kid);
             if (pk == null) {
                 r.errors.add("no public key for kid=" + s.kid);

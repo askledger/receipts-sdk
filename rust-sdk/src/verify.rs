@@ -23,6 +23,21 @@ pub fn verify_receipt(
 ) -> VerifyResult {
     let mut result = VerifyResult::default();
 
+    // 0. structural guard: `integrity` must be present and an object.
+    //    Mirror the hardened Go/Java behavior — bail out early as invalid.
+    if signed
+        .receipt
+        .get("integrity")
+        .and_then(Value::as_object)
+        .is_none()
+    {
+        result
+            .errors
+            .push("integrity block missing or not an object".to_string());
+        result.valid = false;
+        return result;
+    }
+
     // 1. recompute receipt_hash
     let mut body = signed.receipt.clone();
     if let Some(integrity) = body.get_mut("integrity").and_then(Value::as_object_mut) {
@@ -47,6 +62,14 @@ pub fn verify_receipt(
     let canon_sign = canonicalize_bytes(&signed.receipt);
     let mut any = false;
     for s in &signed.signatures {
+        // Defense-in-depth: reject any signature whose alg is not exactly
+        // "EdDSA" before running Ed25519 verification (spec §3).
+        if s.alg != "EdDSA" {
+            result
+                .errors
+                .push(format!("unsupported signature alg={} for kid={}", s.alg, s.kid));
+            continue;
+        }
         match public_keys.get(&s.kid) {
             Some(pk) => {
                 if verify_sig(&canon_sign, &s.sig, pk) {

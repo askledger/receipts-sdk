@@ -51,6 +51,14 @@ def verify_receipt(
     any_valid = False
     for sig in signed["signatures"]:
         kid = sig["kid"]
+        # §3: reject any signature whose alg is not exactly "EdDSA" before
+        # running Ed25519 verification (prevents algorithm confusion).
+        alg = sig.get("alg")
+        if alg != "EdDSA":
+            result.errors.append(
+                f"Unsupported signature alg={alg!r} for kid={kid} (expected 'EdDSA')"
+            )
+            continue
         pk = public_keys.get(kid)
         if not pk:
             result.errors.append(f"No public key supplied for kid={kid}")
