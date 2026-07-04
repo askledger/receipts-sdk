@@ -1,61 +1,900 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.5",
-  "serialNumber": "urn:uuid:project-ledger-receipts-sdk-v0.1.0",
+  "serialNumber": "urn:uuid:3815ac49-37b8-4e10-a82b-3b1d86c46d6c",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-06-13T11:48:00Z",
+    "timestamp": "2026-07-04T00:19:06.711Z",
     "tools": [
       {
-        "vendor": "ProjectLedger",
-        "name": "manual-sbom-stub",
-        "version": "0.1.0"
+        "vendor": "AskLedger",
+        "name": "generate-sbom.mjs",
+        "version": "0.6.0"
       }
     ],
     "component": {
       "type": "library",
-      "bom-ref": "pkg:npm/%40projectledger/receipts-sdk@0.1.0",
-      "name": "@projectledger/receipts-sdk",
-      "version": "0.1.0",
-      "purl": "pkg:npm/%40projectledger/receipts-sdk@0.1.0",
-      "licenses": [{ "license": { "id": "Apache-2.0" } }],
-      "description": "Cryptographic AI receipts SDK — RFC 8785 + Ed25519 + hash chain"
+      "bom-ref": "pkg:npm/%40askledger%2Freceipts-sdk@0.6.0",
+      "name": "@askledger/receipts-sdk",
+      "version": "0.6.0",
+      "purl": "pkg:npm/%40askledger%2Freceipts-sdk@0.6.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     }
   },
   "components": [
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40noble/ed25519@2.1.0",
+      "bom-ref": "pkg:npm/%40esbuild%2Fdarwin-arm64@0.28.1",
+      "name": "@esbuild/darwin-arm64",
+      "version": "0.28.1",
+      "purl": "pkg:npm/%40esbuild%2Fdarwin-arm64@0.28.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "The macOS ARM 64-bit binary for esbuild, a JavaScript bundler."
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40jridgewell%2Fsourcemap-codec@1.5.5",
+      "name": "@jridgewell/sourcemap-codec",
+      "version": "1.5.5",
+      "purl": "pkg:npm/%40jridgewell%2Fsourcemap-codec@1.5.5",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Encode/decode sourcemap mappings"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40noble%2Fed25519@2.3.0",
       "name": "@noble/ed25519",
-      "version": "2.1.0",
-      "purl": "pkg:npm/%40noble/ed25519@2.1.0",
-      "licenses": [{ "license": { "id": "MIT" } }],
-      "description": "Audited Ed25519 implementation"
+      "version": "2.3.0",
+      "purl": "pkg:npm/%40noble%2Fed25519@2.3.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Fastest 4KB JS implementation of ed25519 EDDSA signatures compliant with RFC8032, FIPS 186-5 & ZIP215"
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40noble/hashes@1.4.0",
+      "bom-ref": "pkg:npm/%40noble%2Fhashes@1.8.0",
       "name": "@noble/hashes",
-      "version": "1.4.0",
-      "purl": "pkg:npm/%40noble/hashes@1.4.0",
-      "licenses": [{ "license": { "id": "MIT" } }]
+      "version": "1.8.0",
+      "purl": "pkg:npm/%40noble%2Fhashes@1.8.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Audited & minimal 0-dependency JS implementation of SHA, RIPEMD, BLAKE, HMAC, HKDF, PBKDF & Scrypt"
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/uuid@9.0.0",
-      "name": "uuid",
-      "version": "9.0.0",
-      "purl": "pkg:npm/uuid@9.0.0",
-      "licenses": [{ "license": { "id": "MIT" } }]
-    }
-  ],
-  "compositions": [
+      "bom-ref": "pkg:npm/%40rollup%2Frollup-darwin-arm64@4.62.2",
+      "name": "@rollup/rollup-darwin-arm64",
+      "version": "4.62.2",
+      "purl": "pkg:npm/%40rollup%2Frollup-darwin-arm64@4.62.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Native bindings for Rollup"
+    },
     {
-      "aggregate": "complete",
-      "dependencies": [
-        "pkg:npm/%40projectledger/receipts-sdk@0.1.0"
+      "type": "library",
+      "bom-ref": "pkg:npm/%40types%2Fchai@5.2.3",
+      "name": "@types/chai",
+      "version": "5.2.3",
+      "purl": "pkg:npm/%40types%2Fchai@5.2.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "TypeScript definitions for chai"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40types%2Fdeep-eql@4.0.2",
+      "name": "@types/deep-eql",
+      "version": "4.0.2",
+      "purl": "pkg:npm/%40types%2Fdeep-eql@4.0.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "TypeScript definitions for deep-eql"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40types%2Festree@1.0.9",
+      "name": "@types/estree",
+      "version": "1.0.9",
+      "purl": "pkg:npm/%40types%2Festree@1.0.9",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "TypeScript definitions for estree"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40types%2Fnode@20.19.43",
+      "name": "@types/node",
+      "version": "20.19.43",
+      "purl": "pkg:npm/%40types%2Fnode@20.19.43",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "TypeScript definitions for node"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40vitest%2Fexpect@3.2.6",
+      "name": "@vitest/expect",
+      "version": "3.2.6",
+      "purl": "pkg:npm/%40vitest%2Fexpect@3.2.6",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Jest's expect matchers as a Chai plugin"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40vitest%2Fmocker@3.2.6",
+      "name": "@vitest/mocker",
+      "version": "3.2.6",
+      "purl": "pkg:npm/%40vitest%2Fmocker@3.2.6",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Vitest module mocker implementation"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40vitest%2Fpretty-format@3.2.6",
+      "name": "@vitest/pretty-format",
+      "version": "3.2.6",
+      "purl": "pkg:npm/%40vitest%2Fpretty-format@3.2.6",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Fork of pretty-format with support for ESM"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40vitest%2Frunner@3.2.6",
+      "name": "@vitest/runner",
+      "version": "3.2.6",
+      "purl": "pkg:npm/%40vitest%2Frunner@3.2.6",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Vitest test runner"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40vitest%2Fsnapshot@3.2.6",
+      "name": "@vitest/snapshot",
+      "version": "3.2.6",
+      "purl": "pkg:npm/%40vitest%2Fsnapshot@3.2.6",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Vitest snapshot manager"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40vitest%2Fspy@3.2.6",
+      "name": "@vitest/spy",
+      "version": "3.2.6",
+      "purl": "pkg:npm/%40vitest%2Fspy@3.2.6",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Lightweight Jest compatible spy implementation"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40vitest%2Futils@3.2.6",
+      "name": "@vitest/utils",
+      "version": "3.2.6",
+      "purl": "pkg:npm/%40vitest%2Futils@3.2.6",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Shared Vitest utility functions"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/assertion-error@2.0.1",
+      "name": "assertion-error",
+      "version": "2.0.1",
+      "purl": "pkg:npm/assertion-error@2.0.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Error constructor for test and validation frameworks that implements standardized AssertionError specification."
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/cac@6.7.14",
+      "name": "cac",
+      "version": "6.7.14",
+      "purl": "pkg:npm/cac@6.7.14",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Simple yet powerful framework for building command-line apps."
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/canonicalize@2.1.0",
+      "name": "canonicalize",
+      "version": "2.1.0",
+      "purl": "pkg:npm/canonicalize@2.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "description": "JSON canonicalize function "
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/chai@5.3.3",
+      "name": "chai",
+      "version": "5.3.3",
+      "purl": "pkg:npm/chai@5.3.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "BDD/TDD assertion library for node.js and the browser. Test framework agnostic."
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/check-error@2.1.3",
+      "name": "check-error",
+      "version": "2.1.3",
+      "purl": "pkg:npm/check-error@2.1.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Error comparison and information related utility for node and the browser"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/commander@12.1.0",
+      "name": "commander",
+      "version": "12.1.0",
+      "purl": "pkg:npm/commander@12.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "the complete solution for node.js command-line programs"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/debug@4.4.3",
+      "name": "debug",
+      "version": "4.4.3",
+      "purl": "pkg:npm/debug@4.4.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Lightweight debugging utility for Node.js and the browser"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/deep-eql@5.0.2",
+      "name": "deep-eql",
+      "version": "5.0.2",
+      "purl": "pkg:npm/deep-eql@5.0.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Improved deep equality testing for Node.js and the browser."
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/es-module-lexer@1.7.0",
+      "name": "es-module-lexer",
+      "version": "1.7.0",
+      "purl": "pkg:npm/es-module-lexer@1.7.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Lexes ES modules returning their import/export metadata"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/esbuild@0.28.1",
+      "name": "esbuild",
+      "version": "0.28.1",
+      "purl": "pkg:npm/esbuild@0.28.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "An extremely fast JavaScript and CSS bundler and minifier."
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/estree-walker@3.0.3",
+      "name": "estree-walker",
+      "version": "3.0.3",
+      "purl": "pkg:npm/estree-walker@3.0.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Traverse an ESTree-compliant AST"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/expect-type@1.4.0",
+      "name": "expect-type",
+      "version": "1.4.0",
+      "purl": "pkg:npm/expect-type@1.4.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
       ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/fdir@6.5.0",
+      "name": "fdir",
+      "version": "6.5.0",
+      "purl": "pkg:npm/fdir@6.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "The fastest directory crawler & globbing alternative to glob, fast-glob, & tiny-glob. Crawls 1m files in < 1s"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/js-tokens@9.0.1",
+      "name": "js-tokens",
+      "version": "9.0.1",
+      "purl": "pkg:npm/js-tokens@9.0.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Tiny JavaScript tokenizer."
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/loupe@3.2.1",
+      "name": "loupe",
+      "version": "3.2.1",
+      "purl": "pkg:npm/loupe@3.2.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Inspect utility for Node.js and browsers"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/magic-string@0.30.21",
+      "name": "magic-string",
+      "version": "0.30.21",
+      "purl": "pkg:npm/magic-string@0.30.21",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Modify strings, generate sourcemaps"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/ms@2.1.3",
+      "name": "ms",
+      "version": "2.1.3",
+      "purl": "pkg:npm/ms@2.1.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Tiny millisecond conversion utility"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/nanoid@3.3.15",
+      "name": "nanoid",
+      "version": "3.3.15",
+      "purl": "pkg:npm/nanoid@3.3.15",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "A tiny (116 bytes), secure URL-friendly unique string ID generator"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/pathe@2.0.3",
+      "name": "pathe",
+      "version": "2.0.3",
+      "purl": "pkg:npm/pathe@2.0.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Universal filesystem path utils"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/pathval@2.0.1",
+      "name": "pathval",
+      "version": "2.0.1",
+      "purl": "pkg:npm/pathval@2.0.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Object value retrieval given a string path"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/picocolors@1.1.1",
+      "name": "picocolors",
+      "version": "1.1.1",
+      "purl": "pkg:npm/picocolors@1.1.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC"
+          }
+        }
+      ],
+      "description": "The tiniest and the fastest library for terminal output formatting with ANSI colors"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/picomatch@4.0.5",
+      "name": "picomatch",
+      "version": "4.0.5",
+      "purl": "pkg:npm/picomatch@4.0.5",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Blazing fast and accurate glob matcher written in JavaScript, with no dependencies and full support for standard and extended Bash glob features, including braces, extglobs, POSIX brackets, and regular expressions."
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/postcss@8.5.16",
+      "name": "postcss",
+      "version": "8.5.16",
+      "purl": "pkg:npm/postcss@8.5.16",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Tool for transforming styles with JS plugins"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/rollup@4.62.2",
+      "name": "rollup",
+      "version": "4.62.2",
+      "purl": "pkg:npm/rollup@4.62.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Next-generation ES module bundler"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/siginfo@2.0.0",
+      "name": "siginfo",
+      "version": "2.0.0",
+      "purl": "pkg:npm/siginfo@2.0.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC"
+          }
+        }
+      ],
+      "description": "Utility module to print pretty messages on SIGINFO/SIGUSR1"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/source-map-js@1.2.1",
+      "name": "source-map-js",
+      "version": "1.2.1",
+      "purl": "pkg:npm/source-map-js@1.2.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        }
+      ],
+      "description": "Generates and consumes source maps"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/stackback@0.0.2",
+      "name": "stackback",
+      "version": "0.0.2",
+      "purl": "pkg:npm/stackback@0.0.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "return list of CallSite objects from a captured stacktrace"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/std-env@3.10.0",
+      "name": "std-env",
+      "version": "3.10.0",
+      "purl": "pkg:npm/std-env@3.10.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Runtime agnostic JS utils"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/strip-literal@3.1.0",
+      "name": "strip-literal",
+      "version": "3.1.0",
+      "purl": "pkg:npm/strip-literal@3.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Strip comments and string literals from JavaScript code"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/tinybench@2.9.0",
+      "name": "tinybench",
+      "version": "2.9.0",
+      "purl": "pkg:npm/tinybench@2.9.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/tinyexec@0.3.2",
+      "name": "tinyexec",
+      "version": "0.3.2",
+      "purl": "pkg:npm/tinyexec@0.3.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "A minimal library for executing processes in Node"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/tinyglobby@0.2.17",
+      "name": "tinyglobby",
+      "version": "0.2.17",
+      "purl": "pkg:npm/tinyglobby@0.2.17",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "A fast and minimal alternative to globby and fast-glob"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/tinypool@1.1.1",
+      "name": "tinypool",
+      "version": "1.1.1",
+      "purl": "pkg:npm/tinypool@1.1.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "A minimal and tiny Node.js Worker Thread Pool implementation, a fork of piscina, but with fewer features"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/tinyrainbow@2.0.0",
+      "name": "tinyrainbow",
+      "version": "2.0.0",
+      "purl": "pkg:npm/tinyrainbow@2.0.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "A small library to print colourful messages."
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/tinyspy@4.0.4",
+      "name": "tinyspy",
+      "version": "4.0.4",
+      "purl": "pkg:npm/tinyspy@4.0.4",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "A minimal fork of nanospy, with more features"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/typescript@5.9.3",
+      "name": "typescript",
+      "version": "5.9.3",
+      "purl": "pkg:npm/typescript@5.9.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "description": "TypeScript is a language for application scale JavaScript development"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/undici-types@6.21.0",
+      "name": "undici-types",
+      "version": "6.21.0",
+      "purl": "pkg:npm/undici-types@6.21.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "A stand-alone types package for Undici"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/uuid@11.1.1",
+      "name": "uuid",
+      "version": "11.1.1",
+      "purl": "pkg:npm/uuid@11.1.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "RFC9562 UUIDs"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/vite@7.3.6",
+      "name": "vite",
+      "version": "7.3.6",
+      "purl": "pkg:npm/vite@7.3.6",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Native-ESM powered web dev build tool"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/vite-node@3.2.4",
+      "name": "vite-node",
+      "version": "3.2.4",
+      "purl": "pkg:npm/vite-node@3.2.4",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Vite as Node.js runtime"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/vitest@3.2.6",
+      "name": "vitest",
+      "version": "3.2.6",
+      "purl": "pkg:npm/vitest@3.2.6",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Next generation testing framework powered by Vite"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/why-is-node-running@2.3.0",
+      "name": "why-is-node-running",
+      "version": "2.3.0",
+      "purl": "pkg:npm/why-is-node-running@2.3.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "description": "Node is running but you don't know why? why-is-node-running is here to help you."
     }
-  ],
-  "note": "This file is a checked-in starter SBOM. In CI it is regenerated by `syft . -o cyclonedx-json=sbom.cyclonedx.json` and attested via cosign. See .github/workflows/release.yml."
+  ]
 }

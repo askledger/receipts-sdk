@@ -15,7 +15,7 @@
     "test:e2e:install": "playwright install --with-deps"
   },
   "dependencies": {
-    "next": "14.2.5",
+    "next": "14.2.35",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "@askledger/receipts-sdk": "file:..",

@@ -12,12 +12,30 @@
     "ledger-cli": "dist/cli.js"
   },
   "exports": {
-    ".": { "import": "./dist/index.js", "types": "./dist/index.d.ts" },
-    "./vendor-kit": { "import": "./dist/vendor-kit/index.js", "types": "./dist/vendor-kit/index.d.ts" },
-    "./adapters/openai": { "import": "./dist/adapters/openai.js", "types": "./dist/adapters/openai.d.ts" },
-    "./adapters/anthropic": { "import": "./dist/adapters/anthropic.js", "types": "./dist/adapters/anthropic.d.ts" },
-    "./adapters/fetch": { "import": "./dist/adapters/fetch.js", "types": "./dist/adapters/fetch.d.ts" },
-    "./adapters/langchain": { "import": "./dist/adapters/langchain.js", "types": "./dist/adapters/langchain.d.ts" }
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./vendor-kit": {
+      "import": "./dist/vendor-kit/index.js",
+      "types": "./dist/vendor-kit/index.d.ts"
+    },
+    "./adapters/openai": {
+      "import": "./dist/adapters/openai.js",
+      "types": "./dist/adapters/openai.d.ts"
+    },
+    "./adapters/anthropic": {
+      "import": "./dist/adapters/anthropic.js",
+      "types": "./dist/adapters/anthropic.d.ts"
+    },
+    "./adapters/fetch": {
+      "import": "./dist/adapters/fetch.js",
+      "types": "./dist/adapters/fetch.d.ts"
+    },
+    "./adapters/langchain": {
+      "import": "./dist/adapters/langchain.js",
+      "types": "./dist/adapters/langchain.d.ts"
+    }
   },
   "scripts": {
     "build": "tsc",
@@ -61,7 +79,7 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "typescript": "^5.4.0",
-    "vitest": "^1.6.0"
+    "vitest": "^3.2.6"
   },
   "repository": {
     "type": "git",
