@@ -1,8 +1,10 @@
 name: HSM nightly integration
 
 on:
-  schedule:
-    - cron: "0 3 * * *"   # daily 03:00 UTC
+  # The nightly schedule is disabled until cloud-KMS test credentials
+  # (AWS_KMS_TEST_ROLE_ARN, Azure, GCP) are configured as repo secrets — it was
+  # failing every night on the missing secrets. Run it on demand from the
+  # Actions tab once those are set.
   workflow_dispatch:
 
 permissions:

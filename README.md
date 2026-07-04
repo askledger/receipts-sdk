@@ -15,7 +15,7 @@ Open-source, vendor-neutral cryptographic trust substrate for enterprise AI. Eve
 
 ## Project status
 
-**v0.7.0 · live on npm.** The cryptographic core is hardened and
+**v0.6.0 · live on npm (v0.7.0 tagged, publish pending).** The cryptographic core is hardened and
 independently verifiable — cross-language conformance tests enforce
 byte-identical receipts across the TypeScript, Python, Go, Rust, and
 Java SDKs, and a machine-checked hardening checklist runs in CI. SDK,
@@ -359,7 +359,7 @@ Errors from the wrapped client always propagate — receipts never take down the
 
 | SDK | Language | Status | Conformance |
 |---|---|---|---|
-| `@askledger/receipts-sdk` | TypeScript / Node 18+ / browsers | v0.7.0 · 304 tests passing | Reference |
+| `@askledger/receipts-sdk` | TypeScript / Node 18+ / browsers | v0.6.0 on npm · 304 tests passing | Reference |
 | `askledger-receipts` (Python) | Python 3.10+ | v0.6.0 · cross-verified against TS vectors | Cross-verified |
 | `askledger-receipts-go` | Go 1.22+ | v0.6.0 · cross-verified against TS vectors | Cross-verified |
 | `askledger-receipts-rs` | Rust 1.75+ | v0.6.0 · cross-verified against TS vectors | Cross-verified |
