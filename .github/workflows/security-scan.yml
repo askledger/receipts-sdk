@@ -27,24 +27,11 @@ jobs:
       - run: npm ci
       - run: npm audit --audit-level=high
 
-  codeql:
-    name: CodeQL
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [javascript-typescript, python, go, java]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: github/codeql-action/init@v3
-        with:
-          languages: ${{ matrix.language }}
-          # No-build extraction for every language: the compiled ones (go, java)
-          # otherwise autobuild and fail here (no Maven/Go build step). CodeQL
-          # 'none' mode analyzes source without compiling.
-          build-mode: none
-          queries: security-and-quality
-      - uses: github/codeql-action/analyze@v3
+  # CodeQL runs via the repository's CodeQL *default setup* (Security settings),
+  # which already covers actions/go/java/javascript-typescript/python/rust. An
+  # advanced CodeQL job here is redundant and, worse, GitHub refuses to process
+  # advanced-config SARIF while default setup is enabled. So we don't duplicate
+  # it in this workflow.
 
   trivy:
     name: Trivy filesystem + secret scan
