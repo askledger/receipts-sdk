@@ -2,16 +2,18 @@
 
 Wire-format compatible. Cross-verified via shared conformance vectors. Apache-2.0.
 
+> Not yet published to Maven Central — build from source (`cd java-sdk && mvn install`) to use it locally. The coordinates below are the eventual published form.
+
 ```xml
 <dependency>
-  <groupId>io.askledger</groupId>
+  <groupId>io.projectledger</groupId>
   <artifactId>receipts-sdk</artifactId>
   <version>0.1.0</version>
 </dependency>
 ```
 
 ```java
-import io.askledger.receipts.*;
+import io.projectledger.receipts.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 

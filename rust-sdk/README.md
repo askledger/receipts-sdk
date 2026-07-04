@@ -2,9 +2,11 @@
 
 Wire-format compatible. Cross-verified via shared conformance vectors. Apache-2.0.
 
+> Not yet on crates.io — use the git dependency below.
+
 ```toml
 [dependencies]
-askledger-receipts = "0.1"
+askledger-receipts = { git = "https://github.com/askledger/receipts-sdk", package = "askledger-receipts" }
 ```
 
 ```rust

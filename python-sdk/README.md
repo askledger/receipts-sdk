@@ -4,8 +4,10 @@ Wire-format-compatible Python SDK for [AskLedger Receipts](../README.md). Receip
 
 ## Install
 
+> Not yet on PyPI. Install from source: `pip install git+https://github.com/askledger/receipts-sdk.git#subdirectory=python-sdk` (or clone and `pip install ./python-sdk`).
+
 ```bash
-pip install askledger-receipts
+pip install git+https://github.com/askledger/receipts-sdk.git#subdirectory=python-sdk
 ```
 
 ## Quick start
