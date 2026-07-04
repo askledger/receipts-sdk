@@ -1,6 +1,9 @@
-# Dependabot version updates across every ecosystem in the repo. Security
-# updates are enabled separately at the repo level; this keeps versions fresh
-# and batches low-risk minor/patch bumps to limit PR noise.
+# Dependabot version updates. Batched into ONE grouped PR per ecosystem per week
+# to avoid PR floods, with a low open-PR cap. Crypto/canonicalization libraries
+# are pinned against MAJOR bumps — those change signature/hash bytes and must go
+# through the cross-language conformance suite + a security review, never an
+# auto-PR. (Security advisories are still surfaced separately by the repo's
+# Dependabot alerts + the dep-audit workflow.)
 version: 2
 updates:
   - package-ecosystem: npm
@@ -13,43 +16,75 @@ updates:
       - "/integrations/openai-proxy"
     schedule:
       interval: weekly
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 3
     groups:
-      npm-minor-patch:
-        update-types: ["minor", "patch"]
+      npm:
+        patterns: ["*"]
+    ignore:
+      - dependency-name: "canonicalize"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@noble/ed25519"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@noble/hashes"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: cargo
     directory: "/rust-sdk"
     schedule:
       interval: weekly
+    open-pull-requests-limit: 2
     groups:
-      cargo-minor-patch:
-        update-types: ["minor", "patch"]
+      cargo:
+        patterns: ["*"]
+    ignore:
+      - dependency-name: "ed25519-dalek"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "sha2"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "curve25519-dalek"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "rand_core"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: pip
     directory: "/python-sdk"
     schedule:
       interval: weekly
+    open-pull-requests-limit: 2
+    groups:
+      pip:
+        patterns: ["*"]
+    ignore:
+      - dependency-name: "cryptography"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: gomod
     directory: "/go-sdk"
     schedule:
       interval: weekly
+    open-pull-requests-limit: 2
 
   - package-ecosystem: maven
     directory: "/java-sdk"
     schedule:
       interval: weekly
+    open-pull-requests-limit: 2
     groups:
-      maven-minor-patch:
-        update-types: ["minor", "patch"]
+      maven:
+        patterns: ["*"]
+    ignore:
+      - dependency-name: "org.bouncycastle:bcprov-jdk18on"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "com.fasterxml.jackson.core:jackson-databind"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
       interval: weekly
+    open-pull-requests-limit: 2
     groups:
-      actions-all:
+      actions:
         patterns: ["*"]
 
   - package-ecosystem: docker
@@ -58,3 +93,7 @@ updates:
       - "/console"
     schedule:
       interval: weekly
+    open-pull-requests-limit: 2
+    groups:
+      docker:
+        patterns: ["*"]
