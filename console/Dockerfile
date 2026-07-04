@@ -1,21 +1,21 @@
 # syntax=docker/dockerfile:1.7
 # Multi-stage Dockerfile for the AskLedger admin console.
 
-FROM node:20-alpine AS deps
+FROM node:26-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json* ./
 # Allow file: dependency on the parent SDK to resolve in the build context
 COPY ../package.json /sdk/package.json
 RUN npm install --no-audit --no-fund
 
-FROM node:20-alpine AS builder
+FROM node:26-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
-FROM node:20-alpine AS runner
+FROM node:26-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
