@@ -30,26 +30,40 @@ Out of scope:
 - Local file storage permissions (production should use HSM)
 - Social engineering against maintainers
 
+## Signature algorithm binding
+
+Receipts are signed with Ed25519 (`alg: "EdDSA"`). Each signature entry carries
+`alg` and `kid`, but these header fields are **not yet cryptographically bound
+into the signed bytes** (the signature covers the canonical receipt, not the
+signature header). This is mitigated today, and hardened further on the roadmap:
+
+- **Current mitigation (shipped):** every verifier (TypeScript, Python, Go, Rust,
+  Java) rejects any signature whose `alg` is not exactly `"EdDSA"` before
+  verification, and a signature only counts as valid if its `kid` maps to a
+  supplied public key and the Ed25519 signature verifies against that key.
+  Because only one algorithm is supported and the signature is over fixed bytes
+  produced by a specific key, an attacker cannot rewrite `alg`/`kid` to obtain a
+  different valid interpretation (a swapped `kid` fails signature verification; a
+  swapped `alg` is rejected outright). Algorithm-confusion is therefore closed in
+  practice for the current single-algorithm design.
+- **Planned (protocol v0.7):** when multiple signature algorithms are introduced,
+  the protected header (`alg`, `kid`) will be bound into the signed input
+  (JWS/COSE style). This is a deliberate, versioned format change — it alters the
+  signed bytes, so it is scheduled for a protocol version bump rather than a
+  silent update.
+
 ## Known dev-dependency advisories (do not affect production)
 
-Running `npm audit` on this repository will show advisories against
-`vitest` and its transitive dependencies (`vite`, `esbuild`, `vite-node`).
-These packages are pinned in `devDependencies` and **do not appear in
-the published npm package or the docker image.** A consumer who runs
-`npm install @askledger/receipts-sdk` receives **zero** of these
-packages.
+Test/build tooling (`vitest` and its transitive `vite`/`esbuild`) lives in
+`devDependencies` and **does not appear in the published npm package or the
+docker image** — a consumer who runs `npm install @askledger/receipts-sdk`
+receives **zero** of these packages.
 
-We pin `vitest@^1.6` deliberately. Later major versions have
-unresolved transitive-dependency resolution issues in our environment
-that would block clean local builds. The advisories that remain
-against vitest 1.x are:
-
-| Advisory | Surface | Reachable in production? |
-|---|---|---|
-| GHSA-5xrq-8626-4rwp (vitest UI server) | dev-only, requires `vitest --ui` to be running locally | **No** |
-| GHSA-fx2h-pf6j-xcff (vite `server.fs.deny` bypass on Windows) | dev-only, requires `vite` dev server to be running on Windows | **No** |
-| GHSA-67mh-4wv8-2f99 (esbuild dev-server CORS) | dev-only, requires `esbuild` dev server to be running locally | **No** |
-| GHSA-4w7w-66w2-5vf9, GHSA-v6wh-96g9-6wx3 (vite path traversal) | dev-only, requires `vite` dev server to be running | **No** |
+As of this release the toolchain is on `vitest@^3.2`, and
+`npm audit --audit-level=high` runs clean in CI (the `security-scan`
+workflow). The earlier `vitest` 1.x / `vite` / `esbuild` dev-server advisories
+are resolved. Any dev-only advisory that surfaces in future remains, by the
+above, unreachable from what ships to consumers.
 
 Production runtime dependencies have zero known vulnerabilities at
 the version pins shipped in this release. The shipped npm package
