@@ -57,7 +57,15 @@ browser-extension/
 
 - Manifest V3 strict CSP — no remote scripts, no eval
 - Private key generated via `ed.utils.randomPrivateKey()` (CSPRNG)
-- Stored in `chrome.storage.local`, encrypted at rest by Chrome
+- Key + receipts live in `chrome.storage.local` — the browser's per-extension
+  sandboxed store, isolated from web pages and other extensions. It is not
+  additionally passphrase-encrypted at rest yet (planned); on disk it is
+  protected only by the OS user profile / any full-disk encryption.
+- Service worker only accepts messages from this extension's own contexts;
+  reading or clearing the receipt history is restricted to the extension's
+  own pages (a content script may only request signing).
+- OIDC `id_token` is verified (JWS signature against issuer JWKS + iss/aud/exp/nonce)
+  before any identity claim is trusted.
 - Receipts cap at 1000 entries locally (FIFO)
 - Optional corporate ingest is HTTPS only
 

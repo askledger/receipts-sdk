@@ -5,7 +5,7 @@
   "description": "Captures every AI prompt you send to ChatGPT, Claude, Gemini, Bedrock and signs a cryptographic receipt locally. Stays on your machine. Optional ship-to-corp-IT for shadow-AI visibility.",
   "author": "AskLedger",
   "homepage_url": "https://github.com/askledger/receipts-sdk",
-  "permissions": ["storage", "webRequest", "activeTab", "scripting"],
+  "permissions": ["storage", "webRequest", "activeTab", "scripting", "identity", "downloads"],
   "host_permissions": [
     "https://chatgpt.com/*",
     "https://chat.openai.com/*",

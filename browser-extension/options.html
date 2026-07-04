@@ -23,7 +23,7 @@ button { margin-top: 16px; background: #0a1530; color: white; padding: 10px 18px
 
 <section>
   <h2>Local-only mode (default)</h2>
-  <p>Every receipt is signed with a keypair generated in this browser. The private key never leaves your machine. Receipts are stored encrypted in <code>chrome.storage.local</code>.</p>
+  <p>Every receipt is signed with a keypair generated in this browser. The private key and your receipts are kept in <code>chrome.storage.local</code> — the browser's per-extension sandboxed store, not readable by web pages or other extensions — and never leave your machine. (They are not additionally passphrase-encrypted at rest yet; that's a planned option.)</p>
 </section>
 
 <section>

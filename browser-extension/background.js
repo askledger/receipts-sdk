@@ -8,9 +8,11 @@
  * Crypto: imports @noble/ed25519 + @noble/hashes + canonicalize from
  * bundled vendor files (Manifest V3 forbids remote scripts).
  *
- * Privacy: every receipt is stored encrypted-at-rest using a key
- * derived from the user's machine entropy + an optional passphrase.
- * Default: NO data leaves the browser.
+ * Privacy: the signing key and receipts are held in chrome.storage.local —
+ * the browser's per-extension sandboxed store, not readable by web pages or
+ * other extensions. They are NOT additionally app-encrypted at rest today
+ * (an optional passphrase-wrapped key is a planned enhancement). By default
+ * NO data leaves the browser.
  */
 
 import { sha256 } from "./vendor/noble-hashes-sha256.js";
@@ -102,22 +104,55 @@ async function signReceipt(event) {
   return signed;
 }
 
+// Message trust boundary. There is no `externally_connectable`, so onMessage
+// only ever receives from THIS extension's own contexts: content scripts
+// (which carry sender.tab) or our own extension pages — popup/options (no
+// sender.tab). Content scripts may only sign / read the public key. Reading
+// or clearing the stored receipt history is restricted to our own extension
+// pages, so a compromised or malicious in-page context on a matched site
+// cannot exfiltrate the prompt-hash history or wipe the chain.
+function fromOwnExtension(sender) {
+  return sender != null && sender.id === chrome.runtime.id;
+}
+function fromExtensionPage(sender) {
+  return (
+    fromOwnExtension(sender) &&
+    !sender.tab &&
+    typeof sender.url === "string" &&
+    sender.url.startsWith(`chrome-extension://${chrome.runtime.id}/`)
+  );
+}
+
 chrome.runtime.onMessage.addListener((msg, sender, send) => {
-  if (msg.type === "pl.sign") {
-    signReceipt(msg.event).then((r) => send({ ok: true, receipt: r }));
-    return true; // async
+  // Anything not from our own extension is refused outright.
+  if (!fromOwnExtension(sender)) {
+    send({ ok: false, error: "unauthorized sender" });
+    return false;
   }
-  if (msg.type === "pl.list") {
-    chrome.storage.local.get(STORE_KEY.RECEIPTS).then((r) => send({ receipts: r[STORE_KEY.RECEIPTS] ?? [] }));
-    return true;
-  }
-  if (msg.type === "pl.clear") {
-    chrome.storage.local.set({ [STORE_KEY.RECEIPTS]: [], [STORE_KEY.CHAIN]: { chain_height: 0, previous_receipt_hash: GENESIS } }).then(() => send({ ok: true }));
-    return true;
-  }
-  if (msg.type === "pl.pubkey") {
-    ensureKey().then(ed.getPublicKeyAsync).then((p) => send({ public_key: b64(p) }));
-    return true;
+
+  switch (msg && msg.type) {
+    case "pl.sign": // content scripts + extension pages
+      signReceipt(msg.event).then((r) => send({ ok: true, receipt: r }));
+      return true; // async
+
+    case "pl.pubkey": // public data — any own-extension context
+      ensureKey().then(ed.getPublicKeyAsync).then((p) => send({ public_key: b64(p) }));
+      return true;
+
+    case "pl.list": // sensitive: full receipt history — extension pages only
+      if (!fromExtensionPage(sender)) { send({ ok: false, error: "forbidden" }); return false; }
+      chrome.storage.local.get(STORE_KEY.RECEIPTS).then((r) => send({ receipts: r[STORE_KEY.RECEIPTS] ?? [] }));
+      return true;
+
+    case "pl.clear": // destructive: wipes the chain — extension pages only
+      if (!fromExtensionPage(sender)) { send({ ok: false, error: "forbidden" }); return false; }
+      chrome.storage.local
+        .set({ [STORE_KEY.RECEIPTS]: [], [STORE_KEY.CHAIN]: { chain_height: 0, previous_receipt_hash: GENESIS } })
+        .then(() => send({ ok: true }));
+      return true;
+
+    default:
+      return false;
   }
 });
 
