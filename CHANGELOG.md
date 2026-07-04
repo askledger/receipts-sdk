@@ -4,6 +4,41 @@ All notable changes to the AskLedger Receipts SDK will be documented in this fil
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (with the caveat that until v1.0, breaking changes may occur between minor versions).
 
+## [0.7.0] — 2026-07-04
+
+### Security & correctness hardening
+
+Hardens the cryptographic guarantees and closes the gaps found in a full
+multi-language security + correctness audit.
+
+#### Security
+- **Verifier algorithm allowlist** — every SDK (TS/Python/Go/Rust/Java) now
+  rejects any signature whose `alg` is not `EdDSA` before Ed25519 verification,
+  closing algorithm-confusion.
+- **Chain continuity enforced on verify** — with a predecessor, verification
+  requires `chain_height === prev + 1` (not just the hash link); genesis
+  consistency (`chain_height 1` ⇔ `GENESIS_HASH`) is checked even without the
+  predecessor. Dropped or reordered receipts are now rejected.
+- **Admin console** — session cookie is HMAC-signed (forgery-proof) and the
+  dev-login helper is hard-disabled in production builds.
+- **Browser extension** — service-worker message trust boundary; the OIDC
+  `id_token` is now verified (JWS signature against the issuer JWKS +
+  iss/aud/exp/nonce); honest key-storage docs.
+
+#### Correctness
+- **Cross-language canonicalization parity** — fixed Go's HTML-escaping and
+  ECMAScript number formatting across Python/Go/Rust/Java, so a receipt signed
+  by one SDK verifies byte-identically in every other. Shared conformance
+  vectors expanded 7 → 43 and enforced in CI across all five languages.
+- Go and Java verifiers fail closed on malformed input (no panic).
+
+#### Supply chain & tooling
+- Dependency CVEs patched (jackson, bcprov, `next` 15, `vitest` 3, trivy-action);
+  Rust `Cargo.lock` and a hashed Python lock committed; SBOM regenerated.
+- Cross-language conformance, Console build, and dependency-audit
+  (cargo-audit / pip-audit / govulncheck) added to CI; the previously-broken
+  security-scan workflow fixed.
+
 ## [0.6.0] — 2026-06-13
 
 ### Become-the-default release
