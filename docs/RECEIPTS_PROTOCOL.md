@@ -3,7 +3,7 @@
 **Version:** 0.1 (draft)
 **Status:** Open for public review · subject to change before v1.0
 **Editors:** AskLedger
-**Authors of source implementation:** see [CONTRIBUTORS](../CONTRIBUTORS.md)
+**Authors of source implementation:** the AskLedger team — see [CONTRIBUTING](../CONTRIBUTING.md)
 
 ---
 
