@@ -18,6 +18,10 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { fileURLToPath } from "node:url";
+
+// This repo is ESM ("type":"module"), where __dirname is not defined.
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Allow caller to override the repo root via env var, useful when running
 // the compiled JS from /tmp during local verification.

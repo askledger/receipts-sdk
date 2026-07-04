@@ -31,6 +31,7 @@ jobs:
     name: CodeQL
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         language: [javascript-typescript, python, go, java]
     steps:
@@ -38,6 +39,10 @@ jobs:
       - uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
+          # No-build extraction for every language: the compiled ones (go, java)
+          # otherwise autobuild and fail here (no Maven/Go build step). CodeQL
+          # 'none' mode analyzes source without compiling.
+          build-mode: none
           queries: security-and-quality
       - uses: github/codeql-action/analyze@v3
 
@@ -46,13 +51,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: aquasecurity/trivy-action@0.36.0
+      - uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: fs
           severity: HIGH,CRITICAL
           exit-code: "1"
           ignore-unfixed: true
-      - uses: aquasecurity/trivy-action@0.36.0
+      - uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: fs
           scanners: secret
