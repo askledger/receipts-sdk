@@ -1,4 +1,4 @@
-FROM node:20-bookworm-slim AS base
+FROM node:26-bookworm-slim AS base
 ENV NODE_ENV=production PNPM_HOME=/pnpm PATH=/pnpm:$PATH
 WORKDIR /app
 
