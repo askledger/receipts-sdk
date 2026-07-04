@@ -29,6 +29,7 @@ interest, and standards-body co-authorship.
 - Package: [npm install @askledger/receipts-sdk](https://www.npmjs.com/package/@askledger/receipts-sdk)
 - Site: [askledger.org](https://askledger.org)
 - Source: [github.com/askledger/receipts-sdk](https://github.com/askledger/receipts-sdk)
+- Contact: [hello@askledger.org](mailto:hello@askledger.org)
 
 ---
 

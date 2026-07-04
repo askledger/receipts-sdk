@@ -25,6 +25,6 @@ Examples of unacceptable behavior:
 
 ## Enforcement
 
-Project maintainers are responsible for clarifying and enforcing the standards. Reports of conduct violations may be sent to `conduct@github.com/askledger/receipts-sdk`. All reports will be reviewed and investigated.
+Project maintainers are responsible for clarifying and enforcing the standards. Reports of conduct violations may be sent to `hello@askledger.org`. All reports will be reviewed and investigated.
 
 This Code of Conduct is adapted from the [Contributor Covenant 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/).

@@ -68,12 +68,12 @@ registered with Sigstore. Maintainers must rotate their key annually.
 ## Communication
 
 - `#askledger` on the CNCF Slack — community + maintainer chat.
-- `maintainers@github.com/askledger/receipts-sdk` — maintainer-only mailing list.
+- `hello@askledger.org` — maintainer-only mailing list.
 - [GitHub Security Advisories](https://github.com/askledger/receipts-sdk/security/advisories/new) — security reports (see SECURITY.md).
 - GitHub Discussions — feature proposals, RFC-style design discussions.
 
 ## Code of Conduct
 
 We follow the [Contributor Covenant 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/).
-Violations: `conduct@github.com/askledger/receipts-sdk`. Handled by the TSC chair or a
+Violations: `hello@askledger.org`. Handled by the TSC chair or a
 designated alternate, never by anyone named in the report.
