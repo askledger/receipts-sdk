@@ -10,7 +10,7 @@
  * by mis-setting an env var.
  */
 
-import { z } from "./zod-shim";
+import { z, type ZodSchema } from "./zod-shim";
 
 // =============================================================================
 // Wire-format types (the API contract).
@@ -136,7 +136,7 @@ const USE_FIXTURES = process.env.PL_USE_FIXTURES !== "false";
 
 async function call<T>(
   endpoint: string,
-  schema: z.ZodSchema<T>,
+  schema: ZodSchema<T>,
   fixture: T,
 ): Promise<ApiResult<T>> {
   const trace_id = `tr_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;

@@ -33,31 +33,32 @@ function safe<T>(schema: ZodSchema<T>): ZodSchema<T> {
 const string = (): ZodSchema<string> =>
   safe({ parse: (i: unknown) => (typeof i === "string" ? i : fail("expected string")) } as ZodSchema<string>);
 
-const numberBase = (): ZodSchema<number> & {
-  int: () => ZodSchema<number>;
-  nonnegative: () => ZodSchema<number> & { int: () => ZodSchema<number> };
-  positive: () => ZodSchema<number>;
-  min: (n: number) => ZodSchema<number> & { max: (n: number) => ZodSchema<number> };
-  max: (n: number) => ZodSchema<number>;
-} => {
-  const base = {
-    parse: (i: unknown) => (typeof i === "number" && Number.isFinite(i) ? i : fail("expected number")),
-  } as ZodSchema<number>;
-  const wrap = (extra: (n: number) => void) =>
-    Object.assign(safe({ parse: (i: unknown) => { const n = base.parse(i); extra(n); return n; } }), helpers());
-  function helpers() {
-    return {
-      int: () => wrap((n) => { if (!Number.isInteger(n)) fail("expected integer"); }),
-      nonnegative: () => wrap((n) => { if (n < 0) fail("expected nonnegative"); }),
-      positive: () => wrap((n) => { if (n <= 0) fail("expected positive"); }),
-      min: (m: number) => Object.assign(wrap((n) => { if (n < m) fail(`expected >= ${m}`); }), {
-        max: (mx: number) => wrap((n) => { if (n < m || n > mx) fail(`expected in [${m},${mx}]`); }),
-      }),
-      max: (m: number) => wrap((n) => { if (n > m) fail(`expected <= ${m}`); }),
-    };
-  }
-  return Object.assign(safe(base), helpers()) as ReturnType<typeof numberBase>;
+// A number schema is fully chainable: every constraint returns the same rich
+// type, and each method *composes* onto the current parser so that chains like
+// `.min(0).max(1)` enforce every constraint (not just the last one).
+type NumberSchema = ZodSchema<number> & {
+  int: () => NumberSchema;
+  nonnegative: () => NumberSchema;
+  positive: () => NumberSchema;
+  min: (n: number) => NumberSchema;
+  max: (n: number) => NumberSchema;
 };
+
+const makeNumber = (parse: (i: unknown) => number): NumberSchema => {
+  const self = safe({ parse } as ZodSchema<number>);
+  const chain = (extra: (n: number) => void): NumberSchema =>
+    makeNumber((i: unknown) => { const n = parse(i); extra(n); return n; });
+  return Object.assign(self, {
+    int: () => chain((n) => { if (!Number.isInteger(n)) fail("expected integer"); }),
+    nonnegative: () => chain((n) => { if (n < 0) fail("expected nonnegative"); }),
+    positive: () => chain((n) => { if (n <= 0) fail("expected positive"); }),
+    min: (m: number) => chain((n) => { if (n < m) fail(`expected >= ${m}`); }),
+    max: (m: number) => chain((n) => { if (n > m) fail(`expected <= ${m}`); }),
+  }) as NumberSchema;
+};
+
+const numberBase = (): NumberSchema =>
+  makeNumber((i: unknown) => (typeof i === "number" && Number.isFinite(i) ? i : fail("expected number")));
 
 const number = numberBase;
 

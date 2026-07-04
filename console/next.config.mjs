@@ -45,8 +45,18 @@ const SECURITY_HEADERS = [
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  experimental: { typedRoutes: true },
+  typedRoutes: true, // stabilized to a top-level option in Next 15.5
   transpilePackages: ["@askledger/receipts-sdk"],
+  webpack: (config) => {
+    // The app uses explicit-extension ESM imports (`./foo.js`) that point at
+    // TypeScript sources. tsconfig's "bundler" resolution handles this for
+    // typecheck; mirror it for the webpack build so `.js` resolves to `.ts`.
+    config.resolve.extensionAlias = {
+      ".js": [".ts", ".tsx", ".js", ".jsx"],
+      ".mjs": [".mts", ".mjs"],
+    };
+    return config;
+  },
   async headers() {
     return [
       {

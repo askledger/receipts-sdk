@@ -41,13 +41,14 @@ export async function requireTenantContext(): Promise<TenantContext> {
   const session = await getSession();
   if (!session) throw new Unauthenticated();
 
-  const requested = headers().get("x-tenant-id");
+  const hdrs = await headers();
+  const requested = hdrs.get("x-tenant-id");
   if (requested && requested !== session.tenantId) {
     logCrossTenant(session, requested);
     throw new CrossTenantAttempt(session.tenantId, requested, session.sub);
   }
 
-  const traceparent = headers().get("traceparent");
+  const traceparent = hdrs.get("traceparent");
   const traceId = traceparent?.split("-")[1] ?? newTraceId();
 
   return { session, tenantId: session.tenantId, traceId };

@@ -1,0 +1,34 @@
+# Typecheck + production build for the admin console. It had no CI, which is
+# why type errors and a Next-version break sat unnoticed. Runs when the console
+# or the SDK it depends on (file:..) changes.
+name: Console (typecheck + build)
+
+on:
+  push:
+    branches: [main]
+    paths: ["console/**", "src/**", ".github/workflows/console.yml"]
+  pull_request:
+    branches: [main]
+    paths: ["console/**", "src/**", ".github/workflows/console.yml"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Console build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Build the SDK (console imports its dist via file:..)
+        run: npm ci && npm run build
+      - name: Install console deps
+        working-directory: console
+        run: npm ci
+      - name: Typecheck
+        working-directory: console
+        run: npm run typecheck
+      - name: Production build
+        working-directory: console
+        run: npm run build

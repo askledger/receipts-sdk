@@ -1,0 +1,14 @@
+# dependencies / build output
+/node_modules/
+/.next/
+/out/
+
+# Next.js generated types (recreated on build)
+/next-env.d.ts
+
+# generated demo fixture (recreated by the prebuild step)
+/src/lib/demo-receipts.json
+
+# test artifacts
+/playwright-report/
+/test-results/

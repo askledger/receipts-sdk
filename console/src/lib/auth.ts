@@ -100,7 +100,7 @@ function verifySignedCookie(raw: string): Session | null {
  * cannot be hand-crafted to escalate roles.
  */
 export async function getSession(): Promise<Session | null> {
-  const raw = cookies().get(SESSION_COOKIE)?.value;
+  const raw = (await cookies()).get(SESSION_COOKIE)?.value;
   if (!raw) return null;
   return verifySignedCookie(raw);
 }
