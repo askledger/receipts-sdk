@@ -8,19 +8,22 @@ Open-source, vendor-neutral cryptographic trust substrate for enterprise AI. Eve
 [![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org)
 [![Spec](https://img.shields.io/badge/PL--RFC-001…010-blueviolet)](spec/README.md)
 [![Conformance](https://img.shields.io/badge/conformance-CL1%2FCL2%2FCL3-blue)](conformance/README.md)
-[![Tests](https://img.shields.io/badge/tests-280%2B%20passing-brightgreen)](#testing)
+[![Tests](https://img.shields.io/badge/tests-304%20passing-brightgreen)](#testing)
 [![Hardening](https://img.shields.io/badge/hardening-66%2F66%20PASS-brightgreen)](docs/security/HARDENING_CHECKLIST.md)
 
 ---
 
 ## Project status
 
-**v0.6.0 · live on npm.** The cryptographic substrate is production-
-grade and tested. SDK, integrations, browser extension, console,
-public verifier, specification, and conformance program are complete
-and publicly available. Hosted SaaS, third-party penetration test,
-and SOC 2 Type II report are scoped for Q4 2026 - Q1 2027. We are at
-the **design-partner stage** and welcome architectural review, pilot
+**v0.6.0 · live on npm.** The cryptographic core is hardened and
+independently verifiable — cross-language conformance tests enforce
+byte-identical receipts across the TypeScript, Python, Go, Rust, and
+Java SDKs, and a machine-checked hardening checklist runs in CI. SDK,
+integrations, browser extension, console, public verifier, specification,
+and conformance program are publicly available. A third-party
+penetration test and SOC 2 Type II report are scoped for Q4 2026 - Q1
+2027, and the hosted SaaS is in development. We are at the
+**design-partner stage** and welcome architectural review, pilot
 interest, and standards-body co-authorship.
 
 - Package: [npm install @askledger/receipts-sdk](https://www.npmjs.com/package/@askledger/receipts-sdk)
