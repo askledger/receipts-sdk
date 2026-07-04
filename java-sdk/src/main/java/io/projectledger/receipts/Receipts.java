@@ -205,11 +205,52 @@ public final class Receipts {
         }
         r.signature_valid = any;
 
-        if (previousReceipt != null) {
-            String prevHash = textAt(previousReceipt.receipt, "integrity", "receipt_hash");
-            String thisPrev = textAt(signed.receipt, "integrity", "previous_receipt_hash");
-            r.chain_link_valid = prevHash.equals(thisPrev);
-            if (!r.chain_link_valid) r.errors.add("chain link broken");
+        // 3. chain link.
+        //    - chain_height must be a positive integer (>= 1).
+        //    - with a supplied predecessor: its receipt_hash must match this
+        //      receipt's previous_receipt_hash AND chain_height must be exactly
+        //      one greater.
+        //    - genesis consistency (checkable without predecessor):
+        //      chain_height == 1 iff previous_receipt_hash == GENESIS_HASH.
+        //    A mid-chain receipt (height > 1) verified without its predecessor
+        //    leaves chain_link_valid null: position not attested, but not failed.
+        String thisPrev = textAt(signed.receipt, "integrity", "previous_receipt_hash");
+        JsonNode heightNode = integrityNode.get("chain_height");
+
+        if (heightNode == null || !heightNode.isIntegralNumber()) {
+            r.chain_link_valid = false;
+            r.errors.add("Invalid chain_height: " + (heightNode == null ? "null" : heightNode.asText()));
+        } else {
+            long height = heightNode.asLong();
+            if (height < 1) {
+                r.chain_link_valid = false;
+                r.errors.add("Invalid chain_height: " + height);
+            } else if (previousReceipt != null) {
+                String prevHash = textAt(previousReceipt.receipt, "integrity", "receipt_hash");
+                long prevHeight = longAt(previousReceipt.receipt, "integrity", "chain_height");
+                boolean linkOk = prevHash.equals(thisPrev);
+                boolean heightOk = height == prevHeight + 1;
+                r.chain_link_valid = linkOk && heightOk;
+                if (!linkOk) {
+                    r.errors.add("Chain link broken: previous_receipt_hash " + thisPrev
+                        + " does not match previous receipt's receipt_hash " + prevHash);
+                }
+                if (!heightOk) {
+                    r.errors.add("Chain height not contiguous: expected " + (prevHeight + 1)
+                        + ", got " + height);
+                }
+            } else if (height == 1 || thisPrev.equals(GENESIS_HASH)) {
+                // Genesis reference and chain_height 1 must agree with each other.
+                boolean genesisOk = height == 1 && thisPrev.equals(GENESIS_HASH);
+                r.chain_link_valid = genesisOk;
+                if (!genesisOk) {
+                    r.errors.add("Genesis inconsistency: chain_height " + height
+                        + " with previous_receipt_hash " + thisPrev
+                        + " (chain_height 1 must reference GENESIS_HASH, and vice-versa)");
+                }
+            }
+            // else: mid-chain (height > 1) without predecessor -> chain_link_valid
+            // stays null: position not attested, but not failed.
         }
 
         boolean chainOk = r.chain_link_valid == null || r.chain_link_valid;
@@ -225,5 +266,15 @@ public final class Receipts {
         if (obj == null) return "";
         JsonNode val = obj.get(field);
         return val != null ? val.asText() : "";
+    }
+
+    /** Null-safe nested long lookup: returns 0 if the receipt, the object, or
+     * the field is missing/null rather than throwing on untrusted input. */
+    private static long longAt(JsonNode receipt, String objField, String field) {
+        if (receipt == null) return 0;
+        JsonNode obj = receipt.get(objField);
+        if (obj == null) return 0;
+        JsonNode val = obj.get(field);
+        return val != null ? val.asLong() : 0;
     }
 }

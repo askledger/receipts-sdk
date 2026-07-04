@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional
 
 from .canonicalize import canonicalize_bytes
 from .crypto import sha256_hex, verify as ed_verify
+from .receipt import GENESIS_HASH
 
 
 @dataclass
@@ -70,17 +71,41 @@ def verify_receipt(
     result.signature_valid = any_valid
 
     # 3. Chain link
-    if previous_receipt is not None:
-        prev_hash = previous_receipt["receipt"]["integrity"]["receipt_hash"]
-        if prev_hash == receipt["integrity"]["previous_receipt_hash"]:
-            result.chain_link_valid = True
-        else:
-            result.chain_link_valid = False
+    integrity = receipt["integrity"]
+    height = integrity.get("chain_height")
+    prev_hash_claim = integrity.get("previous_receipt_hash")
+
+    if not isinstance(height, int) or isinstance(height, bool) or height < 1:
+        result.chain_link_valid = False
+        result.errors.append(f"Invalid chain_height: {height}")
+    elif previous_receipt is not None:
+        prev = previous_receipt["receipt"]["integrity"]
+        link_ok = prev["receipt_hash"] == prev_hash_claim
+        height_ok = height == prev["chain_height"] + 1
+        result.chain_link_valid = link_ok and height_ok
+        if not link_ok:
             result.errors.append(
                 f"Chain link broken: previous_receipt_hash "
-                f"{receipt['integrity']['previous_receipt_hash']} does not match "
-                f"prev receipt's receipt_hash {prev_hash}"
+                f"{prev_hash_claim} does not match "
+                f"prev receipt's receipt_hash {prev['receipt_hash']}"
             )
+        if not height_ok:
+            result.errors.append(
+                f"Chain height not contiguous: expected "
+                f"{prev['chain_height'] + 1}, got {height}"
+            )
+    elif height == 1 or prev_hash_claim == GENESIS_HASH:
+        # Genesis reference and chain_height 1 must agree with each other.
+        genesis_ok = height == 1 and prev_hash_claim == GENESIS_HASH
+        result.chain_link_valid = genesis_ok
+        if not genesis_ok:
+            result.errors.append(
+                f"Genesis inconsistency: chain_height {height} with "
+                f"previous_receipt_hash {prev_hash_claim} (chain_height 1 must "
+                f"reference GENESIS_HASH, and vice-versa)"
+            )
+    # else: mid-chain (height > 1) without predecessor -> chain_link_valid
+    # stays None (unset): position not attested, but not failed.
 
     result.valid = (
         result.canonical_hash_matches

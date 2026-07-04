@@ -2,7 +2,7 @@
 
 use crate::canonicalize::canonicalize_bytes;
 use crate::crypto::{sha256_hex, verify as verify_sig};
-use crate::receipt::SignedReceipt;
+use crate::receipt::{SignedReceipt, GENESIS_HASH};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
@@ -86,23 +86,72 @@ pub fn verify_receipt(
     result.signature_valid = any;
 
     // 3. chain link
-    if let Some(prev) = previous_receipt {
-        let prev_hash = prev
-            .receipt
-            .get("integrity")
-            .and_then(|i| i.get("receipt_hash"))
-            .and_then(|v| v.as_str())
-            .unwrap_or("");
-        let this_prev = signed
-            .receipt
-            .get("integrity")
-            .and_then(|i| i.get("previous_receipt_hash"))
-            .and_then(|v| v.as_str())
-            .unwrap_or("");
-        let ok = prev_hash == this_prev;
-        result.chain_link_valid = Some(ok);
-        if !ok {
-            result.errors.push("chain link broken".to_string());
+    let integrity = signed.receipt.get("integrity");
+    // chain_height must be a positive integer (>= 1). A non-integer or a
+    // non-integral JSON number leaves `height` as None -> reported invalid.
+    let height: Option<i64> = integrity
+        .and_then(|i| i.get("chain_height"))
+        .and_then(Value::as_i64);
+    let prev_hash_claim = integrity
+        .and_then(|i| i.get("previous_receipt_hash"))
+        .and_then(|v| v.as_str())
+        .unwrap_or("");
+
+    match height {
+        Some(h) if h >= 1 => {
+            if let Some(prev) = previous_receipt {
+                let prev_hash = prev
+                    .receipt
+                    .get("integrity")
+                    .and_then(|i| i.get("receipt_hash"))
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("");
+                let prev_height = prev
+                    .receipt
+                    .get("integrity")
+                    .and_then(|i| i.get("chain_height"))
+                    .and_then(Value::as_i64)
+                    .unwrap_or(0);
+                let link_ok = prev_hash == prev_hash_claim;
+                let height_ok = h == prev_height + 1;
+                result.chain_link_valid = Some(link_ok && height_ok);
+                if !link_ok {
+                    result.errors.push(format!(
+                        "Chain link broken: previous_receipt_hash {prev_hash_claim} \
+                         does not match previous receipt's receipt_hash {prev_hash}"
+                    ));
+                }
+                if !height_ok {
+                    result.errors.push(format!(
+                        "Chain height not contiguous: expected {}, got {h}",
+                        prev_height + 1
+                    ));
+                }
+            } else if h == 1 || prev_hash_claim == GENESIS_HASH {
+                // Genesis reference and chain_height 1 must agree.
+                let genesis_ok = h == 1 && prev_hash_claim == GENESIS_HASH;
+                result.chain_link_valid = Some(genesis_ok);
+                if !genesis_ok {
+                    result.errors.push(format!(
+                        "Genesis inconsistency: chain_height {h} with \
+                         previous_receipt_hash {prev_hash_claim} (chain_height 1 \
+                         must reference GENESIS_HASH, and vice-versa)"
+                    ));
+                }
+            }
+            // else: mid-chain (height > 1) without predecessor -> leave
+            // chain_link_valid as None: position not attested, but not failed.
+        }
+        _ => {
+            // chain_height missing, non-integral, or < 1.
+            result.chain_link_valid = Some(false);
+            result.errors.push(format!(
+                "Invalid chain_height: {}",
+                integrity
+                    .and_then(|i| i.get("chain_height"))
+                    .map(|v| v.to_string())
+                    .unwrap_or_else(|| "null".to_string())
+            ));
         }
     }
 

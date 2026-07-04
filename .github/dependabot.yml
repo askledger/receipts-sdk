@@ -1,0 +1,60 @@
+# Dependabot version updates across every ecosystem in the repo. Security
+# updates are enabled separately at the repo level; this keeps versions fresh
+# and batches low-risk minor/patch bumps to limit PR noise.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directories:
+      - "/"
+      - "/console"
+      - "/conformance"
+      - "/integrations/claude-code"
+      - "/integrations/cursor"
+      - "/integrations/openai-proxy"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      npm-minor-patch:
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: cargo
+    directory: "/rust-sdk"
+    schedule:
+      interval: weekly
+    groups:
+      cargo-minor-patch:
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: pip
+    directory: "/python-sdk"
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: gomod
+    directory: "/go-sdk"
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: maven
+    directory: "/java-sdk"
+    schedule:
+      interval: weekly
+    groups:
+      maven-minor-patch:
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      actions-all:
+        patterns: ["*"]
+
+  - package-ecosystem: docker
+    directories:
+      - "/deploy"
+      - "/console"
+    schedule:
+      interval: weekly

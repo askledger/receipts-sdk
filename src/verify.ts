@@ -16,7 +16,7 @@ import {
   canonicalHashingPayload,
 } from "./receipt.js";
 import { recordVerify } from "./observability/otel.js";
-import type { SignedReceipt } from "./types.js";
+import { GENESIS_HASH, type SignedReceipt } from "./types.js";
 
 export interface VerifyResult {
   valid: boolean;
@@ -91,15 +91,45 @@ export function verifyReceipt(
   }
   result.checks.signature_valid = anySignatureValid;
 
-  // 3. Optional: verify the chain link to the previous receipt.
-  if (opts.previousReceipt) {
-    const prevHash = opts.previousReceipt.receipt.integrity.receipt_hash;
-    if (prevHash === signed.receipt.integrity.previous_receipt_hash) {
-      result.checks.chain_link_valid = true;
-    } else {
-      result.checks.chain_link_valid = false;
+  // 3. Verify chain continuity.
+  //    - Basic sanity: chain_height must be a positive integer.
+  //    - With a supplied predecessor: its receipt_hash must match this receipt's
+  //      previous_receipt_hash AND chain_height must be exactly one greater, so a
+  //      dropped or reordered receipt cannot pass.
+  //    - Genesis consistency (checkable even without the predecessor):
+  //      chain_height === 1 iff previous_receipt_hash === GENESIS_HASH.
+  //    A mid-chain receipt (height > 1) verified without its predecessor leaves
+  //    chain_link_valid undefined — its signature/hash are valid but its chain
+  //    position is not attested here; supply the predecessor (or full chain).
+  const integrity = signed.receipt.integrity;
+  const height = integrity.chain_height;
+  const prevHashClaim = integrity.previous_receipt_hash;
+
+  if (typeof height !== "number" || !Number.isInteger(height) || height < 1) {
+    result.checks.chain_link_valid = false;
+    result.errors.push(`Invalid chain_height: ${height}`);
+  } else if (opts.previousReceipt) {
+    const prev = opts.previousReceipt.receipt.integrity;
+    const linkOk = prev.receipt_hash === prevHashClaim;
+    const heightOk = height === prev.chain_height + 1;
+    result.checks.chain_link_valid = linkOk && heightOk;
+    if (!linkOk) {
       result.errors.push(
-        `Chain link broken: previous_receipt_hash ${signed.receipt.integrity.previous_receipt_hash} does not match previous receipt's receipt_hash ${prevHash}`
+        `Chain link broken: previous_receipt_hash ${prevHashClaim} does not match previous receipt's receipt_hash ${prev.receipt_hash}`
+      );
+    }
+    if (!heightOk) {
+      result.errors.push(
+        `Chain height not contiguous: expected ${prev.chain_height + 1}, got ${height}`
+      );
+    }
+  } else if (height === 1 || prevHashClaim === GENESIS_HASH) {
+    // Genesis reference and chain_height 1 must agree with each other.
+    const genesisOk = height === 1 && prevHashClaim === GENESIS_HASH;
+    result.checks.chain_link_valid = genesisOk;
+    if (!genesisOk) {
+      result.errors.push(
+        `Genesis inconsistency: chain_height ${height} with previous_receipt_hash ${prevHashClaim} (chain_height 1 must reference GENESIS_HASH, and vice-versa)`
       );
     }
   }

@@ -227,25 +227,98 @@ func VerifyReceipt(
 	}
 	result.SignatureValid = any
 
-	// 3. optional chain link
-	if previousReceipt != nil {
-		var prevHash, thisPrev string
+	// 3. chain link
+	//    - chain_height must be a positive integer (>= 1).
+	//    - with a supplied predecessor: its receipt_hash must match this
+	//      receipt's previous_receipt_hash AND chain_height must be exactly one
+	//      greater.
+	//    - genesis consistency (checkable without predecessor):
+	//      chain_height == 1 iff previous_receipt_hash == GenesisHash.
+	//    A mid-chain receipt (height > 1) verified without its predecessor
+	//    leaves ChainLinkValid nil: position not attested, but not failed.
+	var thisPrev string
+	if ti, ok := signed.Receipt["integrity"].(map[string]interface{}); ok {
+		thisPrev, _ = ti["previous_receipt_hash"].(string)
+	}
+	height, heightIsInt := chainHeightInt(signed.Receipt)
+
+	if !heightIsInt || height < 1 {
+		f := false
+		result.ChainLinkValid = &f
+		result.Errors = append(result.Errors, fmt.Sprintf("Invalid chain_height: %v", rawChainHeight(signed.Receipt)))
+	} else if previousReceipt != nil {
+		var prevHash string
 		if pi, ok := previousReceipt.Receipt["integrity"].(map[string]interface{}); ok {
 			prevHash, _ = pi["receipt_hash"].(string)
 		}
-		if ti, ok := signed.Receipt["integrity"].(map[string]interface{}); ok {
-			thisPrev, _ = ti["previous_receipt_hash"].(string)
-		}
-		ok := prevHash == thisPrev
+		prevHeight, _ := chainHeightInt(previousReceipt.Receipt)
+		linkOk := prevHash == thisPrev
+		heightOk := height == prevHeight+1
+		ok := linkOk && heightOk
 		result.ChainLinkValid = &ok
-		if !ok {
-			result.Errors = append(result.Errors, "chain link broken")
+		if !linkOk {
+			result.Errors = append(result.Errors, fmt.Sprintf(
+				"Chain link broken: previous_receipt_hash %s does not match previous receipt's receipt_hash %s",
+				thisPrev, prevHash))
+		}
+		if !heightOk {
+			result.Errors = append(result.Errors, fmt.Sprintf(
+				"Chain height not contiguous: expected %d, got %d", prevHeight+1, height))
+		}
+	} else if height == 1 || thisPrev == GenesisHash {
+		// Genesis reference and chain_height 1 must agree with each other.
+		genesisOk := height == 1 && thisPrev == GenesisHash
+		result.ChainLinkValid = &genesisOk
+		if !genesisOk {
+			result.Errors = append(result.Errors, fmt.Sprintf(
+				"Genesis inconsistency: chain_height %d with previous_receipt_hash %s (chain_height 1 must reference GenesisHash, and vice-versa)",
+				height, thisPrev))
 		}
 	}
 
 	chainOK := result.ChainLinkValid == nil || *result.ChainLinkValid
 	result.Valid = result.CanonicalHashMatches && result.SignatureValid && chainOK
 	return result
+}
+
+// rawChainHeight returns the raw integrity.chain_height value (for error
+// messages), or nil if absent.
+func rawChainHeight(receipt map[string]interface{}) interface{} {
+	if i, ok := receipt["integrity"].(map[string]interface{}); ok {
+		return i["chain_height"]
+	}
+	return nil
+}
+
+// chainHeightInt extracts integrity.chain_height as an int64. JSON numbers
+// unmarshal into interface{} as float64, so a value is only a valid chain
+// height if it is an integral, non-negative-representable number. Returns
+// (value, true) when the field is an integral number, else (0, false).
+func chainHeightInt(receipt map[string]interface{}) (int64, bool) {
+	i, ok := receipt["integrity"].(map[string]interface{})
+	if !ok {
+		return 0, false
+	}
+	switch v := i["chain_height"].(type) {
+	case float64:
+		iv := int64(v)
+		if float64(iv) != v {
+			return 0, false // non-integral (e.g. 1.5)
+		}
+		return iv, true
+	case int64:
+		return v, true
+	case int:
+		return int64(v), true
+	case json.Number:
+		iv, err := v.Int64()
+		if err != nil {
+			return 0, false
+		}
+		return iv, true
+	default:
+		return 0, false
+	}
 }
 
 // keep an unused hex import in case future code paths need it

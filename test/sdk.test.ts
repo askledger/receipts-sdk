@@ -217,6 +217,38 @@ describe("sign + verify roundtrip", () => {
     expect(result.checks.chain_link_valid).toBe(true);
   });
 
+  it("rejects a receipt presented out of chain order (reorder detection)", () => {
+    const kp = generateKeyPair();
+    const r1 = signReceipt({ event: sampleEvent("evt-001"), keypair: kp });
+    const r2 = signReceipt({ event: sampleEvent("evt-002"), keypair: kp });
+
+    // Present r1 (height 1) as if it followed r2 (height 2): the height is not
+    // contiguous and the hash link doesn't match, so it must be rejected.
+    const result = verifyReceipt(r1, {
+      publicKeys: { [kp.kid]: kp.public_key },
+      previousReceipt: r2,
+    });
+
+    expect(result.valid).toBe(false);
+    expect(result.checks.chain_link_valid).toBe(false);
+    expect(result.errors.some((e) => e.includes("not contiguous"))).toBe(true);
+  });
+
+  it("verifies a mid-chain receipt's signature without its predecessor, but does not attest position", () => {
+    const kp = generateKeyPair();
+    signReceipt({ event: sampleEvent("evt-001"), keypair: kp });
+    const r2 = signReceipt({ event: sampleEvent("evt-002"), keypair: kp });
+
+    // No previousReceipt supplied: signature + hash are valid, so the receipt
+    // verifies, but chain position (height > 1) is intentionally not attested.
+    const result = verifyReceipt(r2, {
+      publicKeys: { [kp.kid]: kp.public_key },
+    });
+
+    expect(result.valid).toBe(true);
+    expect(result.checks.chain_link_valid).toBeUndefined();
+  });
+
   it("detects broken chain link when wrong prev receipt is supplied", () => {
     const kp = generateKeyPair();
     const r1 = signReceipt({ event: sampleEvent("evt-001"), keypair: kp });
