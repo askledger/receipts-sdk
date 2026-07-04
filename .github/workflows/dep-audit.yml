@@ -45,4 +45,7 @@ jobs:
       - uses: golang/govulncheck-action@v1
         with:
           work-dir: go-sdk
-          go-version-input: "1.22"
+          # Analyze with the latest patched Go so stdlib advisories (govulncheck
+          # reports reachable ones, e.g. GO-2025-3750 in os) are evaluated against
+          # a fixed toolchain. go-sdk only requires go 1.22 as a floor.
+          go-version-input: "stable"
