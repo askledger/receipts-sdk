@@ -20,12 +20,10 @@ updates:
     groups:
       npm:
         patterns: ["*"]
+    # Minor/patch only. Major bumps (crypto especially) change behavior and are
+    # done deliberately with the conformance suite, never an auto-PR.
     ignore:
-      - dependency-name: "canonicalize"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "@noble/ed25519"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "@noble/hashes"
+      - dependency-name: "*"
         update-types: ["version-update:semver-major"]
 
   - package-ecosystem: cargo
@@ -37,13 +35,7 @@ updates:
       cargo:
         patterns: ["*"]
     ignore:
-      - dependency-name: "ed25519-dalek"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "sha2"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "curve25519-dalek"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "rand_core"
+      - dependency-name: "*"
         update-types: ["version-update:semver-major"]
 
   - package-ecosystem: pip
@@ -55,7 +47,7 @@ updates:
       pip:
         patterns: ["*"]
     ignore:
-      - dependency-name: "cryptography"
+      - dependency-name: "*"
         update-types: ["version-update:semver-major"]
 
   - package-ecosystem: gomod
@@ -73,9 +65,7 @@ updates:
       maven:
         patterns: ["*"]
     ignore:
-      - dependency-name: "org.bouncycastle:bcprov-jdk18on"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "com.fasterxml.jackson.core:jackson-databind"
+      - dependency-name: "*"
         update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
@@ -97,3 +87,6 @@ updates:
     groups:
       docker:
         patterns: ["*"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
