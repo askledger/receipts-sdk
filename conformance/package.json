@@ -31,5 +31,8 @@
     "type": "git",
     "url": "https://github.com/askledger/receipts-sdk",
     "directory": "conformance"
+  },
+  "dependencies": {
+    "@askledger/receipts-sdk": "file:.."
   }
 }

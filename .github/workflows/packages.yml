@@ -1,0 +1,43 @@
+# Build the workspace sub-packages (conformance CLI + integrations). They were
+# never in CI, so they silently broke (conformance couldn't resolve the SDK;
+# openai-proxy referenced a non-existent EventPayload field). This builds each
+# against the freshly-built SDK on every relevant change.
+name: Packages (build)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "conformance/**"
+      - "integrations/**"
+      - ".github/workflows/packages.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "conformance/**"
+      - "integrations/**"
+      - ".github/workflows/packages.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build SDK + sub-packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Build the SDK (sub-packages depend on its dist)
+        run: npm ci && npm run build
+      - name: Build conformance CLI
+        working-directory: conformance
+        run: npm install && npm run build
+      - name: Build cursor integration
+        working-directory: integrations/cursor
+        run: npm install && npm run build
+      - name: Build openai-proxy integration
+        working-directory: integrations/openai-proxy
+        run: npm install && npm run build

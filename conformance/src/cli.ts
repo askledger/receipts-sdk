@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 import { runAll, type Adapter } from "./index.js";
-import { canonicalize } from "../../src/canonicalize.js";
-import { signReceipt } from "../../src/receipt.js";
-import { generateKeyPair } from "../../src/crypto.js";
-import type { RawEvent } from "../../src/types.js";
+import {
+  canonicalize,
+  signReceipt,
+  generateKeyPair,
+  type RawEvent,
+} from "@askledger/receipts-sdk";
 
 const adapter: Adapter = {
   async canonicalize(input) {

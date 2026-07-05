@@ -17,9 +17,14 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
 import { URL } from "node:url";
-import { signReceipt } from "../../src/receipt.js";
-import { sha256String, generateKeyPair } from "../../src/crypto.js";
-import type { KeyPair, RawEvent, SignedReceipt } from "../../src/types.js";
+import {
+  signReceipt,
+  sha256String,
+  generateKeyPair,
+  type KeyPair,
+  type RawEvent,
+  type SignedReceipt,
+} from "@askledger/receipts-sdk";
 
 interface ProxyOptions {
   listen: { host: string; port: number };
@@ -142,9 +147,11 @@ function buildEvent(args: {
       output_hash: sha256String(outputText),
       input_token_count: inputTokens,
       output_token_count: outputTokens,
-      latency_ms: args.latencyMs,
-      http_status: args.statusCode,
       input_classification: "internal",
+      metadata: {
+        latency_ms: args.latencyMs,
+        http_status: args.statusCode,
+      },
     },
   };
 }
