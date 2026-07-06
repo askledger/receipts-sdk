@@ -16,6 +16,7 @@ import type {
   KeyPair,
   ProvenanceBlock,
   DecisionBlock,
+  EvidenceRef,
 } from "./types.js";
 
 interface SignReceiptOptions {
@@ -23,12 +24,18 @@ interface SignReceiptOptions {
   keypair: KeyPair;
   decision?: DecisionBlock;
   provenance?: ProvenanceBlock;
+  /**
+   * OPTIONAL references to external evidence/attestation artifacts (by digest).
+   * When provided, they are included in the receipt body and thus covered by
+   * the receipt_hash and the signature.
+   */
+  evidenceRefs?: EvidenceRef[];
   /** ISO timestamp; defaults to now() */
   issuedAt?: string;
 }
 
 export function signReceipt(opts: SignReceiptOptions): SignedReceipt {
-  const { event, keypair, decision, provenance, issuedAt } = opts;
+  const { event, keypair, decision, provenance, evidenceRefs, issuedAt } = opts;
   const span = startSpan("pl.sign", { tenant_id: event.tenant_id, kid: keypair.kid });
   const t0 = performance.now();
   let ok = false;
@@ -47,6 +54,7 @@ export function signReceipt(opts: SignReceiptOptions): SignedReceipt {
       event,
       ...(decision !== undefined && { decision }),
       ...(provenance !== undefined && { provenance }),
+      ...(evidenceRefs !== undefined && { evidence_refs: evidenceRefs }),
       integrity: {
         previous_receipt_hash: prev.previous_receipt_hash,
         receipt_hash: "",
