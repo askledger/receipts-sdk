@@ -168,6 +168,24 @@ That's it. The receipt is in `.ledger/last-receipt.json`. The keypair is in `.le
 
 Every field is part of the canonical hash. Any modification to any field — including reordering keys — breaks the signature.
 
+### Optional: `evidence_refs`
+
+A receipt **MAY** carry an optional top-level `evidence_refs` array that references external evidence or attestation artifacts by digest (the artifact itself is never embedded). It is strictly additive — receipts without it sign and verify exactly as before — and when present it is part of the canonical bytes, so it is covered by both `integrity.receipt_hash` and the signature.
+
+```json
+"evidence_refs": [
+  {
+    "kind": "attestation",
+    "hash": "3b1f...c9",
+    "alg": "sha256",
+    "uri": "https://evidence.example.com/artifacts/3b1f...c9",
+    "status": "pass"
+  }
+]
+```
+
+Only `kind` and `hash` are required per entry; `alg`, `uri`, and `status` are optional. Pass it via `signReceipt({ event, keypair, evidenceRefs: [...] })`.
+
 ---
 
 ## Programmatic usage

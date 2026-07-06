@@ -76,9 +76,17 @@ def sign_receipt(
     keypair: Dict[str, Any],
     decision: Optional[Dict[str, Any]] = None,
     provenance: Optional[Dict[str, Any]] = None,
+    evidence_refs: Optional[list] = None,
     issued_at: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Build, chain, and sign a receipt for one event.
+
+    ``evidence_refs`` is an OPTIONAL list of references to external
+    evidence/attestation artifacts (by digest), each e.g.
+    ``{"kind": ..., "hash": ..., "alg"?: ..., "uri"?: ..., "status"?: ...}``.
+    When provided it is included in the receipt body and thus covered by the
+    receipt_hash and signature. When omitted the receipt is byte-identical,
+    under canonicalization, to one produced before this field existed.
 
     Returns the SignedReceipt envelope as a dict.
     """
@@ -101,6 +109,8 @@ def sign_receipt(
         receipt["decision"] = decision
     if provenance is not None:
         receipt["provenance"] = provenance
+    if evidence_refs is not None:
+        receipt["evidence_refs"] = evidence_refs
 
     # Compute receipt_hash over body with receipt_hash=""
     body_for_hash = copy.deepcopy(receipt)

@@ -87,6 +87,31 @@ export interface IntegrityBlock {
   merkle_period?: string;
 }
 
+/**
+ * A reference to an external evidence or attestation artifact associated with
+ * a receipt (for example, a checker report or an out-of-band verification
+ * artifact). The referenced artifact itself is NOT embedded — only its digest
+ * (and optional locator) is recorded, so the reference is bound into the
+ * receipt's canonical bytes and covered by the signature without changing any
+ * cryptographic behavior.
+ *
+ * Each entry is a plain digest reference; the SDK does not fetch, validate, or
+ * interpret the referenced artifact. Consumers dereference `uri` (when present)
+ * and check the artifact against `hash` themselves.
+ */
+export interface EvidenceRef {
+  /** Free-form category of the referenced artifact, e.g. "attestation", "external-report". */
+  kind: string;
+  /** Digest of the referenced artifact, hex- or base64-encoded per `alg`. */
+  hash: string;
+  /** Hash algorithm used to produce `hash`, e.g. "sha256". Defaults to consumer convention when omitted. */
+  alg?: string;
+  /** Optional locator (URI/URL/URN) where the referenced artifact can be retrieved. */
+  uri?: string;
+  /** Optional consumer-defined status, e.g. "pass" | "fail" | "unknown". */
+  status?: string;
+}
+
 export interface Receipt {
   schema_version: "1.0";
   receipt_id: string;       // UUIDv7
@@ -95,6 +120,13 @@ export interface Receipt {
   event: RawEvent;
   decision?: DecisionBlock;
   provenance?: ProvenanceBlock;
+  /**
+   * OPTIONAL. References to external evidence/attestation artifacts, by digest.
+   * Strictly additive: receipts without this field sign and verify identically
+   * to before. When present, it is part of the canonical bytes and therefore
+   * covered by both `integrity.receipt_hash` and the signature.
+   */
+  evidence_refs?: EvidenceRef[];
   integrity: IntegrityBlock;
 }
 

@@ -43,6 +43,7 @@ Receipt = {
   "event"          : RawEvent,
   "decision"       : DecisionBlock OPTIONAL,
   "provenance"     : ProvenanceBlock OPTIONAL,
+  "evidence_refs"  : [ EvidenceRef, ... ] OPTIONAL,
   "integrity"      : IntegrityBlock
 }
 ```
@@ -128,6 +129,32 @@ ProvenanceBlock = {
 
 These blocks are OPTIONAL. When present they **MUST** be canonicalized
 and included in the signature input.
+
+## 7a · Evidence references
+
+`evidence_refs` is an OPTIONAL array of references to external
+evidence or attestation artifacts associated with the receipt. It is
+strictly additive: a Receipt without `evidence_refs` is byte-identical,
+under canonicalization, to one produced before this member existed, and
+therefore signs and verifies unchanged.
+
+```
+EvidenceRef = {
+  "kind"   : <string>,            ; free-form category, e.g. "attestation", "external-report"
+  "hash"   : <digest string>,     ; digest of the referenced artifact
+  "alg"    : <string> OPTIONAL,   ; hash algorithm, e.g. "sha256"
+  "uri"    : <string> OPTIONAL,   ; locator for the referenced artifact
+  "status" : <string> OPTIONAL    ; consumer-defined, e.g. "pass" | "fail" | "unknown"
+}
+```
+
+Only the digest (and optional locator) of the referenced artifact is
+recorded; the artifact itself is NOT embedded. When present,
+`evidence_refs` **MUST** be canonicalized and included in the signature
+input, so any modification to a reference invalidates the receipt.
+Producers **MUST NOT** place plaintext PII in any `EvidenceRef` member.
+Verifiers treat `evidence_refs` as opaque with respect to receipt
+integrity: they do not fetch or interpret the referenced artifacts.
 
 ## 8 · Validation rules
 
