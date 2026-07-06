@@ -216,6 +216,23 @@ console.log(result.valid); // true
 
 ## CLI reference
 
+The CLI ships as a `bin`, so once the package is published you can run it
+directly with `npx` — no clone or build required:
+
+```bash
+# Verify a receipt against a public key (published form)
+npx @askledger/receipts-sdk verify receipt.json
+
+# ...same for every subcommand
+npx @askledger/receipts-sdk keygen --out .ledger/keys/default.json
+npx @askledger/receipts-sdk sign examples/event.json
+npx @askledger/receipts-sdk demo
+```
+
+> The `npx @askledger/receipts-sdk …` form works from the published package
+> (this `bin` ships with **0.7.0**). If you are working from a local clone,
+> build first (`npm run build`) and use the `node dist/cli.js …` form below.
+
 ```bash
 # Generate a keypair (HSM-backed in production; JSON file in dev)
 node dist/cli.js keygen --out .ledger/keys/default.json

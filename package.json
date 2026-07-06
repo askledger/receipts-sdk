@@ -8,8 +8,7 @@
   "homepage": "https://github.com/askledger/receipts-sdk#readme",
   "bugs": "https://github.com/askledger/receipts-sdk/issues",
   "bin": {
-    "pl": "dist/cli.js",
-    "ledger-cli": "dist/cli.js"
+    "askledger": "./dist/cli.js"
   },
   "exports": {
     ".": {
