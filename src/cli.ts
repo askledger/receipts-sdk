@@ -75,7 +75,9 @@ import {
   renderDashboardHtml,
   fmtUsd,
   fmtTokens,
+  type DashboardSummary,
 } from "./cost/dashboard.js";
+import { parseUsageExport, receiptsFromWorkloads } from "./cost/ingest.js";
 import { parseQuery, runQuery, type QueryResult, type ReceiptRow } from "./query/index.js";
 import { runAlerts, type Alert } from "./query/alerts.js";
 import { parseQueryLLM } from "./query/llm.js";
@@ -180,8 +182,20 @@ function collectEvidenceRef(value: string, previous: string[]): string[] {
 const program = new Command();
 program
   .name("ledger-cli")
-  .description("AskLedger Receipts SDK · cryptographic AI decision receipts")
-  .version("0.1.0");
+  .description("AskLedger · see your wasted AI spend, then prove and cut it")
+  .version("0.9.0");
+
+program.addHelpText(
+  "after",
+  `
+Start here:
+  $ ledger-cli scan <usage-export.json>   See your wasted AI spend from an existing
+                                          OpenAI/Anthropic bill — no instrumentation.
+
+Then, once you're emitting signed receipts:
+  dashboard · query · alerts · verify · bundle
+`
+);
 
 // ---------- keygen ----------
 program
@@ -780,22 +794,9 @@ program
       console.log("");
     }
 
-    // Savings opportunities (free over-tiering heuristic)
+    // Savings opportunities (free over-tiering heuristic, split by confidence)
     if (summary.suggestions.length > 0) {
-      console.log(
-        `${paint(c.green + c.bold, "  Savings opportunities")}  ${paint(c.gray, `up to ${fmtUsd(summary.potentialSavings)} this period`)}`
-      );
-      for (const s of summary.suggestions) {
-        console.log(
-          `   ${paint(c.navy, clean(s.fromModel))} ${paint(c.gray, "→")} ${paint(c.green, clean(s.toModel))}   ` +
-            `${paint(c.green + c.bold, "save ~" + fmtUsd(s.estSavings))}  ` +
-            `${paint(c.gray, `(${s.shareOfSpendPct}% of spend · ${s.requests} calls · avg ${s.avgOutputTokens} out tok${s.topApp ? ` · ${clean(s.topApp)}` : ""})`)}`
-        );
-      }
-      console.log(
-        paint(c.gray, "   Heuristic from your receipts — reprices the same calls on the cheaper tier. Test quality before switching.")
-      );
-      console.log("");
+      printSavings(summary, 1);
     }
 
     // Integrity strip
@@ -822,6 +823,135 @@ program
     );
     console.log("");
   });
+
+// ---------- scan (import an existing provider bill — the zero-instrumentation front door) ----------
+program
+  .command("scan [files...]")
+  .description("Estimate wasted AI spend from an existing OpenAI/Anthropic usage export — no receipts, no instrumentation")
+  .option("--json", "output the full summary as JSON")
+  .option("--html [path]", "write a self-contained HTML report instead")
+  .action((files: string[], opts) => {
+    if (!files || files.length === 0) {
+      console.log("");
+      console.log(paint(c.bold, "  See your wasted AI spend — from a bill you already have."));
+      console.log("");
+      console.log(paint(c.gray, "  usage: ") + paint(c.bold, "ledger-cli scan <usage-export.json> [more.json ...]"));
+      console.log("");
+      console.log(paint(c.cyan + c.bold, "  Don't have the file? Export it (takes ~1 minute, no code):"));
+      console.log(paint(c.gray, "   • OpenAI    → platform.openai.com/usage  → Export  (JSON)"));
+      console.log(paint(c.gray, "   • Anthropic → console.anthropic.com/settings/usage → Export"));
+      console.log(paint(c.gray, "   Then:  ") + paint(c.bold, "ledger-cli scan ~/Downloads/usage.json"));
+      console.log("");
+      console.log(paint(c.gray, "  No instrumentation, no signup, nothing leaves your machine."));
+      console.log("");
+      process.exit(1);
+    }
+    const workloads = [];
+    for (const f of files) {
+      let text: string;
+      try {
+        text = fs.readFileSync(f, "utf-8");
+      } catch {
+        console.log(paint(c.amber, `  cannot read ${clean(f)}`));
+        process.exit(1);
+      }
+      try {
+        workloads.push(...parseUsageExport(text));
+      } catch (e) {
+        console.log(paint(c.amber, `  ${clean(f)}: ${clean((e as Error).message)}`));
+        process.exit(1);
+      }
+    }
+    if (workloads.length === 0) {
+      console.log(paint(c.amber, "  No usage rows recognized — expected an OpenAI or Anthropic usage export (JSON)."));
+      process.exit(0);
+    }
+    const { receipts, totalRequests, scale } = receiptsFromWorkloads(workloads);
+    const summary = summarizeReceipts(receipts);
+
+    if (opts.html) {
+      const outPath = typeof opts.html === "string" ? opts.html : "askledger-scan.html";
+      fs.writeFileSync(outPath, renderDashboardHtml(summary, new Date().toISOString()));
+      console.log(paint(c.green, `  ✓ ${clean(outPath)}`));
+      return;
+    }
+    if (opts.json) {
+      console.log(JSON.stringify({ totalRequests, scale, summary }, null, 2));
+      return;
+    }
+    printScan(summary, totalRequests, scale, files.length);
+  });
+
+// Shared savings printer (used by `dashboard` and `scan`). `scale` (>=1) undoes
+// any downsampling applied to a very large imported bill.
+function printSavings(summary: DashboardSummary, scale: number): void {
+  const conf = summary.potentialSavings * scale;
+  const rev = summary.reviewSavings * scale;
+  console.log(
+    `${paint(c.green + c.bold, "  Savings opportunities")}  ${paint(
+      c.gray,
+      `${fmtUsd(conf)} confident${rev > 0 ? ` · +${fmtUsd(rev)} to review` : ""}`
+    )}`
+  );
+  for (const s of summary.suggestions) {
+    const badge =
+      s.confidence === "high" ? paint(c.green, "[confident]") : paint(c.amber, "[review]   ");
+    console.log(
+      `   ${badge} ${paint(c.navy, clean(s.fromModel))} ${paint(c.gray, "→")} ${paint(c.green, clean(s.toModel))}   ` +
+        `${paint(c.green + c.bold, "save ~" + fmtUsd(s.estSavings * scale))}  ` +
+        `${paint(c.gray, `(${s.shareOfSpendPct}% · ${Math.round(s.requests * scale).toLocaleString()} calls · avg ${s.avgInputTokens} in / ${s.avgOutputTokens} out${s.topApp ? ` · ${clean(s.topApp)}` : ""})`)}`
+    );
+  }
+  console.log(
+    paint(
+      c.gray,
+      "   Only [confident] flags count toward the headline. [review] = heavy input context or a cross-family swap — test a sample first."
+    )
+  );
+  console.log("");
+}
+
+function printScan(summary: DashboardSummary, totalRequests: number, scale: number, sources: number): void {
+  const S = scale;
+  console.log("");
+  console.log(rule());
+  console.log(
+    `  ${paint(c.gold + c.bold, "AskLedger")} ${paint(c.gray, "·")} ${paint(c.bold, "Wasted-spend scan")}  ` +
+      `${paint(c.gray, `(imported from ${sources} export${sources > 1 ? "s" : ""} · ${Math.round(totalRequests).toLocaleString()} requests · no instrumentation)`)}`
+  );
+  console.log(rule());
+  console.log("");
+  console.log(
+    `   ${paint(c.green + c.bold, fmtUsd(summary.costUsd * S))} ${paint(c.gray, "estimated spend")}   ` +
+      `${paint(c.green + c.bold, fmtUsd(summary.potentialSavings * S))} ${paint(c.gray, "confidently recoverable")}   ` +
+      `${paint(c.amber + c.bold, fmtUsd(summary.reviewSavings * S))} ${paint(c.gray, "to review")}`
+  );
+  console.log("");
+  if (summary.models.length > 0) {
+    console.log(paint(c.cyan + c.bold, "  Spend by model"));
+    const maxCost = summary.models.reduce((m, x) => Math.max(m, x.costUsd), 0) || 1;
+    for (const m of summary.models) {
+      const barLen = Math.max(1, Math.round((m.costUsd / maxCost) * 24));
+      console.log(
+        `   ${clean(m.key).padEnd(30).slice(0, 30)} ${paint(m.priced ? c.navy : c.gray, "█".repeat(barLen))}  ${paint(m.priced ? c.green : c.gray, m.priced ? fmtUsd(m.costUsd * S) : "—")}`
+      );
+    }
+    console.log("");
+  }
+  if (summary.suggestions.length > 0) printSavings(summary, S);
+  if (scale > 1) {
+    console.log(
+      paint(c.gray, `   (Large bill — sampled 1:${scale.toFixed(1)} for speed; dollar figures scaled to full volume.)`)
+    );
+  }
+  console.log(
+    paint(
+      c.gray,
+      "   Estimate from your provider export, repriced on AskLedger's pricing table — not a promise. Sign at capture to make savings verifiable (Pro)."
+    )
+  );
+  console.log("");
+}
 
 // ---------- query (natural language) ----------
 

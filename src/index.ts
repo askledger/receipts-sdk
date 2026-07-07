@@ -280,6 +280,17 @@ export {
   type SavingsSuggestion,
 } from "./cost/dashboard.js";
 
+// Ingest an existing provider usage export (OpenAI/Anthropic) with no
+// instrumentation — the "read the bill you already have" front door.
+export {
+  normalizeModel,
+  parseUsageExport,
+  receiptsFromWorkloads,
+  receiptsFromExport,
+  type Workload,
+  type IngestResult,
+} from "./cost/ingest.js";
+
 // Natural-language query + alerts over your signed receipts (free, local).
 export {
   parseQuery,

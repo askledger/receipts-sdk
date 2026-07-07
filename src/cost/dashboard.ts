@@ -58,6 +58,12 @@ export interface SavingsSuggestion {
   requests: number; // calls that would be affected
   shareOfSpendPct: number; // fromModel's share of total estimated spend (0..100)
   avgOutputTokens: number; // evidence the workload is light
+  avgInputTokens: number; // context size — high input can mean the big model is warranted
+  // "high" = short output AND modest input AND an adjacent same-family tier: a
+  // low-risk swap we'll put in the headline number. "review" = worth trying but
+  // the swap carries real quality risk (heavy input context, or a cross-family
+  // move), so it is reported separately and NEVER counted as confident savings.
+  confidence: "high" | "review";
   topApp: string | null; // where this spend mostly comes from
   currentCost: number; // what these calls cost (recorded tokens × current price)
   projectedCost: number; // what they'd cost on toModel (same tokens × cheaper price)
@@ -78,7 +84,8 @@ export interface DashboardSummary {
   apps: NamedCount[]; // by event.source_system
   environments: NamedCount[]; // by event.context.environment
   suggestions: SavingsSuggestion[]; // over-tiering opportunities (free heuristic)
-  potentialSavings: number; // sum of estSavings across suggestions
+  potentialSavings: number; // sum of estSavings for HIGH-confidence suggestions only (the defensible headline)
+  reviewSavings: number; // sum of estSavings for "review" suggestions (real quality risk — not counted as confident)
   tenants: string[];
   chainHeight: number | null; // max integrity.chain_height seen
   signedReceipts: number; // receipts carrying >=1 signature
@@ -95,19 +102,29 @@ function bump(map: Map<string, NamedCount>, name: string, cost: number): void {
 
 // A premium model -> the cheaper same-vendor tier a light workload can usually
 // move to. Only pairs where both sides are in the PRICING table are used, so
-// the counterfactual cost is always real.
-const DOWNSHIFT: Record<string, string> = {
-  "anthropic:claude-opus-4-6": "claude-sonnet-4-6",
-  "anthropic:claude-sonnet-4-6": "claude-haiku-4-5",
-  "openai:gpt-5": "gpt-5-mini",
-  "openai:gpt-4o": "gpt-5-mini",
-  "google:gemini-2-5-pro": "gemini-2-5-flash",
+// the counterfactual cost is always real. `sameFamily` marks an adjacent tier
+// of the SAME family/generation (opus->sonnet, gpt-5->gpt-5-mini) — a low-risk
+// swap. A cross-family/generation move (gpt-4o->gpt-5-mini) is a bigger quality
+// change, so it can only ever be surfaced as "review", never as confident.
+const DOWNSHIFT: Record<string, { to: string; sameFamily: boolean }> = {
+  "anthropic:claude-opus-4-6": { to: "claude-sonnet-4-6", sameFamily: true },
+  "anthropic:claude-sonnet-4-6": { to: "claude-haiku-4-5", sameFamily: true },
+  "openai:gpt-5": { to: "gpt-5-mini", sameFamily: true },
+  "openai:gpt-4o": { to: "gpt-5-mini", sameFamily: false },
+  "google:gemini-2-5-pro": { to: "gemini-2-5-flash", sameFamily: true },
 };
 
 // A workload is a downshift candidate when its average completion is short.
 // Long generations are where a premium model earns its keep, so we don't nudge
 // those — keep the big model's capacity for the heavy, high-value calls.
 const LIGHT_OUTPUT_TOKENS = 800;
+
+// Short output alone is NOT enough. A call that feeds a large input context
+// (RAG, long documents, big system prompts) often genuinely needs the stronger
+// model even when its answer is brief. Above this average input size we don't
+// claim the saving with confidence — it becomes a "review" flag instead. This
+// is the fix for the heuristic being "input-blind".
+const LIGHT_INPUT_TOKENS = 4000;
 
 // A (model × application) workload — the granularity at which over-tiering is
 // judged. Grouping by model alone would let a few heavy calls mask a large,
@@ -133,34 +150,51 @@ function buildSuggestions(groups: GroupStat[], totalCost: number): SavingsSugges
   const out: SavingsSuggestion[] = [];
   for (const g of groups) {
     if (!g.priced) continue;
-    const toModel = DOWNSHIFT[g.modelKey];
-    if (!toModel) continue;
+    const ds = DOWNSHIFT[g.modelKey];
+    if (!ds) continue;
 
     const avgOut = g.requests > 0 ? Math.round(g.outputTokens / g.requests) : 0;
+    const avgIn = g.requests > 0 ? Math.round(g.inputTokens / g.requests) : 0;
     // Only flag light workloads with at least a few calls and real spend.
     if (avgOut > LIGHT_OUTPUT_TOKENS) continue;
     if (g.requests < 3 || g.costUsd <= 0) continue;
 
-    const altPrice = priceFor(g.vendor, toModel);
+    const altPrice = priceFor(g.vendor, ds.to);
     if (!altPrice) continue;
     const projectedCost = costUsd(altPrice, { input: g.inputTokens, output: g.outputTokens });
     const estSavings = g.costUsd - projectedCost;
     if (estSavings <= 0) continue;
 
-    const share = totalCost > 0 ? (g.costUsd / totalCost) * 100 : 0;
-    const reason =
-      `${g.requests.toLocaleString()} ${g.model} call(s) in "${g.app}" averaged just ` +
-      `${avgOut.toLocaleString()} output tokens — short enough that ${toModel} usually ` +
-      `handles them. Those same calls repriced on ${toModel} cost ${fmtUsd(projectedCost)} ` +
-      `vs ${fmtUsd(g.costUsd)}. Route this workload to ${toModel} and keep ${g.model} for ` +
-      `the heavy, high-value calls.`;
+    // Confidence: high only when the swap is genuinely low-risk — an adjacent
+    // same-family tier AND the workload isn't feeding heavy context. Anything
+    // else is real (the repricing is exact) but carries quality risk, so it's
+    // reported for review, never folded into the headline savings number.
+    const heavyContext = avgIn > LIGHT_INPUT_TOKENS;
+    const confidence: "high" | "review" =
+      ds.sameFamily && !heavyContext ? "high" : "review";
+
+    const head = `${g.requests.toLocaleString()} ${g.model} call(s) in "${g.app}" averaged just ${avgOut.toLocaleString()} output tokens`;
+    const money = `${ds.to} would cost ${fmtUsd(projectedCost)} vs ${fmtUsd(g.costUsd)}`;
+    let reason: string;
+    if (confidence === "high") {
+      reason =
+        `${head} — short enough that ${ds.to} usually handles them. Those same calls repriced on ${ds.to} cost ${fmtUsd(projectedCost)} vs ${fmtUsd(g.costUsd)}. Route this workload to ${ds.to} and keep ${g.model} for the heavy, high-value calls.`;
+    } else if (heavyContext) {
+      reason =
+        `${head}, but each also feeds a large input context (avg ${avgIn.toLocaleString()} tokens) — long-context work often needs the stronger model, so review a sample before switching. If quality holds, ${money}.`;
+    } else {
+      reason =
+        `${head}, short enough to try ${ds.to} — but this crosses model families (${g.model} → ${ds.to}), a bigger quality change, so test on a sample first. If quality holds, ${money}.`;
+    }
 
     out.push({
       fromModel: g.modelKey,
-      toModel: `${g.vendor}:${toModel}`,
+      toModel: `${g.vendor}:${ds.to}`,
       requests: g.requests,
-      shareOfSpendPct: Number(share.toFixed(1)),
+      shareOfSpendPct: Number(share(g.costUsd, totalCost).toFixed(1)),
       avgOutputTokens: avgOut,
+      avgInputTokens: avgIn,
+      confidence,
       topApp: g.app,
       currentCost: g.costUsd,
       projectedCost,
@@ -168,7 +202,18 @@ function buildSuggestions(groups: GroupStat[], totalCost: number): SavingsSugges
       reason,
     });
   }
-  return out.sort((a, b) => b.estSavings - a.estSavings);
+  // High-confidence first, then by savings within each tier.
+  return out.sort((a, b) =>
+    a.confidence === b.confidence
+      ? b.estSavings - a.estSavings
+      : a.confidence === "high"
+        ? -1
+        : 1
+  );
+}
+
+function share(cost: number, total: number): number {
+  return total > 0 ? (cost / total) * 100 : 0;
 }
 
 /**
@@ -303,7 +348,12 @@ export function summarizeReceipts(receipts: SignedReceipt[]): DashboardSummary {
   );
 
   const suggestions = buildSuggestions(groupList, totalCost);
-  const potentialSavings = suggestions.reduce((s, x) => s + x.estSavings, 0);
+  const potentialSavings = suggestions
+    .filter((x) => x.confidence === "high")
+    .reduce((s, x) => s + x.estSavings, 0);
+  const reviewSavings = suggestions
+    .filter((x) => x.confidence === "review")
+    .reduce((s, x) => s + x.estSavings, 0);
   const appList = Array.from(apps.values()).sort(
     (a, b) => b.costUsd - a.costUsd || b.requests - a.requests
   );
@@ -323,6 +373,7 @@ export function summarizeReceipts(receipts: SignedReceipt[]): DashboardSummary {
     environments: envList,
     suggestions,
     potentialSavings,
+    reviewSavings,
     tenants: Array.from(tenants).sort(),
     chainHeight,
     signedReceipts,
@@ -405,20 +456,20 @@ export function renderDashboardHtml(
 
   const savingsCard = summary.suggestions.length
     ? `<div class="card save">
-    <h2>Savings opportunities <span class="save-total">up to ${esc(fmtUsd(summary.potentialSavings))} for this period</span></h2>
+    <h2>Savings opportunities <span class="save-total">${esc(fmtUsd(summary.potentialSavings))} confident${summary.reviewSavings > 0 ? ` · +${esc(fmtUsd(summary.reviewSavings))} to review` : ""}</span></h2>
     ${summary.suggestions
       .map(
-        (s) => `<div class="sug">
+        (s) => `<div class="sug${s.confidence === "review" ? " review" : ""}">
         <div class="sug-head">
-          <span class="sug-move"><b>${esc(s.fromModel)}</b> <span class="arw">→</span> <b class="to">${esc(s.toModel)}</b></span>
+          <span class="sug-move"><b>${esc(s.fromModel)}</b> <span class="arw">→</span> <b class="to">${esc(s.toModel)}</b> <span class="conf ${s.confidence}">${s.confidence === "high" ? "confident" : "review"}</span></span>
           <span class="sug-save">save ~${esc(fmtUsd(s.estSavings))}</span>
         </div>
-        <div class="sug-meta">${s.requests.toLocaleString()} calls · ${s.shareOfSpendPct}% of spend · avg ${s.avgOutputTokens.toLocaleString()} output tokens${s.topApp ? ` · mostly "${esc(s.topApp)}"` : ""}</div>
+        <div class="sug-meta">${s.requests.toLocaleString()} calls · ${s.shareOfSpendPct}% of spend · avg ${s.avgInputTokens.toLocaleString()} in / ${s.avgOutputTokens.toLocaleString()} out tokens${s.topApp ? ` · mostly "${esc(s.topApp)}"` : ""}</div>
         <div class="sug-why">${esc(s.reason)}</div>
       </div>`
       )
       .join("")}
-    <p class="note">These are <b>heuristic</b> over-tiering flags from your own receipts. The savings figure reprices the <em>same</em> recorded calls on the cheaper tier — it is an estimate, not a promise, and does not account for output quality. Test the cheaper model on a sample before you switch. Automated verified-savings (baseline → proof) is the AskLedger platform.</p>
+    <p class="note">These are <b>heuristic</b> over-tiering flags. The savings figure reprices the <em>same</em> recorded calls on the cheaper tier — exact arithmetic, but it can't judge output quality. Only <b>confident</b> flags (short output, modest input context, an adjacent same-family tier) count toward the headline number; <b>review</b> flags (heavy input context or a cross-family swap) are shown separately because they carry real quality risk — test on a sample before switching. Automated verified-savings (baseline → signed proof) is the AskLedger platform.</p>
   </div>`
     : "";
 
@@ -481,6 +532,10 @@ export function renderDashboardHtml(
   .sug-move .arw{color:var(--muted2);margin:0 4px}
   .sug-move .to{color:var(--green)}
   .sug-save{font-weight:800;color:var(--green);font-size:14px;white-space:nowrap}
+  .sug.review{opacity:.92}
+  .conf{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;border-radius:5px;padding:1px 6px;vertical-align:middle}
+  .conf.high{background:rgba(15,157,107,.12);color:var(--green)}
+  .conf.review{background:rgba(201,135,26,.14);color:#a9711a}
   .sug-meta{font-size:12px;color:var(--muted2);margin-top:4px}
   .sug-why{font-size:13px;color:var(--muted);margin-top:7px;line-height:1.5}
   .note{font-size:12.5px;color:var(--muted);margin:14px 0 0;line-height:1.5}

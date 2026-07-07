@@ -13,9 +13,30 @@ Open-source, vendor-neutral cryptographic trust substrate for enterprise AI. Eve
 
 ---
 
+## See your wasted AI spend in 60 seconds
+
+No instrumentation, no signup, nothing leaves your machine — point it at a usage
+export you already have:
+
+```bash
+# 1. Export your usage as JSON:
+#      OpenAI    → platform.openai.com/usage → Export
+#      Anthropic → console.anthropic.com/settings/usage → Export
+# 2. Scan it:
+npx @askledger/receipts-sdk scan ~/Downloads/usage.json
+```
+
+You get a per-model spend breakdown and an over-tiering savings estimate, split
+into **confident** (safe, same-family swaps) and **review** (heavy-context or
+cross-family — test a sample first). The confident number is the one we'd stake
+our name on. Then instrument your app to make the tracking continuous and the
+savings **signed and verifiable** — that is the paid tier.
+
+---
+
 ## Project status
 
-**v0.6.0 · live on npm (v0.8.0 tagged, publish pending).** The cryptographic core is hardened and
+**v0.9.0 · live on npm.** The cryptographic core is hardened and
 independently verifiable — cross-language conformance tests enforce
 byte-identical receipts across the TypeScript, Python, Go, Rust, and
 Java SDKs, and a machine-checked hardening checklist runs in CI. SDK,

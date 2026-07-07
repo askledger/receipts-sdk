@@ -4,6 +4,35 @@ All notable changes to the AskLedger Receipts SDK will be documented in this fil
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (with the caveat that until v1.0, breaking changes may occur between minor versions).
 
+## [0.9.0] — 2026-07-08
+
+### Added
+
+- **`ledger-cli scan <usage-export.json>`** — see your wasted AI spend from a
+  provider bill you **already have**, with no instrumentation and no receipts.
+  Reads OpenAI (`snapshot_id` / `n_requests` / `n_*_tokens_total`) and Anthropic
+  (`model` / `requests` / `input_tokens` / `output_tokens`) usage exports (plus a
+  generic shape), converts them to receipts, and runs the existing cost engine.
+  `--json` and `--html` supported. This is the zero-instrumentation front door:
+  a team that has never emitted a receipt can still get a savings number in
+  seconds. Nothing leaves the machine.
+- **Ingest module** (`src/cost/ingest.ts`): `normalizeModel`, `parseUsageExport`,
+  `receiptsFromWorkloads`, `receiptsFromExport`. Very large bills are uniformly
+  downsampled to bound memory; a returned `scale` recovers exact totals (per-row
+  average tokens are preserved, so cost scales linearly).
+
+### Changed
+
+- **Over-tiering savings are now confidence-tiered — the estimate is honest.**
+  The heuristic was input-blind: it flagged high-context RAG (short output but
+  large input) as waste. Each `SavingsSuggestion` now carries
+  `confidence: "high" | "review"` and `avgInputTokens`. **High** (the headline
+  `potentialSavings`) requires an adjacent *same-family* tier, avg input ≤ 4000,
+  and avg output ≤ 800 — a genuinely low-risk swap. **Review** (`reviewSavings`,
+  reported separately, never in the headline) covers heavy-context or
+  cross-family swaps (e.g. `gpt-4o` → `gpt-5-mini`) that carry real quality risk.
+  CLI and HTML dashboards show both tiers.
+
 ## [0.8.0] — 2026-07-07
 
 ### Added
