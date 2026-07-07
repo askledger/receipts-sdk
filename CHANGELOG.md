@@ -4,6 +4,26 @@ All notable changes to the AskLedger Receipts SDK will be documented in this fil
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (with the caveat that until v1.0, breaking changes may occur between minor versions).
 
+## [Unreleased]
+
+### Added
+
+- **Natural-language query over receipts** (`ledger-cli query "<question>"`,
+  `src/query/index.ts`). An offline, deterministic parser (`parseQuery`) +
+  executor (`runQuery`) answer plain-English questions grounded in real
+  receipts — every result cites the receipt ids it came from. Optional
+  `--llm` mode (`src/query/llm.ts`, lazy-loaded `@anthropic-ai/sdk`, default
+  `claude-opus-4-8`) handles free-form phrasing; the model only emits a
+  validated `StructuredQuery`, never receipt data.
+- **Alerts engine** (`ledger-cli alerts`, `src/query/alerts.ts`). Explainable
+  rules — blocked/denied decisions, sensitive data (pii/pci/mnpi), unsigned
+  records, high-stakes decisions with no bound evidence, over-tiering, and cost
+  spikes — each naming the receipt ids behind it. Honest defaults; `runAlerts`
+  accepts caller-supplied rules; a throwing rule can't take the run down.
+- Exported `parseQuery` / `runQuery` / `answerQuery` / `flattenReceipt` /
+  `runAlerts` / `perReceiptRule` / `DEFAULT_RULES` / `parseQueryLLM` and their
+  types. 19 tests.
+
 ## [0.8.0] — 2026-07-07
 
 ### Added
