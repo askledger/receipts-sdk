@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>io.projectledger</groupId>
+  <groupId>org.askledger</groupId>
   <artifactId>receipts-sdk</artifactId>
   <version>0.1.0</version>
   <packaging>jar</packaging>
 
   <name>AskLedger Receipts SDK</name>
   <description>Wire-format compatible Java SDK for the AI Decision Receipt protocol.</description>
-  <url>https://github.com/projectledger/receipts-sdk-ts</url>
+  <url>https://github.com/askledger/receipts-sdk</url>
 
   <licenses>
     <license>
