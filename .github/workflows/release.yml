@@ -54,10 +54,15 @@ jobs:
       - run: npm ci && npm run build
       - name: Generate SBOM
         run: node scripts/generate-sbom.mjs > sbom.cyclonedx.json
+      # Attach the packed npm tarball (one file), not the raw dist/ tree. GitHub
+      # release assets share a flat namespace, so dist/**/* collides on duplicate
+      # basenames (many index.d.ts / index.js) and fails the asset upload.
+      - name: Pack tarball
+        run: npm pack
       - uses: softprops/action-gh-release@v3
         with:
           generate_release_notes: true
           body_path: CHANGELOG.md
           files: |
             sbom.cyclonedx.json
-            dist/**/*
+            *.tgz
