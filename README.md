@@ -356,9 +356,20 @@ node dist/cli.js alerts                                # flag the critical stuff
 - **`query`** — an offline, deterministic parser handles common questions for
   free (filter / count / aggregate over model, app, decision, time, cost and
   token thresholds, sensitive data, evidence and signature state). `--llm`
-  (optional `@anthropic-ai/sdk` + `ANTHROPIC_API_KEY`) handles free-form
-  phrasing — the model only turns your words into a query; the data always comes
-  from signed receipts.
+  handles free-form phrasing — the model only turns your words into a query; the
+  data always comes from signed receipts. It's **provider-neutral**: the CLI's
+  `--llm` uses `@anthropic-ai/sdk` (optional dep) + `ANTHROPIC_API_KEY` by
+  default, but programmatically you can plug in **any** model by passing a
+  `complete` function:
+
+  ```ts
+  import { parseQueryLLM, runQuery } from "@askledger/receipts-sdk";
+
+  const q = await parseQueryLLM("blocked loan decisions on opus last week", {
+    complete: async ({ system, prompt }) => callYourModel(system, prompt), // OpenAI, Gemini, local, …
+  });
+  const result = runQuery(receipts, q); // grounded + cited, as always
+  ```
 - **`alerts`** — an explainable rules engine that flags what's worth a look:
   blocked/denied decisions, sensitive data (pii/pci/mnpi), unsigned records,
   high-stakes decisions with no bound evidence, over-tiering, and cost spikes.

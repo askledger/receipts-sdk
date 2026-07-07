@@ -13,12 +13,25 @@
 import { parseQuery, type StructuredQuery, type QueryFilter, type GroupBy, type Metric, type Intent } from "./index.js";
 import type { DecisionVerdict } from "../types.js";
 
+/**
+ * Bring-your-own-model hook. Given the system prompt and the user's question,
+ * return the model's raw text reply. This is provider-neutral: back it with
+ * OpenAI, Gemini, a local model, or anything else — AskLedger only needs the
+ * text, and only ever uses it to build a StructuredQuery, never as data.
+ */
+export type CompleteFn = (input: { system: string; prompt: string }) => Promise<string>;
+
 export interface LLMQueryOptions {
-  /** Anthropic API key. Omit to let the SDK resolve it from the environment. */
+  /**
+   * Provider-neutral completion function. When set, no vendor SDK is loaded —
+   * this is how you "plug in your own model" (OpenAI/Gemini/local/etc.).
+   */
+  complete?: CompleteFn;
+  /** Anthropic API key for the built-in Claude default. Omit to resolve from the environment. */
   apiKey?: string;
-  /** Model id. Defaults to claude-opus-4-8. Use claude-haiku-4-5 for a cheaper parse. */
+  /** Model id for the built-in Claude default (claude-opus-4-8). Ignored when `complete`/`client` is given. */
   model?: string;
-  /** Inject a preconstructed Anthropic client (e.g. for tests or a custom base URL). */
+  /** Inject a preconstructed Anthropic-shaped client (tests, custom base URL). */
   client?: { messages: { create: (args: unknown) => Promise<{ content: Array<{ type: string; text?: string }> }> } };
   /** "Now" for relative-date resolution; defaults to new Date(). */
   now?: Date;
@@ -114,36 +127,43 @@ function coerce(base: StructuredQuery, raw: unknown): StructuredQuery {
 export async function parseQueryLLM(nl: string, opts: LLMQueryOptions = {}): Promise<StructuredQuery> {
   const now = opts.now ?? new Date();
   const base = parseQuery(nl, now);
+  const system = systemPrompt(now);
 
-  let client = opts.client;
-  if (!client) {
-    // Optional peer dep. The indirect import keeps the module specifier out of
-    // tsc's static resolution, so the core SDK builds without the package.
-    const dynImport = new Function("spec", "return import(spec)") as (s: string) => Promise<Record<string, unknown>>;
-    let mod: Record<string, unknown>;
-    try {
-      mod = await dynImport("@anthropic-ai/sdk");
-    } catch {
-      throw new Error(
-        "LLM query mode needs the optional '@anthropic-ai/sdk' package. Install it (npm i @anthropic-ai/sdk) and set ANTHROPIC_API_KEY, or use the default offline parser."
-      );
+  let text: string;
+  if (opts.complete) {
+    // Provider-neutral: any model, adapted by the caller.
+    text = (await opts.complete({ system, prompt: nl }) ?? "").trim();
+  } else {
+    // Built-in Claude default (or an injected Anthropic-shaped client).
+    let client = opts.client;
+    if (!client) {
+      // Optional peer dep. The indirect import keeps the module specifier out
+      // of tsc's static resolution, so the core SDK builds without the package.
+      const dynImport = new Function("spec", "return import(spec)") as (s: string) => Promise<Record<string, unknown>>;
+      let mod: Record<string, unknown>;
+      try {
+        mod = await dynImport("@anthropic-ai/sdk");
+      } catch {
+        throw new Error(
+          "LLM query mode needs a model. Pass opts.complete to plug in your own (any provider), or install the optional '@anthropic-ai/sdk' package (npm i @anthropic-ai/sdk) and set ANTHROPIC_API_KEY. Otherwise use the default offline parser."
+        );
+      }
+      const Anthropic = (mod.default ?? mod) as new (a: { apiKey?: string }) => NonNullable<typeof client>;
+      client = new Anthropic({ apiKey: opts.apiKey });
     }
-    const Anthropic = (mod.default ?? mod) as new (a: { apiKey?: string }) => NonNullable<typeof client>;
-    client = new Anthropic({ apiKey: opts.apiKey });
+
+    const resp = await client.messages.create({
+      model: opts.model ?? "claude-opus-4-8",
+      max_tokens: 600,
+      system,
+      messages: [{ role: "user", content: nl }],
+    });
+    text = (resp.content ?? [])
+      .filter((b) => b.type === "text" && typeof b.text === "string")
+      .map((b) => b.text as string)
+      .join("")
+      .trim();
   }
-
-  const resp = await client.messages.create({
-    model: opts.model ?? "claude-opus-4-8",
-    max_tokens: 600,
-    system: systemPrompt(now),
-    messages: [{ role: "user", content: nl }],
-  });
-
-  const text = (resp.content ?? [])
-    .filter((b) => b.type === "text" && typeof b.text === "string")
-    .map((b) => b.text as string)
-    .join("")
-    .trim();
 
   try {
     return coerce(base, extractJson(text));

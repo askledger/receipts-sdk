@@ -197,6 +197,18 @@ describe("parseQueryLLM (grounded parse via injected client)", () => {
     expect(q.filter.model).toBe("gpt-5");
   });
 
+  it("supports a provider-neutral complete() hook (bring your own model)", async () => {
+    let sawSystem = "";
+    const complete = async (input: { system: string; prompt: string }) => {
+      sawSystem = input.system;
+      return '{"intent":"count","metric":"count","filter":{"model":"gpt-5"}}';
+    };
+    const q = await parseQueryLLM("count gpt-5 calls", { complete, now: NOW });
+    expect(q.intent).toBe("count");
+    expect(q.filter.model).toBe("gpt-5");
+    expect(sawSystem).toContain("JSON query object"); // the hook received the system prompt
+  });
+
   it("drops invalid enum values from the model", async () => {
     const fakeClient = { messages: { create: async () => ({ content: [{ type: "text", text: '{"intent":"nonsense","metric":"cost","filter":{"decision":"bogus"}}' }] }) } };
     const q = await parseQueryLLM("spend", { client: fakeClient, now: NOW });

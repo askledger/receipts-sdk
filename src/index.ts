@@ -303,4 +303,4 @@ export {
   type AlertRule,
   type Severity,
 } from "./query/alerts.js";
-export { parseQueryLLM, type LLMQueryOptions } from "./query/llm.js";
+export { parseQueryLLM, type LLMQueryOptions, type CompleteFn } from "./query/llm.js";
