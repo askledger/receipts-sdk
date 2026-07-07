@@ -268,6 +268,45 @@ node dist/cli.js verify .ledger/last-receipt.json --prev .ledger/prev.json
 node dist/cli.js demo
 ```
 
+### End-to-end: keygen → sign → verify → bundle → verify-bundle
+
+The CLI drives all three layers by hand — one keypair, a signed chain, and a
+single verifiable evidence bundle:
+
+```bash
+# 1) Key
+node dist/cli.js keygen --out keys.json
+
+# 2) Sign — optionally BIND an external correctness proof (Layer 3, repeatable).
+#    file=<path> is read and SHA-256-hashed for you; or pass hash=<hexdigest>.
+node dist/cli.js sign examples/event.json --key keys.json --out r1.json \
+  --evidence-ref "kind=rule-check,file=./rule-report.json,status=pass"
+node dist/cli.js sign examples/event.json --key keys.json --out r2.json
+
+# 3) Verify a single receipt (reports any attached evidence_refs)
+node dist/cli.js verify r1.json --key keys.json
+
+# 4) Bundle many receipts into one Merkle-rooted evidence bundle.
+#    Accepts multiple single-receipt files OR one array-of-receipts file.
+node dist/cli.js bundle r1.json r2.json --out bundle.json --title "Q3 Evidence"
+
+# 5) Verify the bundle: pack integrity + inclusion + (with --key) signatures.
+#    Exits non-zero on any failure.
+node dist/cli.js verify-bundle bundle.json --key keys.json
+```
+
+**Three layers, one CLI:**
+
+- **Integrity** — `sign` / `verify` (RFC 8785 hash chain + Ed25519). The receipt is authentic and untampered.
+- **Traceability** — `bundle` / `verify-bundle` (Merkle evidence bundle). Many receipts → one artifact with a single root hash.
+- **Correctness** — `sign --evidence-ref` binds an **external** proof's digest into the signed body.
+
+> **Honest scope:** the SDK **binds** an external correctness proof into the signed
+> receipt (its digest is covered by the signature). It does **not** perform formal
+> verification — the proof is produced by an external prover; the SDK makes it
+> tamper-evident and auditable. An *evidence bundle* and an *evidence pack* are the
+> same artifact (the `buildEvidenceBundle` / `buildEvidencePack` API names are aliases).
+
 ---
 
 ## How it works · the cryptographic design
