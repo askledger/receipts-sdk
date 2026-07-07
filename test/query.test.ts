@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { parseQuery, runQuery, answerQuery } from "../src/query/index.js";
 import { runAlerts, perReceiptRule } from "../src/query/alerts.js";
 import { parseQueryLLM } from "../src/query/llm.js";
+import { summarizeReceipts } from "../src/cost/dashboard.js";
 import type { SignedReceipt, DecisionVerdict, Classification } from "../src/types.js";
 
 function rc(o: {
@@ -169,6 +170,24 @@ describe("alerts", () => {
     const alerts = runAlerts(receipts, { extraRules: [custom, boom] });
     expect(alerts.map((a) => a.id)).toContain("risky-app");
     expect(alerts.map((a) => a.id)).not.toContain("boom"); // throwing rule is swallowed
+  });
+});
+
+describe("over-tiering excludes governed decisions", () => {
+  it("flags a routine light workload but not a decision-bearing one", () => {
+    // Both are opus with short outputs; only the one WITHOUT a policy decision
+    // block should be flagged as over-tiered (a loan approval on opus is a
+    // considered choice, not waste).
+    const routine = Array.from({ length: 6 }, () =>
+      rc({ vendor: "anthropic", model: "claude-opus-4-6", app: "support-bot", input: 900, output: 200 })
+    );
+    const governed = Array.from({ length: 6 }, () =>
+      rc({ vendor: "anthropic", model: "claude-opus-4-6", app: "loan-bot", input: 900, output: 200, decision: "allow" })
+    );
+    const s = summarizeReceipts([...routine, ...governed]);
+    const apps = s.suggestions.map((x) => x.topApp);
+    expect(apps).toContain("support-bot");
+    expect(apps).not.toContain("loan-bot");
   });
 });
 
