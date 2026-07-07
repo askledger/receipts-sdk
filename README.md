@@ -15,7 +15,7 @@ Open-source, vendor-neutral cryptographic trust substrate for enterprise AI. Eve
 
 ## Project status
 
-**v0.6.0 · live on npm (v0.7.0 tagged, publish pending).** The cryptographic core is hardened and
+**v0.6.0 · live on npm (v0.8.0 tagged, publish pending).** The cryptographic core is hardened and
 independently verifiable — cross-language conformance tests enforce
 byte-identical receipts across the TypeScript, Python, Go, Rust, and
 Java SDKs, and a machine-checked hardening checklist runs in CI. SDK,
@@ -248,7 +248,7 @@ npx @askledger/receipts-sdk demo
 ```
 
 > The `npx @askledger/receipts-sdk …` form works from the published package
-> (this `bin` ships with **0.7.0**). If you are working from a local clone,
+> (this `bin` ships with **0.8.0**). If you are working from a local clone,
 > build first (`npm run build`) and use the `node dist/cli.js …` form below.
 
 ```bash

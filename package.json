@@ -1,6 +1,6 @@
 {
   "name": "@askledger/receipts-sdk",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Cryptographic AI Decision Receipts — RFC 8785 canonical JSON, JWS Ed25519, hash-chained, regulator-verifiable",
   "type": "module",
   "main": "dist/index.js",
