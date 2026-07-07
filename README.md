@@ -339,6 +339,48 @@ node dist/cli.js dashboard --html [path]
 > promise. Cross-system discovery, billing ingestion, and **verified savings**
 > (baseline → signed proof) are the hosted AskLedger platform.
 
+### Ask your receipts — natural-language query & alerts
+
+Ask a question in plain English and get an answer grounded in real receipts —
+every result cites the receipt ids it came from, so it's checkable, never
+invented:
+
+```bash
+node dist/cli.js query "how much did we spend by model?"
+node dist/cli.js query "show the blocked loan decisions"
+node dist/cli.js query "anything with pii?"            # routes to alerts
+node dist/cli.js query "gpt-5 calls over $0.05 last week" --llm   # free-form
+node dist/cli.js alerts                                # flag the critical stuff
+```
+
+- **`query`** — an offline, deterministic parser handles common questions for
+  free (filter / count / aggregate over model, app, decision, time, cost and
+  token thresholds, sensitive data, evidence and signature state). `--llm`
+  handles free-form phrasing — the model only turns your words into a query; the
+  data always comes from signed receipts. It's **provider-neutral**: the CLI's
+  `--llm` uses `@anthropic-ai/sdk` (optional dep) + `ANTHROPIC_API_KEY` by
+  default, but programmatically you can plug in **any** model by passing a
+  `complete` function:
+
+  ```ts
+  import { parseQueryLLM, runQuery } from "@askledger/receipts-sdk";
+
+  const q = await parseQueryLLM("blocked loan decisions on opus last week", {
+    complete: async ({ system, prompt }) => callYourModel(system, prompt), // OpenAI, Gemini, local, …
+  });
+  const result = runQuery(receipts, q); // grounded + cited, as always
+  ```
+- **`alerts`** — an explainable rules engine that flags what's worth a look:
+  blocked/denied decisions, sensitive data (pii/pci/mnpi), unsigned records,
+  high-stakes decisions with no bound evidence, over-tiering, and cost spikes.
+  Each alert names the exact receipt ids behind it. Ships honest defaults; add
+  your own rules programmatically via `runAlerts(receipts, { extraRules })`.
+
+> **Honest scope:** the NL layer decides *which* receipts to show and how to
+> summarize them — it never asserts anything the receipts don't already say, and
+> it reports how it interpreted the question. Local and single-tenant; hosted,
+> real-time, cross-system query and alerting is the enterprise tier.
+
 ---
 
 ## How it works · the cryptographic design

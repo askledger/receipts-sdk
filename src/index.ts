@@ -279,3 +279,28 @@ export {
   type NamedCount,
   type SavingsSuggestion,
 } from "./cost/dashboard.js";
+
+// Natural-language query + alerts over your signed receipts (free, local).
+export {
+  parseQuery,
+  runQuery,
+  answerQuery,
+  flattenReceipt,
+  type StructuredQuery,
+  type QueryFilter,
+  type QueryResult,
+  type QueryGroup,
+  type ReceiptRow,
+  type GroupBy,
+  type Metric,
+  type Intent,
+} from "./query/index.js";
+export {
+  runAlerts,
+  perReceiptRule,
+  DEFAULT_RULES,
+  type Alert,
+  type AlertRule,
+  type Severity,
+} from "./query/alerts.js";
+export { parseQueryLLM, type LLMQueryOptions, type CompleteFn } from "./query/llm.js";

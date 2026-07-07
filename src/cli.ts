@@ -27,6 +27,17 @@
  *       Verify an evidence bundle: pack integrity, receipt inclusion,
  *       and (with --key) per-receipt signatures.
  *
+ *   ledger-cli query "<question>" [--paths ...] [--llm] [--json]
+ *       Ask your receipts a question in plain English. The offline parser
+ *       handles common questions for free; --llm (needs @anthropic-ai/sdk +
+ *       ANTHROPIC_API_KEY) handles free-form phrasing. Every answer is grounded
+ *       in real receipts and cites their ids — the NL layer never invents data.
+ *
+ *   ledger-cli alerts [paths...] [--json]
+ *       Flag the receipts most worth a look: blocked/denied decisions, sensitive
+ *       data (pii/pci/mnpi), unsigned records, over-tiering, and cost spikes.
+ *       Each alert names the exact receipt ids behind it.
+ *
  *   ledger-cli dashboard [paths...] [--html [path]]
  *       Local, single-tenant usage & cost dashboard built from your own
  *       signed receipts (scans .ledger/ by default). Shows estimated spend,
@@ -65,6 +76,9 @@ import {
   fmtUsd,
   fmtTokens,
 } from "./cost/dashboard.js";
+import { parseQuery, runQuery, type QueryResult, type ReceiptRow } from "./query/index.js";
+import { runAlerts, type Alert } from "./query/alerts.js";
+import { parseQueryLLM } from "./query/llm.js";
 import type { RawEvent, KeyPair, SignedReceipt, EvidenceRef } from "./types.js";
 import type { EvidencePack } from "./evidence/index.js";
 
@@ -84,6 +98,10 @@ const c = {
 };
 function paint(color: string, s: string): string { return `${color}${s}${c.reset}`; }
 function shortHash(h: string): string { return `${h.slice(0,8)}…${h.slice(-6)}`; }
+// Neutralize ANSI/control characters in receipt-authored strings before printing
+// them to a terminal — a receipt from another party (e.g. inside an evidence
+// bundle you received) could otherwise embed escape sequences to spoof output.
+function clean(s: string): string { return String(s).replace(/[\u0000-\u001f\u007f-\u009f]/g, "\uFFFD"); }
 function rule(): string { return paint(c.gray, "─".repeat(78)); }
 function sleep(ms: number): Promise<void> { return new Promise((r) => setTimeout(r, ms)); }
 
@@ -743,7 +761,7 @@ program
         const bar = paint(m.priced ? c.navy : c.gray, "█".repeat(barLen));
         const label = m.priced ? "" : paint(c.amber, " (unpriced)");
         console.log(
-          `   ${m.key.padEnd(34).slice(0, 34)} ${bar.padEnd(0)} ` +
+          `   ${clean(m.key).padEnd(34).slice(0, 34)} ${bar.padEnd(0)} ` +
             `${paint(c.gray, m.requests + " req · " + fmtTokens(m.inputTokens + m.outputTokens) + " tok")}  ` +
             `${paint(m.priced ? c.green : c.gray, m.priced ? fmtUsd(m.costUsd) : "—")}${label}`
         );
@@ -756,7 +774,7 @@ program
       console.log(paint(c.cyan + c.bold, "  Spend by application"));
       for (const a of summary.apps.slice(0, 8)) {
         console.log(
-          `   ${a.name.padEnd(34).slice(0, 34)} ${paint(c.gray, a.requests + " req")}  ${paint(c.green, fmtUsd(a.costUsd))}`
+          `   ${clean(a.name).padEnd(34).slice(0, 34)} ${paint(c.gray, a.requests + " req")}  ${paint(c.green, fmtUsd(a.costUsd))}`
         );
       }
       console.log("");
@@ -769,9 +787,9 @@ program
       );
       for (const s of summary.suggestions) {
         console.log(
-          `   ${paint(c.navy, s.fromModel)} ${paint(c.gray, "→")} ${paint(c.green, s.toModel)}   ` +
+          `   ${paint(c.navy, clean(s.fromModel))} ${paint(c.gray, "→")} ${paint(c.green, clean(s.toModel))}   ` +
             `${paint(c.green + c.bold, "save ~" + fmtUsd(s.estSavings))}  ` +
-            `${paint(c.gray, `(${s.shareOfSpendPct}% of spend · ${s.requests} calls · avg ${s.avgOutputTokens} out tok${s.topApp ? ` · ${s.topApp}` : ""})`)}`
+            `${paint(c.gray, `(${s.shareOfSpendPct}% of spend · ${s.requests} calls · avg ${s.avgOutputTokens} out tok${s.topApp ? ` · ${clean(s.topApp)}` : ""})`)}`
         );
       }
       console.log(
@@ -803,6 +821,105 @@ program
       )
     );
     console.log("");
+  });
+
+// ---------- query (natural language) ----------
+
+const SEV_COLOR: Record<Alert["severity"], string> = { high: c.red, medium: c.amber, low: c.gray };
+
+function printAlerts(alerts: Alert[], json: boolean): void {
+  if (json) { console.log(JSON.stringify(alerts, null, 2)); return; }
+  console.log("");
+  if (alerts.length === 0) {
+    console.log(paint(c.green, "  ✓ No alerts — nothing critical in these receipts."));
+    console.log("");
+    return;
+  }
+  console.log(paint(c.cyan + c.bold, `  Alerts (${alerts.length})`));
+  console.log("");
+  for (const a of alerts) {
+    const sev = SEV_COLOR[a.severity];
+    console.log(`  ${paint(sev + c.bold, "● " + a.severity.toUpperCase().padEnd(6))} ${paint(c.bold, clean(a.title))} ${paint(c.gray, "· " + a.count)}`);
+    console.log(`    ${paint(c.gray, clean(a.detail))}`);
+    console.log(`    ${paint(c.gray, "receipts: " + a.receiptIds.slice(0, 5).map((x) => shortHash(clean(x))).join(", ") + (a.count > 5 ? " …" : ""))}`);
+    console.log("");
+  }
+}
+
+function printQueryResult(r: QueryResult, json: boolean): void {
+  if (json) { console.log(JSON.stringify({ answer: r.answer, interpretation: r.interpretation, matchedCount: r.matchedCount, scanned: r.scanned, groups: r.groups, aggregate: r.aggregate, citations: r.citations }, null, 2)); return; }
+  console.log("");
+  console.log(`  ${paint(c.bold, r.answer)}`);
+  console.log(`  ${paint(c.gray, "interpreted as: " + r.interpretation)}`);
+  console.log("");
+  if (r.groups && r.groups.length) {
+    const max = r.groups.reduce((m, g) => Math.max(m, g.value), 0) || 1;
+    for (const g of r.groups) {
+      const bar = paint(c.navy, "█".repeat(Math.max(1, Math.round((g.value / max) * 22))));
+      const val = r.query.metric === "cost" ? fmtUsd(g.value) : r.query.metric === "tokens" ? fmtTokens(g.value) : String(g.value);
+      console.log(`   ${clean(g.key).padEnd(22).slice(0, 22)} ${bar}  ${paint(c.bold, val)} ${paint(c.gray, "· " + g.count + " rec")}`);
+    }
+    console.log("");
+  } else if (r.matched.length) {
+    console.log(paint(c.cyan + c.bold, "  Matching receipts"));
+    for (const row of r.matched as ReceiptRow[]) {
+      const dec = row.decision ? paint(row.decision === "block" ? c.red : c.gray, row.decision) : paint(c.gray, "—");
+      console.log(`   ${paint(c.gold, shortHash(clean(row.id)))} ${paint(c.gray, clean(row.model ?? "—").padEnd(20).slice(0, 20))} ${paint(c.gray, clean(row.app).padEnd(14).slice(0, 14))} ${dec}  ${paint(c.green, fmtUsd(row.costUsd))}`);
+    }
+    console.log("");
+  }
+  if (r.citations.length) {
+    console.log(paint(c.gray, "  Every result is backed by a signed receipt — verify any id with: ledger-cli verify <receipt.json>"));
+    console.log("");
+  }
+}
+
+program
+  .command("query <question...>")
+  .description("Ask your receipts a question in plain English (local; --llm for free-form)")
+  .option("--llm", "Use an LLM to parse free-form questions (default: Claude via @anthropic-ai/sdk + ANTHROPIC_API_KEY)")
+  .option("--model <id>", "Model for --llm mode (default claude-opus-4-8)")
+  .option("--paths <paths...>", "Receipt files/dirs to search (default: .ledger/)")
+  .option("--json", "Emit JSON instead of a formatted view")
+  .action(async (question: string[], opts) => {
+    const nl = question.join(" ");
+    const receipts = loadReceipts(opts.paths ?? []);
+    if (receipts.length === 0) {
+      console.log(paint(c.amber, "\nNo signed receipts found. Sign some events first, then ask again.\n"));
+      process.exit(0);
+    }
+
+    // Route "any issues?"-style questions to the alerts engine.
+    const probe = parseQuery(nl);
+    if (probe.wantsAlerts) { printAlerts(runAlerts(receipts), Boolean(opts.json)); return; }
+
+    let q;
+    if (opts.llm) {
+      try {
+        q = await parseQueryLLM(nl, { model: opts.model });
+      } catch (e) {
+        console.log(paint(c.red, `\n${(e as Error).message}\n`));
+        console.log(paint(c.gray, "Falling back to the offline parser.\n"));
+        q = probe;
+      }
+    } else {
+      q = probe;
+    }
+    printQueryResult(runQuery(receipts, q), Boolean(opts.json));
+  });
+
+// ---------- alerts ----------
+program
+  .command("alerts [paths...]")
+  .description("Flag critical patterns in your receipts (blocked decisions, sensitive data, unsigned, over-tiering, cost spikes)")
+  .option("--json", "Emit JSON instead of a formatted view")
+  .action((paths: string[], opts) => {
+    const receipts = loadReceipts(paths ?? []);
+    if (receipts.length === 0) {
+      console.log(paint(c.amber, "\nNo signed receipts found. Sign some events first, then re-run.\n"));
+      process.exit(0);
+    }
+    printAlerts(runAlerts(receipts), Boolean(opts.json));
   });
 
 program.parse();
