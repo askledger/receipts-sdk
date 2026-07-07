@@ -27,6 +27,13 @@
  *       Verify an evidence bundle: pack integrity, receipt inclusion,
  *       and (with --key) per-receipt signatures.
  *
+ *   ledger-cli dashboard [paths...] [--html [path]]
+ *       Local, single-tenant usage & cost dashboard built from your own
+ *       signed receipts (scans .ledger/ by default). Shows estimated spend,
+ *       tokens, per-model and per-app breakdowns, and integrity signals
+ *       (signed count, chain height, correctness bindings). --html writes a
+ *       self-contained report. Free tier: local only, no shadow-AI discovery.
+ *
  *   ledger-cli demo
  *       Run a full keygen + sign + verify cycle end-to-end.
  *
@@ -52,6 +59,12 @@ import {
   verifyAllReceiptsInPack,
   sha256String,
 } from "./index.js";
+import {
+  summarizeReceipts,
+  renderDashboardHtml,
+  fmtUsd,
+  fmtTokens,
+} from "./cost/dashboard.js";
 import type { RawEvent, KeyPair, SignedReceipt, EvidenceRef } from "./types.js";
 import type { EvidencePack } from "./evidence/index.js";
 
@@ -592,6 +605,185 @@ program
     console.log(`    ${paint(c.bold, "open site/demo.html")}     ${paint(c.gray, "for the visual demo")}`);
     console.log(`    ${paint(c.bold, "open site/verify.html")}   ${paint(c.gray, "to verify any receipt in your browser")}`);
     console.log(rule());
+    console.log("");
+  });
+
+// ---------- dashboard ----------
+
+/** True when a parsed value looks like a SignedReceipt (has receipt + signatures). */
+function isSignedReceipt(v: unknown): v is SignedReceipt {
+  return (
+    typeof v === "object" &&
+    v !== null &&
+    "receipt" in v &&
+    "signatures" in v &&
+    typeof (v as { receipt?: unknown }).receipt === "object"
+  );
+}
+
+/** Recursively collect *.json paths under a directory. */
+function walkJson(dir: string, out: string[]): void {
+  let entries: fs.Dirent[];
+  try {
+    entries = fs.readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return;
+  }
+  for (const e of entries) {
+    const full = path.join(dir, e.name);
+    if (e.isDirectory()) walkJson(full, out);
+    else if (e.isFile() && e.name.endsWith(".json")) out.push(full);
+  }
+}
+
+/**
+ * Load signed receipts from the given files/dirs, or scan `.ledger/` when no
+ * paths are supplied. Non-receipt JSON (keypairs, bundles) is skipped quietly;
+ * arrays of receipts (e.g. demo-chain.json) are flattened.
+ */
+function loadReceipts(paths: string[]): SignedReceipt[] {
+  const files: string[] = [];
+  const sources = paths.length > 0 ? paths : [RECEIPTS_DIR];
+  for (const p of sources) {
+    let stat: fs.Stats | null = null;
+    try {
+      stat = fs.statSync(p);
+    } catch {
+      console.log(paint(c.amber, `   ! skipped (not found): ${p}`));
+      continue;
+    }
+    if (stat.isDirectory()) walkJson(p, files);
+    else files.push(p);
+  }
+
+  const receipts: SignedReceipt[] = [];
+  for (const f of files) {
+    let parsed: unknown;
+    try {
+      parsed = readJSON<unknown>(f);
+    } catch {
+      continue; // unreadable / not JSON
+    }
+    if (Array.isArray(parsed)) {
+      for (const item of parsed) if (isSignedReceipt(item)) receipts.push(item);
+    } else if (isSignedReceipt(parsed)) {
+      receipts.push(parsed);
+    }
+  }
+  return receipts;
+}
+
+program
+  .command("dashboard [paths...]")
+  .description("Local usage & cost dashboard from your signed receipts (free, single-tenant)")
+  .option("--html [path]", "Write a self-contained HTML report (default .ledger/dashboard.html)")
+  .action((paths: string[], opts) => {
+    const receipts = loadReceipts(paths ?? []);
+
+    if (receipts.length === 0) {
+      console.log("");
+      console.log(paint(c.amber, "No signed receipts found."));
+      console.log(
+        paint(
+          c.gray,
+          `   Looked in: ${paths && paths.length ? paths.join(", ") : RECEIPTS_DIR + "/"}. ` +
+            `Sign some events first (ledger-cli sign <event.json>), then re-run.`
+        )
+      );
+      console.log("");
+      process.exit(0);
+    }
+
+    const summary = summarizeReceipts(receipts);
+
+    // ----- HTML output -----
+    if (opts.html) {
+      const outPath =
+        typeof opts.html === "string" ? opts.html : `${RECEIPTS_DIR}/dashboard.html`;
+      const html = renderDashboardHtml(summary, new Date().toISOString());
+      ensureDir(path.dirname(outPath));
+      fs.writeFileSync(outPath, html);
+      console.log("");
+      console.log(paint(c.cyan + c.bold, "Dashboard written"));
+      console.log(`   ${paint(c.green, "✓")} ${paint(c.gold, outPath)}`);
+      console.log(paint(c.gray, `   open ${outPath}`));
+      console.log("");
+      return;
+    }
+
+    // ----- terminal output -----
+    const period =
+      summary.period.from && summary.period.to
+        ? `${summary.period.from} → ${summary.period.to}`
+        : "—";
+
+    console.log("");
+    console.log(rule());
+    console.log(
+      `  ${paint(c.gold + c.bold, "AskLedger")} ${paint(c.gray, "·")} ${paint(c.bold, "Local usage & cost")}  ${paint(c.gray, `(${summary.receipts} receipts · ${period})`)}`
+    );
+    console.log(rule());
+    console.log("");
+
+    // KPIs
+    console.log(
+      `   ${paint(c.green + c.bold, fmtUsd(summary.costUsd))} ${paint(c.gray, "estimated spend")}   ` +
+        `${paint(c.bold, summary.requests.toLocaleString())} ${paint(c.gray, "requests")}   ` +
+        `${paint(c.bold, fmtTokens(summary.totalTokens))} ${paint(c.gray, "tokens")}   ` +
+        `${paint(c.bold, String(summary.models.length))} ${paint(c.gray, "models")}`
+    );
+    console.log("");
+
+    // Spend by model
+    if (summary.models.length > 0) {
+      console.log(paint(c.cyan + c.bold, "  Spend by model"));
+      const maxCost = summary.models.reduce((m, x) => Math.max(m, x.costUsd), 0) || 1;
+      for (const m of summary.models) {
+        const barLen = Math.max(1, Math.round((m.costUsd / maxCost) * 24));
+        const bar = paint(m.priced ? c.navy : c.gray, "█".repeat(barLen));
+        const label = m.priced ? "" : paint(c.amber, " (unpriced)");
+        console.log(
+          `   ${m.key.padEnd(34).slice(0, 34)} ${bar.padEnd(0)} ` +
+            `${paint(c.gray, m.requests + " req · " + fmtTokens(m.inputTokens + m.outputTokens) + " tok")}  ` +
+            `${paint(m.priced ? c.green : c.gray, m.priced ? fmtUsd(m.costUsd) : "—")}${label}`
+        );
+      }
+      console.log("");
+    }
+
+    // Spend by app
+    if (summary.apps.length > 0) {
+      console.log(paint(c.cyan + c.bold, "  Spend by application"));
+      for (const a of summary.apps.slice(0, 8)) {
+        console.log(
+          `   ${a.name.padEnd(34).slice(0, 34)} ${paint(c.gray, a.requests + " req")}  ${paint(c.green, fmtUsd(a.costUsd))}`
+        );
+      }
+      console.log("");
+    }
+
+    // Integrity strip
+    console.log(paint(c.cyan + c.bold, "  Integrity"));
+    console.log(
+      `   ${paint(c.green, "✓")} ${paint(c.bold, summary.signedReceipts + "/" + summary.receipts)} signed & verifiable   ` +
+        `${paint(c.gray, "chain height")} ${paint(c.bold, summary.chainHeight === null ? "—" : "#" + summary.chainHeight)}   ` +
+        `${paint(c.gray, "correctness bindings")} ${paint(c.bold, String(summary.withEvidenceRefs))}`
+    );
+    if (summary.unpricedRequests > 0) {
+      console.log(
+        paint(
+          c.gray,
+          `   ! ${summary.unpricedRequests} request(s) used a model not in the pricing table — counted, excluded from the cost estimate.`
+        )
+      );
+    }
+    console.log("");
+    console.log(
+      paint(
+        c.gray,
+        "   Estimate from your local receipts only — not a bill, and blind to un-instrumented AI. HTML report: ledger-cli dashboard --html"
+      )
+    );
     console.log("");
   });
 

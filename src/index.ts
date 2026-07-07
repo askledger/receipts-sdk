@@ -258,3 +258,23 @@ export {
   type ReceiptScore,
   type Grade,
 } from "./receipt-score/index.js";
+
+// Free, local usage & cost dashboard (single-tenant, estimated from your own
+// signed receipts). Hosted/cross-system intelligence is the enterprise tier.
+export {
+  PRICING,
+  priceFor,
+  costUsd,
+  type VendorPricing,
+  type ModelKey,
+  type Usage,
+} from "./cost/pricing.js";
+export {
+  summarizeReceipts,
+  renderDashboardHtml,
+  fmtUsd,
+  fmtTokens,
+  type DashboardSummary,
+  type ModelStat,
+  type NamedCount,
+} from "./cost/dashboard.js";
