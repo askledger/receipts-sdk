@@ -277,4 +277,5 @@ export {
   type DashboardSummary,
   type ModelStat,
   type NamedCount,
+  type SavingsSuggestion,
 } from "./cost/dashboard.js";

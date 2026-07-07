@@ -762,6 +762,24 @@ program
       console.log("");
     }
 
+    // Savings opportunities (free over-tiering heuristic)
+    if (summary.suggestions.length > 0) {
+      console.log(
+        `${paint(c.green + c.bold, "  Savings opportunities")}  ${paint(c.gray, `up to ${fmtUsd(summary.potentialSavings)} this period`)}`
+      );
+      for (const s of summary.suggestions) {
+        console.log(
+          `   ${paint(c.navy, s.fromModel)} ${paint(c.gray, "→")} ${paint(c.green, s.toModel)}   ` +
+            `${paint(c.green + c.bold, "save ~" + fmtUsd(s.estSavings))}  ` +
+            `${paint(c.gray, `(${s.shareOfSpendPct}% of spend · ${s.requests} calls · avg ${s.avgOutputTokens} out tok${s.topApp ? ` · ${s.topApp}` : ""})`)}`
+        );
+      }
+      console.log(
+        paint(c.gray, "   Heuristic from your receipts — reprices the same calls on the cheaper tier. Test quality before switching.")
+      );
+      console.log("");
+    }
+
     // Integrity strip
     console.log(paint(c.cyan + c.bold, "  Integrity"));
     console.log(

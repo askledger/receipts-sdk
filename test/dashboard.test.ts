@@ -182,6 +182,66 @@ describe("dashboard summarizer", () => {
   });
 });
 
+describe("dashboard savings suggestions", () => {
+  it("flags an over-tiered light workload with an exact counterfactual saving", () => {
+    // 6 opus calls with short completions in one app.
+    const rs = Array.from({ length: 6 }, () =>
+      receipt({ vendor: "anthropic", model: "claude-opus-4-6", input: 900, output: 200, app: "support-bot" })
+    );
+    const s = summarizeReceipts(rs);
+    expect(s.suggestions).toHaveLength(1);
+    const g = s.suggestions[0];
+    expect(g.fromModel).toBe("anthropic:claude-opus-4-6");
+    expect(g.toModel).toBe("anthropic:claude-sonnet-4-6");
+    expect(g.requests).toBe(6);
+    expect(g.topApp).toBe("support-bot");
+
+    const current = 6 * costUsd(priceFor("anthropic", "claude-opus-4-6")!, { input: 900, output: 200 });
+    const projected = 6 * costUsd(priceFor("anthropic", "claude-sonnet-4-6")!, { input: 900, output: 200 });
+    expect(g.currentCost).toBeCloseTo(current, 8);
+    expect(g.projectedCost).toBeCloseTo(projected, 8);
+    expect(g.estSavings).toBeCloseTo(current - projected, 8);
+    expect(s.potentialSavings).toBeCloseTo(current - projected, 8);
+  });
+
+  it("does NOT flag a heavy workload (long completions) on a premium model", () => {
+    const rs = Array.from({ length: 6 }, () =>
+      receipt({ vendor: "anthropic", model: "claude-opus-4-6", input: 2000, output: 4000, app: "report-writer" })
+    );
+    const s = summarizeReceipts(rs);
+    expect(s.suggestions).toHaveLength(0);
+  });
+
+  it("groups by (model × app) so a heavy workload cannot mask a light one on the same model", () => {
+    const light = Array.from({ length: 8 }, () =>
+      receipt({ vendor: "anthropic", model: "claude-opus-4-6", input: 900, output: 220, app: "support-bot" })
+    );
+    const heavy = Array.from({ length: 3 }, () =>
+      receipt({ vendor: "anthropic", model: "claude-opus-4-6", input: 2000, output: 4000, app: "report-writer" })
+    );
+    const s = summarizeReceipts([...light, ...heavy]);
+    // The model-level average output (~1251) is > threshold, but the light app
+    // workload must still be surfaced on its own.
+    expect(s.suggestions).toHaveLength(1);
+    expect(s.suggestions[0].topApp).toBe("support-bot");
+    expect(s.suggestions[0].requests).toBe(8);
+  });
+
+  it("requires at least a few calls before suggesting a switch", () => {
+    const rs = Array.from({ length: 2 }, () =>
+      receipt({ vendor: "anthropic", model: "claude-opus-4-6", input: 900, output: 200, app: "rare" })
+    );
+    expect(summarizeReceipts(rs).suggestions).toHaveLength(0);
+  });
+
+  it("makes no suggestion when the model has no cheaper same-vendor tier", () => {
+    const rs = Array.from({ length: 6 }, () =>
+      receipt({ vendor: "anthropic", model: "claude-haiku-4-5", input: 500, output: 100, app: "cheap" })
+    );
+    expect(summarizeReceipts(rs).suggestions).toHaveLength(0);
+  });
+});
+
 describe("dashboard formatting", () => {
   it("formats USD with sensible precision", () => {
     expect(fmtUsd(0)).toBe("$0.00");
