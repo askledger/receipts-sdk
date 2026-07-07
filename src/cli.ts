@@ -10,10 +10,38 @@
  *       Read an event, hash-chain it, sign it, write the signed receipt.
  *
  *   ledger-cli verify <receipt.json> [--key <path>]
- *       Verify a signed receipt against a public key.
+ *       Verify a signed receipt against a public key. Reports any
+ *       attached evidence_refs (Layer 3 correctness bindings).
+ *
+ *   ledger-cli sign <event.json> [--evidence-ref <spec>]...
+ *       Attach one or more external correctness/attestation proofs at
+ *       sign time. Each --evidence-ref is a comma-separated spec, e.g.
+ *       kind=rule-check,file=./proof.json,status=pass  (file is hashed)
+ *       kind=external-proof,hash=<hex>,alg=sha-256,status=pass
+ *
+ *   ledger-cli bundle <receipt-or-chain files...> [--out <path>] [--title <t>] [--tenant <id>]
+ *       Build an evidence bundle (Merkle root + inclusion proofs + pack
+ *       hash) from many signed receipts — one verifiable artifact.
+ *
+ *   ledger-cli verify-bundle <bundle.json> [--key <keypair.json>]
+ *       Verify an evidence bundle: pack integrity, receipt inclusion,
+ *       and (with --key) per-receipt signatures.
+ *
+ *   ledger-cli dashboard [paths...] [--html [path]]
+ *       Local, single-tenant usage & cost dashboard built from your own
+ *       signed receipts (scans .ledger/ by default). Shows estimated spend,
+ *       tokens, per-model and per-app breakdowns, and integrity signals
+ *       (signed count, chain height, correctness bindings). --html writes a
+ *       self-contained report. Free tier: local only, no shadow-AI discovery.
  *
  *   ledger-cli demo
  *       Run a full keygen + sign + verify cycle end-to-end.
+ *
+ * Three layers, one CLI:
+ *   Integrity     — keygen / sign / verify (hash chain + Ed25519)
+ *   Traceability  — bundle / verify-bundle (Merkle evidence bundle)
+ *   Correctness   — sign --evidence-ref (binds an EXTERNAL proof; the SDK
+ *                   binds it into the signed body, it does not itself verify).
  */
 
 import * as fs from "node:fs";
@@ -28,8 +56,17 @@ import {
   verifyInclusion,
   buildEvidencePack,
   verifyPackIntegrity,
+  verifyAllReceiptsInPack,
+  sha256String,
 } from "./index.js";
-import type { RawEvent, KeyPair, SignedReceipt } from "./types.js";
+import {
+  summarizeReceipts,
+  renderDashboardHtml,
+  fmtUsd,
+  fmtTokens,
+} from "./cost/dashboard.js";
+import type { RawEvent, KeyPair, SignedReceipt, EvidenceRef } from "./types.js";
+import type { EvidencePack } from "./evidence/index.js";
 
 // ---------- terminal styling ----------
 const isTTY = process.stdout.isTTY && !process.env.NO_COLOR;
@@ -67,6 +104,61 @@ function writeJSON(filepath: string, value: unknown): void {
   fs.writeFileSync(filepath, JSON.stringify(value, null, 2));
 }
 
+/**
+ * Parse a single `--evidence-ref` spec into an EvidenceRef.
+ *
+ * A spec is a comma-separated list of key=value pairs, e.g.
+ *   kind=rule-check,file=./proof.json,status=pass,uri=https://…
+ *   kind=external-proof,hash=<hexdigest>,alg=sha-256,status=pass
+ *
+ * When `file=` is given, the file is read, its SHA-256 is computed via the
+ * SDK's `sha256String` helper, and `alg=sha-256` / `hash=<digest>` are set.
+ * Collecting the specs and passing them to `signReceipt({ evidenceRefs })`
+ * binds the external correctness proof into the signed receipt body (Layer 3).
+ */
+function parseEvidenceRefSpec(spec: string): EvidenceRef {
+  const fields: Record<string, string> = {};
+  for (const part of spec.split(",")) {
+    const trimmed = part.trim();
+    if (!trimmed) continue;
+    const eq = trimmed.indexOf("=");
+    if (eq === -1) {
+      throw new Error(`Invalid --evidence-ref segment (expected key=value): "${trimmed}"`);
+    }
+    const key = trimmed.slice(0, eq).trim();
+    const value = trimmed.slice(eq + 1).trim();
+    fields[key] = value;
+  }
+
+  const ref: EvidenceRef = {
+    kind: fields.kind ?? "external-proof",
+    hash: fields.hash ?? "",
+  };
+
+  if (fields.file) {
+    const contents = fs.readFileSync(fields.file, "utf-8");
+    ref.hash = sha256String(contents);
+    ref.alg = "sha-256";
+  } else if (fields.alg) {
+    ref.alg = fields.alg;
+  }
+
+  if (!ref.hash) {
+    throw new Error(
+      `--evidence-ref must provide either file=<path> or hash=<digest>: "${spec}"`
+    );
+  }
+  if (fields.uri) ref.uri = fields.uri;
+  if (fields.status) ref.status = fields.status;
+
+  return ref;
+}
+
+/** Collector for repeatable --evidence-ref options. */
+function collectEvidenceRef(value: string, previous: string[]): string[] {
+  return previous.concat([value]);
+}
+
 const program = new Command();
 program
   .name("ledger-cli")
@@ -93,6 +185,13 @@ program
   .description("Sign an event and produce a chained, signed receipt")
   .option("-k, --key <path>", "Keypair JSON file", `${KEYS_DIR}/default.json`)
   .option("-o, --out <path>", "Output path", `${RECEIPTS_DIR}/last-receipt.json`)
+  .option(
+    "-e, --evidence-ref <spec>",
+    "Attach an external correctness/attestation proof (repeatable). " +
+      "Spec: kind=…,file=./proof.json,status=pass OR kind=…,hash=<hex>,alg=sha-256,status=pass",
+    collectEvidenceRef,
+    [] as string[]
+  )
   .action((eventPath, opts) => {
     // Load keypair (generate if missing)
     let kp: KeyPair;
@@ -107,8 +206,17 @@ program
     // Load event
     const event = readJSON<RawEvent>(eventPath);
 
+    // Build evidence_refs (Layer 3) from repeatable --evidence-ref specs.
+    const evidenceRefs: EvidenceRef[] = (opts.evidenceRef as string[]).map(
+      parseEvidenceRefSpec
+    );
+
     // Sign
-    const signed = signReceipt({ event, keypair: kp });
+    const signed = signReceipt(
+      evidenceRefs.length > 0
+        ? { event, keypair: kp, evidenceRefs }
+        : { event, keypair: kp }
+    );
 
     // Write
     writeJSON(opts.out, signed);
@@ -121,6 +229,11 @@ program
     console.log(`  receipt_hash:         ${signed.receipt.integrity.receipt_hash}`);
     console.log(`  previous_hash:        ${signed.receipt.integrity.previous_receipt_hash}`);
     console.log(`  signature (kid=${kp.kid}): ${signed.signatures[0]?.sig.substring(0, 32)}...`);
+    if (evidenceRefs.length > 0) {
+      const kinds = evidenceRefs.map((r) => r.kind).join(", ");
+      console.log(`  evidence_refs:        ${evidenceRefs.length} attached (${kinds})`);
+      console.log(`                        bound into signed body (Layer 3 correctness binding)`);
+    }
     console.log(`  written to:           ${opts.out}\n`);
   });
 
@@ -153,6 +266,11 @@ program
       }
       console.log(`  receipt_id: ${signed.receipt.receipt_id}`);
       console.log(`  chain_height: ${signed.receipt.integrity.chain_height}`);
+      const refs = signed.receipt.evidence_refs;
+      if (refs && refs.length > 0) {
+        const kinds = refs.map((r) => r.kind).join(", ");
+        console.log(`  evidence refs: ${refs.length} (${kinds}) — covered by this signature`);
+      }
     } else {
       console.log("\x1b[31m✗ RECEIPT INVALID\x1b[0m");
       console.log(`  canonical hash matches: ${result.checks.canonical_hash_matches}`);
@@ -162,6 +280,152 @@ program
       }
       console.log(`  errors:`);
       for (const err of result.errors) console.log(`    - ${err}`);
+      process.exit(1);
+    }
+  });
+
+// ---------- bundle ----------
+program
+  .command("bundle <files...>")
+  .description("Build an evidence bundle (Merkle pack) from many signed receipts")
+  .option("-o, --out <path>", "Output path", `${RECEIPTS_DIR}/evidence-bundle.json`)
+  .option("-t, --title <title>", "Human-readable bundle title")
+  .option("--tenant <id>", "Tenant id (derived from receipts if omitted)")
+  .action((files: string[], opts) => {
+    // Accept either single-receipt JSON files OR a JSON file that is an ARRAY
+    // of SignedReceipts (like the demo's demo-chain.json). Flatten to one list.
+    const receipts: SignedReceipt[] = [];
+    for (const file of files) {
+      const parsed = readJSON<SignedReceipt | SignedReceipt[]>(file);
+      if (Array.isArray(parsed)) {
+        receipts.push(...parsed);
+      } else {
+        receipts.push(parsed);
+      }
+    }
+
+    if (receipts.length === 0) {
+      console.log(paint(c.red, "✗ No receipts found in the provided files."));
+      process.exit(1);
+    }
+
+    // Derive tenant + period from the receipts when flags are not given.
+    const tenantId: string =
+      opts.tenant ?? receipts[0].receipt.tenant_id;
+    const issuedTimes = receipts
+      .map((r) => r.receipt.issued_at)
+      .filter((t): t is string => typeof t === "string")
+      .sort();
+    const period = {
+      from: issuedTimes[0] ?? new Date().toISOString(),
+      to: issuedTimes[issuedTimes.length - 1] ?? new Date().toISOString(),
+    };
+
+    // Collect the trusted public keys referenced by the receipts' signatures.
+    // The private key never appears in a receipt, so we can only include the
+    // kids here; a --key on verify-bundle supplies the actual public key.
+    const kids = Array.from(
+      new Set(
+        receipts.flatMap((r) => r.signatures.map((s) => s.kid))
+      )
+    );
+
+    const meta = {
+      title: opts.title ?? `Evidence bundle · ${tenantId}`,
+      tenantId,
+      purpose: "evidence bundle built from signed receipts",
+      period,
+      builtBy: "ledger-cli bundle",
+      builtAt: new Date().toISOString(),
+    };
+
+    const pack = buildEvidencePack(
+      meta,
+      receipts,
+      kids.map((kid) => ({
+        kid,
+        public_key: "",
+        algorithm: "EdDSA" as const,
+        curve: "ed25519" as const,
+        status: "active" as const,
+        issued_at: meta.builtAt,
+      }))
+    );
+
+    writeJSON(opts.out, pack);
+
+    console.log("");
+    console.log(paint(c.cyan + c.bold, "Evidence bundle built"));
+    console.log(`   ${paint(c.green, "✓")} merkle root         ${paint(c.gold, pack.merkle.root)}`);
+    console.log(`   ${paint(c.green, "✓")} receipts included   ${paint(c.gold, String(pack.integrity.receipts_count))}`);
+    console.log(`   ${paint(c.green, "✓")} pack_hash           ${paint(c.gold, pack.integrity.pack_hash)}`);
+    console.log(`   ${paint(c.gray, "·")} tenant              ${paint(c.gray, tenantId)}`);
+    console.log(`   ${paint(c.gray, "·")} period              ${paint(c.gray, `${period.from} → ${period.to}`)}`);
+    console.log(`   ${paint(c.gray, "·")} written to          ${paint(c.gray, opts.out)}`);
+    console.log("");
+    console.log(paint(c.gray, `   Verify it:  ledger-cli verify-bundle ${opts.out} --key <keypair.json>`));
+    console.log("");
+  });
+
+// ---------- verify-bundle ----------
+program
+  .command("verify-bundle <bundle>")
+  .description("Verify an evidence bundle: pack integrity, inclusion, and (with --key) signatures")
+  .option("-k, --key <path>", "Keypair JSON file (only public_key is read)")
+  .action((bundlePath: string, opts) => {
+    const pack = readJSON<EvidencePack>(bundlePath);
+
+    let allOk = true;
+
+    console.log("");
+    console.log(paint(c.cyan + c.bold, "Verifying evidence bundle"));
+    console.log(paint(c.gray, `   ${pack.meta?.title ?? "(untitled)"} · ${pack.integrity.receipts_count} receipts`));
+    console.log("");
+
+    // 1) Pack integrity (top-level pack_hash).
+    const integrityOk = verifyPackIntegrity(pack);
+    if (!integrityOk) allOk = false;
+    console.log(`   ${paint(integrityOk ? c.green : c.red, integrityOk ? "✓" : "✕")} pack integrity      ${paint(integrityOk ? c.green : c.red, integrityOk ? "OK" : "FAILED")}`);
+
+    // 2) Every receipt is included under the Merkle root.
+    const failedInclusion = verifyAllReceiptsInPack(pack);
+    if (failedInclusion.length > 0) allOk = false;
+    console.log(`   ${paint(failedInclusion.length === 0 ? c.green : c.red, failedInclusion.length === 0 ? "✓" : "✕")} merkle inclusion    ${paint(c.gray, `${pack.integrity.receipts_count - failedInclusion.length}/${pack.integrity.receipts_count} receipts under root`)}`);
+    for (const r of failedInclusion) {
+      console.log(`       ${paint(c.red, "✕")} ${paint(c.gray, r.receipt.receipt_id + " not included")}`);
+    }
+
+    // 3) Optional: per-receipt Ed25519 signature verification with a key.
+    if (opts.key) {
+      const kp = readJSON<KeyPair>(opts.key);
+      const publicKeys = { [kp.kid]: kp.public_key };
+      let sigBad = 0;
+      for (const r of pack.receipts) {
+        const result = verifyReceipt(r, { publicKeys });
+        if (!result.valid) sigBad++;
+      }
+      if (sigBad > 0) allOk = false;
+      console.log(`   ${paint(sigBad === 0 ? c.green : c.red, sigBad === 0 ? "✓" : "✕")} signatures          ${paint(c.gray, `${pack.receipts.length - sigBad}/${pack.receipts.length} valid (kid=${kp.kid})`)}`);
+
+      // Spot-check an inclusion proof end-to-end for the first receipt.
+      const first = pack.receipts[0];
+      const proof = pack.merkle.proofs[first.receipt.receipt_id];
+      if (proof) {
+        const inclOk = verifyInclusion(first, proof, pack.merkle.root);
+        if (!inclOk) allOk = false;
+        console.log(`   ${paint(inclOk ? c.green : c.red, inclOk ? "✓" : "✕")} inclusion proof     ${paint(c.gray, "(spot-check: first receipt ∈ root)")}`);
+      }
+    } else {
+      console.log(`   ${paint(c.gray, "·")} signatures          ${paint(c.gray, "skipped (pass --key <keypair.json> to check)")}`);
+    }
+
+    console.log("");
+    if (allOk) {
+      console.log(`   ${paint(c.green + c.bold, "✓ BUNDLE VALID")}`);
+      console.log("");
+    } else {
+      console.log(`   ${paint(c.red + c.bold, "✗ BUNDLE INVALID")}`);
+      console.log("");
       process.exit(1);
     }
   });
@@ -341,6 +605,203 @@ program
     console.log(`    ${paint(c.bold, "open site/demo.html")}     ${paint(c.gray, "for the visual demo")}`);
     console.log(`    ${paint(c.bold, "open site/verify.html")}   ${paint(c.gray, "to verify any receipt in your browser")}`);
     console.log(rule());
+    console.log("");
+  });
+
+// ---------- dashboard ----------
+
+/** True when a parsed value looks like a SignedReceipt (has receipt + signatures). */
+function isSignedReceipt(v: unknown): v is SignedReceipt {
+  return (
+    typeof v === "object" &&
+    v !== null &&
+    "receipt" in v &&
+    "signatures" in v &&
+    typeof (v as { receipt?: unknown }).receipt === "object"
+  );
+}
+
+/** Recursively collect *.json paths under a directory. */
+function walkJson(dir: string, out: string[]): void {
+  let entries: fs.Dirent[];
+  try {
+    entries = fs.readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return;
+  }
+  for (const e of entries) {
+    const full = path.join(dir, e.name);
+    if (e.isDirectory()) walkJson(full, out);
+    else if (e.isFile() && e.name.endsWith(".json")) out.push(full);
+  }
+}
+
+/**
+ * Load signed receipts from the given files/dirs, or scan `.ledger/` when no
+ * paths are supplied. Non-receipt JSON (keypairs, bundles) is skipped quietly;
+ * arrays of receipts (e.g. demo-chain.json) are flattened.
+ */
+function loadReceipts(paths: string[]): SignedReceipt[] {
+  const files: string[] = [];
+  const sources = paths.length > 0 ? paths : [RECEIPTS_DIR];
+  for (const p of sources) {
+    let stat: fs.Stats | null = null;
+    try {
+      stat = fs.statSync(p);
+    } catch {
+      console.log(paint(c.amber, `   ! skipped (not found): ${p}`));
+      continue;
+    }
+    if (stat.isDirectory()) walkJson(p, files);
+    else files.push(p);
+  }
+
+  const receipts: SignedReceipt[] = [];
+  for (const f of files) {
+    let parsed: unknown;
+    try {
+      parsed = readJSON<unknown>(f);
+    } catch {
+      continue; // unreadable / not JSON
+    }
+    if (Array.isArray(parsed)) {
+      for (const item of parsed) if (isSignedReceipt(item)) receipts.push(item);
+    } else if (isSignedReceipt(parsed)) {
+      receipts.push(parsed);
+    }
+  }
+  return receipts;
+}
+
+program
+  .command("dashboard [paths...]")
+  .description("Local usage & cost dashboard from your signed receipts (free, single-tenant)")
+  .option("--html [path]", "Write a self-contained HTML report (default .ledger/dashboard.html)")
+  .action((paths: string[], opts) => {
+    const receipts = loadReceipts(paths ?? []);
+
+    if (receipts.length === 0) {
+      console.log("");
+      console.log(paint(c.amber, "No signed receipts found."));
+      console.log(
+        paint(
+          c.gray,
+          `   Looked in: ${paths && paths.length ? paths.join(", ") : RECEIPTS_DIR + "/"}. ` +
+            `Sign some events first (ledger-cli sign <event.json>), then re-run.`
+        )
+      );
+      console.log("");
+      process.exit(0);
+    }
+
+    const summary = summarizeReceipts(receipts);
+
+    // ----- HTML output -----
+    if (opts.html) {
+      const outPath =
+        typeof opts.html === "string" ? opts.html : `${RECEIPTS_DIR}/dashboard.html`;
+      const html = renderDashboardHtml(summary, new Date().toISOString());
+      ensureDir(path.dirname(outPath));
+      fs.writeFileSync(outPath, html);
+      console.log("");
+      console.log(paint(c.cyan + c.bold, "Dashboard written"));
+      console.log(`   ${paint(c.green, "✓")} ${paint(c.gold, outPath)}`);
+      console.log(paint(c.gray, `   open ${outPath}`));
+      console.log("");
+      return;
+    }
+
+    // ----- terminal output -----
+    const period =
+      summary.period.from && summary.period.to
+        ? `${summary.period.from} → ${summary.period.to}`
+        : "—";
+
+    console.log("");
+    console.log(rule());
+    console.log(
+      `  ${paint(c.gold + c.bold, "AskLedger")} ${paint(c.gray, "·")} ${paint(c.bold, "Local usage & cost")}  ${paint(c.gray, `(${summary.receipts} receipts · ${period})`)}`
+    );
+    console.log(rule());
+    console.log("");
+
+    // KPIs
+    console.log(
+      `   ${paint(c.green + c.bold, fmtUsd(summary.costUsd))} ${paint(c.gray, "estimated spend")}   ` +
+        `${paint(c.bold, summary.requests.toLocaleString())} ${paint(c.gray, "requests")}   ` +
+        `${paint(c.bold, fmtTokens(summary.totalTokens))} ${paint(c.gray, "tokens")}   ` +
+        `${paint(c.bold, String(summary.models.length))} ${paint(c.gray, "models")}`
+    );
+    console.log("");
+
+    // Spend by model
+    if (summary.models.length > 0) {
+      console.log(paint(c.cyan + c.bold, "  Spend by model"));
+      const maxCost = summary.models.reduce((m, x) => Math.max(m, x.costUsd), 0) || 1;
+      for (const m of summary.models) {
+        const barLen = Math.max(1, Math.round((m.costUsd / maxCost) * 24));
+        const bar = paint(m.priced ? c.navy : c.gray, "█".repeat(barLen));
+        const label = m.priced ? "" : paint(c.amber, " (unpriced)");
+        console.log(
+          `   ${m.key.padEnd(34).slice(0, 34)} ${bar.padEnd(0)} ` +
+            `${paint(c.gray, m.requests + " req · " + fmtTokens(m.inputTokens + m.outputTokens) + " tok")}  ` +
+            `${paint(m.priced ? c.green : c.gray, m.priced ? fmtUsd(m.costUsd) : "—")}${label}`
+        );
+      }
+      console.log("");
+    }
+
+    // Spend by app
+    if (summary.apps.length > 0) {
+      console.log(paint(c.cyan + c.bold, "  Spend by application"));
+      for (const a of summary.apps.slice(0, 8)) {
+        console.log(
+          `   ${a.name.padEnd(34).slice(0, 34)} ${paint(c.gray, a.requests + " req")}  ${paint(c.green, fmtUsd(a.costUsd))}`
+        );
+      }
+      console.log("");
+    }
+
+    // Savings opportunities (free over-tiering heuristic)
+    if (summary.suggestions.length > 0) {
+      console.log(
+        `${paint(c.green + c.bold, "  Savings opportunities")}  ${paint(c.gray, `up to ${fmtUsd(summary.potentialSavings)} this period`)}`
+      );
+      for (const s of summary.suggestions) {
+        console.log(
+          `   ${paint(c.navy, s.fromModel)} ${paint(c.gray, "→")} ${paint(c.green, s.toModel)}   ` +
+            `${paint(c.green + c.bold, "save ~" + fmtUsd(s.estSavings))}  ` +
+            `${paint(c.gray, `(${s.shareOfSpendPct}% of spend · ${s.requests} calls · avg ${s.avgOutputTokens} out tok${s.topApp ? ` · ${s.topApp}` : ""})`)}`
+        );
+      }
+      console.log(
+        paint(c.gray, "   Heuristic from your receipts — reprices the same calls on the cheaper tier. Test quality before switching.")
+      );
+      console.log("");
+    }
+
+    // Integrity strip
+    console.log(paint(c.cyan + c.bold, "  Integrity"));
+    console.log(
+      `   ${paint(c.green, "✓")} ${paint(c.bold, summary.signedReceipts + "/" + summary.receipts)} signed & verifiable   ` +
+        `${paint(c.gray, "chain height")} ${paint(c.bold, summary.chainHeight === null ? "—" : "#" + summary.chainHeight)}   ` +
+        `${paint(c.gray, "correctness bindings")} ${paint(c.bold, String(summary.withEvidenceRefs))}`
+    );
+    if (summary.unpricedRequests > 0) {
+      console.log(
+        paint(
+          c.gray,
+          `   ! ${summary.unpricedRequests} request(s) used a model not in the pricing table — counted, excluded from the cost estimate.`
+        )
+      );
+    }
+    console.log("");
+    console.log(
+      paint(
+        c.gray,
+        "   Estimate from your local receipts only — not a bill, and blind to un-instrumented AI. HTML report: ledger-cli dashboard --html"
+      )
+    );
     console.log("");
   });
 

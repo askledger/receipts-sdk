@@ -44,6 +44,50 @@ Artifacts land in `.ledger/`. You can verify any of them yourself:
 node dist/cli.js verify .ledger/demo-chain.json --key .ledger/keys/demo.json
 ```
 
+### End-to-end walkthrough (all three layers, one CLI)
+
+The CLI runs the full lifecycle by hand — keygen → sign → verify → bundle → verify-bundle:
+
+```bash
+# 1. Generate an Ed25519 keypair
+node dist/cli.js keygen --out keys.json
+
+# 2. Sign an event into a chained, signed receipt.
+#    Optionally BIND an external correctness proof at sign time (Layer 3).
+#    --evidence-ref is repeatable. If you pass file=, the CLI hashes that file
+#    (SHA-256) and records the digest; otherwise pass hash=<hexdigest> directly.
+node dist/cli.js sign event.json --key keys.json --out r1.json \
+  --evidence-ref "kind=rule-check,file=./rule-report.json,status=pass" \
+  --evidence-ref "kind=external-proof,hash=<hexdigest>,alg=sha-256,status=pass"
+
+node dist/cli.js sign event.json --key keys.json --out r2.json
+
+# 3. Verify a single receipt (also reports any attached evidence_refs)
+node dist/cli.js verify r1.json --key keys.json
+
+# 4. Bundle many receipts into one verifiable evidence bundle (Merkle root
+#    + inclusion proofs + top-level pack_hash). Accepts multiple single-receipt
+#    files OR one JSON file that is an array of receipts (e.g. demo-chain.json).
+node dist/cli.js bundle r1.json r2.json --out bundle.json --title "Q3 Evidence"
+
+# 5. Verify the whole bundle: pack integrity, receipt inclusion, and — with a
+#    key — every receipt's Ed25519 signature. Exits non-zero on any failure.
+node dist/cli.js verify-bundle bundle.json --key keys.json
+```
+
+**Three layers, one CLI:**
+
+| Layer | Commands | What it proves |
+|---|---|---|
+| **Integrity** | `sign` / `verify` (hash chain + Ed25519) | The receipt is authentic and untampered, linked to its predecessor. |
+| **Traceability** | `bundle` / `verify-bundle` (Merkle evidence bundle) | Many receipts reduce to one verifiable artifact with a single root hash. |
+| **Correctness** | `sign --evidence-ref` (binding) | An **external** proof (rule check, attestation) is bound into the signed body. |
+
+> **Honest scope:** the SDK **binds** an external correctness proof into the signed
+> receipt — its digest becomes part of the canonical bytes covered by the signature.
+> The SDK does **not** perform formal verification itself. The proof is produced by an
+> external prover/attestor; the SDK makes it tamper-evident and auditable.
+
 ---
 
 ## Path 3 · I want to integrate it into my code

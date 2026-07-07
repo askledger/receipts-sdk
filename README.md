@@ -15,7 +15,7 @@ Open-source, vendor-neutral cryptographic trust substrate for enterprise AI. Eve
 
 ## Project status
 
-**v0.6.0 · live on npm (v0.7.0 tagged, publish pending).** The cryptographic core is hardened and
+**v0.6.0 · live on npm (v0.8.0 tagged, publish pending).** The cryptographic core is hardened and
 independently verifiable — cross-language conformance tests enforce
 byte-identical receipts across the TypeScript, Python, Go, Rust, and
 Java SDKs, and a machine-checked hardening checklist runs in CI. SDK,
@@ -248,7 +248,7 @@ npx @askledger/receipts-sdk demo
 ```
 
 > The `npx @askledger/receipts-sdk …` form works from the published package
-> (this `bin` ships with **0.7.0**). If you are working from a local clone,
+> (this `bin` ships with **0.8.0**). If you are working from a local clone,
 > build first (`npm run build`) and use the `node dist/cli.js …` form below.
 
 ```bash
@@ -267,6 +267,77 @@ node dist/cli.js verify .ledger/last-receipt.json --prev .ledger/prev.json
 # Full demo cycle
 node dist/cli.js demo
 ```
+
+### End-to-end: keygen → sign → verify → bundle → verify-bundle
+
+The CLI drives all three layers by hand — one keypair, a signed chain, and a
+single verifiable evidence bundle:
+
+```bash
+# 1) Key
+node dist/cli.js keygen --out keys.json
+
+# 2) Sign — optionally BIND an external correctness proof (Layer 3, repeatable).
+#    file=<path> is read and SHA-256-hashed for you; or pass hash=<hexdigest>.
+node dist/cli.js sign examples/event.json --key keys.json --out r1.json \
+  --evidence-ref "kind=rule-check,file=./rule-report.json,status=pass"
+node dist/cli.js sign examples/event.json --key keys.json --out r2.json
+
+# 3) Verify a single receipt (reports any attached evidence_refs)
+node dist/cli.js verify r1.json --key keys.json
+
+# 4) Bundle many receipts into one Merkle-rooted evidence bundle.
+#    Accepts multiple single-receipt files OR one array-of-receipts file.
+node dist/cli.js bundle r1.json r2.json --out bundle.json --title "Q3 Evidence"
+
+# 5) Verify the bundle: pack integrity + inclusion + (with --key) signatures.
+#    Exits non-zero on any failure.
+node dist/cli.js verify-bundle bundle.json --key keys.json
+
+# 6) See what it all cost — a local, single-tenant usage & cost dashboard
+#    built from your own signed receipts (scans .ledger/ by default).
+node dist/cli.js dashboard
+node dist/cli.js dashboard --html   # writes a self-contained HTML report
+```
+
+**Three layers, one CLI:**
+
+- **Integrity** — `sign` / `verify` (RFC 8785 hash chain + Ed25519). The receipt is authentic and untampered.
+- **Traceability** — `bundle` / `verify-bundle` (Merkle evidence bundle). Many receipts → one artifact with a single root hash.
+- **Correctness** — `sign --evidence-ref` binds an **external** proof's digest into the signed body.
+
+> **Honest scope:** the SDK **binds** an external correctness proof into the signed
+> receipt (its digest is covered by the signature). It does **not** perform formal
+> verification — the proof is produced by an external prover; the SDK makes it
+> tamper-evident and auditable. An *evidence bundle* and an *evidence pack* are the
+> same artifact (the `buildEvidenceBundle` / `buildEvidencePack` API names are aliases).
+
+### See your spend & savings — the free local dashboard
+
+`dashboard` turns the receipts you already signed into the numbers a team wants
+on day one — no account, no network, no hosted service:
+
+```bash
+node dist/cli.js dashboard [paths...]   # defaults to scanning .ledger/
+node dist/cli.js dashboard --html [path]
+```
+
+- **Spend & usage** — estimated cost, requests, tokens, and per-model / per-app
+  breakdowns, computed locally from the built-in pricing table.
+- **Savings opportunities** — flags *over-tiered* workloads (a premium model
+  doing short, simple calls) grouped by (model × application), and quantifies
+  each with an **exact counterfactual**: the same recorded calls repriced on the
+  cheaper same-vendor tier. It nudges only light workloads, so the big model
+  keeps the heavy, high-value calls.
+- **Integrity** — how many receipts are signed, the chain height, and how many
+  carry correctness bindings.
+
+> **Honest scope:** cost is an **estimate** from your instrumented receipts and
+> the local pricing table — not a bill. Unknown models are counted but excluded
+> and flagged, never guessed. This is single-tenant and blind to un-instrumented
+> ("shadow") AI; the savings figures are heuristic hints to **test**, not a
+> promise. Cross-system discovery, billing ingestion, and **verified savings**
+> (baseline → signed proof) are the hosted AskLedger platform.
 
 ---
 

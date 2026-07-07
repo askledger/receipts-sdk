@@ -161,6 +161,22 @@ export {
   type EvidencePackMeta,
 } from "./evidence/index.js";
 
+// Evidence bundle aliases.
+//
+// "Evidence bundle" and "evidence pack" are the SAME artifact: a set of signed
+// receipts reduced to a single Merkle root with inclusion proofs and a
+// top-level `pack_hash`. The marketing site uses the word "bundle"; the SDK
+// internals use "pack". These aliases let callers use either name against the
+// identical implementation — no behavioral difference.
+export {
+  /** Alias of `buildEvidencePack`. A "bundle" and a "pack" are the same artifact. */
+  buildEvidencePack as buildEvidenceBundle,
+  /** Alias of `verifyPackIntegrity`. A "bundle" and a "pack" are the same artifact. */
+  verifyPackIntegrity as verifyEvidenceBundleIntegrity,
+  /** Alias of `verifyAllReceiptsInPack`. A "bundle" and a "pack" are the same artifact. */
+  verifyAllReceiptsInPack as verifyAllReceiptsInBundle,
+} from "./evidence/index.js";
+
 // Content safety (Plane 4 · Pillar 6 — Shadow AI Discovery & Block)
 export {
   scanPii,
@@ -242,3 +258,24 @@ export {
   type ReceiptScore,
   type Grade,
 } from "./receipt-score/index.js";
+
+// Free, local usage & cost dashboard (single-tenant, estimated from your own
+// signed receipts). Hosted/cross-system intelligence is the enterprise tier.
+export {
+  PRICING,
+  priceFor,
+  costUsd,
+  type VendorPricing,
+  type ModelKey,
+  type Usage,
+} from "./cost/pricing.js";
+export {
+  summarizeReceipts,
+  renderDashboardHtml,
+  fmtUsd,
+  fmtTokens,
+  type DashboardSummary,
+  type ModelStat,
+  type NamedCount,
+  type SavingsSuggestion,
+} from "./cost/dashboard.js";
