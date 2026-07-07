@@ -36,10 +36,12 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       - run: npm ci
       - run: npm run build
-      - name: Publish with provenance
+      # OIDC "trusted publishing" (no long-lived token) requires npm >= 11.5.0.
+      # setup-node@v6 ships npm 10 with Node 20, so upgrade before publishing.
+      - name: Upgrade npm for OIDC trusted publishing
+        run: npm install -g npm@latest
+      - name: Publish with provenance (OIDC trusted publishing)
         run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   github-release:
     name: Create GitHub release with notes
