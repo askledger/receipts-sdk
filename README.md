@@ -293,6 +293,11 @@ node dist/cli.js bundle r1.json r2.json --out bundle.json --title "Q3 Evidence"
 # 5) Verify the bundle: pack integrity + inclusion + (with --key) signatures.
 #    Exits non-zero on any failure.
 node dist/cli.js verify-bundle bundle.json --key keys.json
+
+# 6) See what it all cost — a local, single-tenant usage & cost dashboard
+#    built from your own signed receipts (scans .ledger/ by default).
+node dist/cli.js dashboard
+node dist/cli.js dashboard --html   # writes a self-contained HTML report
 ```
 
 **Three layers, one CLI:**
@@ -306,6 +311,33 @@ node dist/cli.js verify-bundle bundle.json --key keys.json
 > verification — the proof is produced by an external prover; the SDK makes it
 > tamper-evident and auditable. An *evidence bundle* and an *evidence pack* are the
 > same artifact (the `buildEvidenceBundle` / `buildEvidencePack` API names are aliases).
+
+### See your spend & savings — the free local dashboard
+
+`dashboard` turns the receipts you already signed into the numbers a team wants
+on day one — no account, no network, no hosted service:
+
+```bash
+node dist/cli.js dashboard [paths...]   # defaults to scanning .ledger/
+node dist/cli.js dashboard --html [path]
+```
+
+- **Spend & usage** — estimated cost, requests, tokens, and per-model / per-app
+  breakdowns, computed locally from the built-in pricing table.
+- **Savings opportunities** — flags *over-tiered* workloads (a premium model
+  doing short, simple calls) grouped by (model × application), and quantifies
+  each with an **exact counterfactual**: the same recorded calls repriced on the
+  cheaper same-vendor tier. It nudges only light workloads, so the big model
+  keeps the heavy, high-value calls.
+- **Integrity** — how many receipts are signed, the chain height, and how many
+  carry correctness bindings.
+
+> **Honest scope:** cost is an **estimate** from your instrumented receipts and
+> the local pricing table — not a bill. Unknown models are counted but excluded
+> and flagged, never guessed. This is single-tenant and blind to un-instrumented
+> ("shadow") AI; the savings figures are heuristic hints to **test**, not a
+> promise. Cross-system discovery, billing ingestion, and **verified savings**
+> (baseline → signed proof) are the hosted AskLedger platform.
 
 ---
 

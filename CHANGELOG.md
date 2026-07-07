@@ -4,6 +4,31 @@ All notable changes to the AskLedger Receipts SDK will be documented in this fil
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (with the caveat that until v1.0, breaking changes may occur between minor versions).
 
+## [Unreleased]
+
+### Added
+
+- **End-to-end CLI across all three layers.** `sign --evidence-ref` binds an
+  external correctness proof into the signed body (Layer 3); `bundle` /
+  `verify-bundle` build and check a Merkle-rooted evidence bundle (Layer 2).
+  Added `buildEvidenceBundle` / `verifyEvidenceBundleIntegrity` /
+  `verifyAllReceiptsInBundle` aliases and a `quickstart` command.
+- **Optional `evidence_refs` on receipts.** Strictly additive — receipts without
+  it sign and verify identically; when present it is covered by the signature.
+- **Free local usage & cost dashboard** (`ledger-cli dashboard [paths...]
+  [--html]`, `src/cost/dashboard.ts`). Single-tenant, offline: estimated spend,
+  tokens, per-model / per-app breakdowns, and integrity signals (signed count,
+  chain height, correctness bindings), built from your own signed receipts.
+  Unknown models are counted but excluded from the estimate and flagged, never
+  guessed. Exported `summarizeReceipts` / `renderDashboardHtml` + the pricing
+  API for programmatic use.
+- **Over-tiering savings suggestions** in the dashboard. Flags premium models
+  used for short/simple calls, grouped by (model × application), and quantifies
+  each with an exact counterfactual — the same recorded calls repriced on the
+  cheaper same-vendor tier. Heuristic hints framed to *test*, not a promise;
+  the deep recommendation engine and verified-savings (baseline → signed proof)
+  remain the hosted platform.
+
 ## [0.7.0] — 2026-07-04
 
 ### Security & correctness hardening
