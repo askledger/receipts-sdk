@@ -4,6 +4,22 @@ All notable changes to the AskLedger Receipts SDK will be documented in this fil
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (with the caveat that until v1.0, breaking changes may occur between minor versions).
 
+## [0.10.0] — 2026-07-08
+
+### Added
+
+- **Verified savings — `ledger-cli baseline` / `prove` / `verify-savings`**
+  (`src/cost/savings.ts`). Sign a tamper-evident baseline of your AI spend,
+  prove the realized saving against it in a later period, and let anyone verify
+  that proof independently. `verifySavingsProof` checks the Ed25519 signature
+  **and** recomputes the savings math from the figures in the proof, so a
+  skeptic (a CFO, a customer) can trust the number without trusting whoever
+  produced it. The headline saving is **efficiency-normalized** — the current
+  period's tokens priced at the baseline blended rate, minus what they actually
+  cost — so a change in volume cannot manufacture a saving. Signed over RFC 8785
+  canonical bytes. New API exports: `buildBaseline`, `proveSavings`,
+  `verifyBaseline`, `verifySavingsProof`, `toPeriodSummary`, and their types.
+
 ## [0.9.0] — 2026-07-08
 
 ### Added

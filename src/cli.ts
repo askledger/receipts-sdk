@@ -78,6 +78,13 @@ import {
   type DashboardSummary,
 } from "./cost/dashboard.js";
 import { parseUsageExport, receiptsFromWorkloads } from "./cost/ingest.js";
+import {
+  buildBaseline,
+  proveSavings,
+  verifySavingsProof,
+  type SignedBaseline,
+  type SavingsProof,
+} from "./cost/savings.js";
 import { parseQuery, runQuery, type QueryResult, type ReceiptRow } from "./query/index.js";
 import { runAlerts, type Alert } from "./query/alerts.js";
 import { parseQueryLLM } from "./query/llm.js";
@@ -183,7 +190,7 @@ const program = new Command();
 program
   .name("ledger-cli")
   .description("AskLedger · see your wasted AI spend, then prove and cut it")
-  .version("0.9.0");
+  .version("0.10.0");
 
 program.addHelpText(
   "after",
@@ -1050,6 +1057,107 @@ program
       process.exit(0);
     }
     printAlerts(runAlerts(receipts), Boolean(opts.json));
+  });
+
+// ---------- verified savings (baseline -> proof -> independent verify) ----------
+
+function loadOrCreateKeypair(keyPath: string): KeyPair {
+  if (!fs.existsSync(keyPath)) {
+    const kp = generateKeyPair();
+    writeJSON(keyPath, kp);
+    console.log(paint(c.gray, `  (generated a signing key at ${keyPath})`));
+    return kp;
+  }
+  return readJSON<KeyPair>(keyPath);
+}
+
+function summarizeExport(files: string[]): DashboardSummary {
+  const workloads = files.flatMap((f) => parseUsageExport(fs.readFileSync(f, "utf-8")));
+  const { receipts } = receiptsFromWorkloads(workloads);
+  return summarizeReceipts(receipts);
+}
+
+program
+  .command("baseline [files...]")
+  .description("Sign a tamper-evident baseline snapshot of your AI spend from a usage export")
+  .option("-k, --key <path>", "Keypair JSON file", `${KEYS_DIR}/default.json`)
+  .option("-o, --out <path>", "Output path", `${RECEIPTS_DIR}/baseline.json`)
+  .option("-l, --label <label>", "A label for this baseline", "baseline")
+  .action((files: string[], opts) => {
+    if (!files || files.length === 0) {
+      console.log(paint(c.amber, "  usage: ledger-cli baseline <usage-export.json> [-l \"june-2026\"]"));
+      process.exit(1);
+    }
+    const kp = loadOrCreateKeypair(opts.key);
+    const summary = summarizeExport(files);
+    const baseline = buildBaseline(summary, { label: opts.label, issuedAt: new Date().toISOString(), keypair: kp });
+    ensureDir(path.dirname(opts.out));
+    writeJSON(opts.out, baseline);
+    console.log("");
+    console.log(`  ${paint(c.green, "✓")} ${paint(c.bold, "Baseline signed")}  ${paint(c.gray, `label "${clean(opts.label)}" · kid ${clean(kp.kid)}`)}`);
+    console.log(`   ${paint(c.gray, "spend")} ${paint(c.bold, fmtUsd(baseline.period.costUsd))}   ${paint(c.gray, "blended rate")} ${paint(c.bold, fmtUsd(baseline.period.costPer1kTokens) + "/1k tok")}   ${paint(c.gray, "requests")} ${paint(c.bold, baseline.period.requests.toLocaleString())}`);
+    console.log(`   ${paint(c.gray, "written to")} ${paint(c.gold, opts.out)}`);
+    console.log(paint(c.gray, "   Next period, run:  ledger-cli prove <new-export.json> --baseline " + opts.out));
+    console.log("");
+  });
+
+program
+  .command("prove [files...]")
+  .description("Prove the realized savings versus a signed baseline (efficiency-normalized, signed)")
+  .requiredOption("-b, --baseline <path>", "Signed baseline file from `ledger-cli baseline`")
+  .option("-k, --key <path>", "Keypair JSON file", `${KEYS_DIR}/default.json`)
+  .option("-o, --out <path>", "Output path", `${RECEIPTS_DIR}/savings-proof.json`)
+  .option("--json", "Emit the signed proof as JSON")
+  .action((files: string[], opts) => {
+    if (!files || files.length === 0) {
+      console.log(paint(c.amber, "  usage: ledger-cli prove <new-export.json> --baseline .ledger/baseline.json"));
+      process.exit(1);
+    }
+    const baseline = readJSON<SignedBaseline>(opts.baseline);
+    const kp = loadOrCreateKeypair(opts.key);
+    const summary = summarizeExport(files);
+    const proof = proveSavings(baseline, summary, { issuedAt: new Date().toISOString(), keypair: kp });
+    ensureDir(path.dirname(opts.out));
+    writeJSON(opts.out, proof);
+    if (opts.json) {
+      console.log(JSON.stringify(proof, null, 2));
+      return;
+    }
+    const s = proof.savings;
+    console.log("");
+    console.log(rule());
+    console.log(`  ${paint(c.gold + c.bold, "AskLedger")} ${paint(c.gray, "·")} ${paint(c.bold, "Verified savings proof")}`);
+    console.log(rule());
+    console.log("");
+    console.log(`   ${paint(c.green + c.bold, fmtUsd(s.normalizedSavingsUsd))} ${paint(c.gray, "saved through efficiency")}  ${paint(c.gray, "(" + s.normalizedSavingsPct + "% lower blended rate)")}`);
+    console.log("");
+    console.log(`   ${paint(c.gray, "blended rate")}   ${paint(c.bold, fmtUsd(s.baselineRatePer1k) + "/1k")} ${paint(c.gray, "→")} ${paint(c.bold, fmtUsd(s.currentRatePer1k) + "/1k")}`);
+    console.log(`   ${paint(c.gray, "raw spend")}      ${paint(c.bold, fmtUsd(proof.baseline.period.costUsd))} ${paint(c.gray, "→")} ${paint(c.bold, fmtUsd(proof.current.costUsd))}  ${paint(c.gray, "(moves with volume)")}`);
+    console.log("");
+    console.log(`   ${paint(c.green, "✓")} ${paint(c.gray, "signed · kid")} ${paint(c.bold, clean(kp.kid))}   ${paint(c.gray, "written to")} ${paint(c.gold, opts.out)}`);
+    console.log(paint(c.gray, "   Anyone verifies it:  ledger-cli verify-savings " + opts.out + " --key <keypair.json>"));
+    console.log("");
+  });
+
+program
+  .command("verify-savings <proof>")
+  .description("Independently verify a signed savings proof (signature + recomputed math)")
+  .option("-k, --key <path>", "Keypair or public-key JSON (public_key is read)", `${KEYS_DIR}/default.json`)
+  .action((proofPath: string, opts) => {
+    const proof = readJSON<SavingsProof>(proofPath);
+    const pub = readJSON<{ kid: string; public_key: string }>(opts.key);
+    const res = verifySavingsProof(proof, { publicKeys: { [pub.kid]: pub.public_key } });
+    console.log("");
+    const mark = (ok: boolean) => (ok ? paint(c.green, "✓") : paint(c.red, "✗"));
+    console.log(`  ${res.valid ? paint(c.green + c.bold, "VERIFIED") : paint(c.red + c.bold, "NOT VERIFIED")}${res.reason ? paint(c.gray, "  · " + clean(res.reason)) : ""}`);
+    console.log(`   ${mark(res.checks.signature_valid)} signature valid`);
+    console.log(`   ${mark(res.checks.baseline_hash_matches)} baseline untampered`);
+    console.log(`   ${mark(res.checks.savings_math_matches)} savings math recomputed and matches`);
+    if (res.valid) {
+      console.log(`   ${paint(c.gray, "claim:")} ${paint(c.green + c.bold, fmtUsd(proof.savings.normalizedSavingsUsd))} ${paint(c.gray, "saved (" + proof.savings.normalizedSavingsPct + "% lower blended rate)")}`);
+    }
+    console.log("");
+    process.exit(res.valid ? 0 : 1);
   });
 
 program.parse();

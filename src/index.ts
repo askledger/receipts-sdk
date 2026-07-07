@@ -291,6 +291,20 @@ export {
   type IngestResult,
 } from "./cost/ingest.js";
 
+// Verified savings — sign a baseline, prove the realized saving, verify it
+// independently. The paid differentiator, buildable standalone.
+export {
+  buildBaseline,
+  proveSavings,
+  verifyBaseline,
+  verifySavingsProof,
+  toPeriodSummary,
+  type PeriodSummary,
+  type SignedBaseline,
+  type SavingsProof,
+  type VerifyResult as SavingsVerifyResult,
+} from "./cost/savings.js";
+
 // Natural-language query + alerts over your signed receipts (free, local).
 export {
   parseQuery,

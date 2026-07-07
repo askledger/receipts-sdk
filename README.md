@@ -36,7 +36,7 @@ savings **signed and verifiable** — that is the paid tier.
 
 ## Project status
 
-**v0.9.0 · live on npm.** The cryptographic core is hardened and
+**v0.10.0 · live on npm.** The cryptographic core is hardened and
 independently verifiable — cross-language conformance tests enforce
 byte-identical receipts across the TypeScript, Python, Go, Rust, and
 Java SDKs, and a machine-checked hardening checklist runs in CI. SDK,
