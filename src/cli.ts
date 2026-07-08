@@ -190,7 +190,7 @@ const program = new Command();
 program
   .name("ledger-cli")
   .description("AskLedger · see your wasted AI spend, then prove and cut it")
-  .version("0.10.0");
+  .version("0.11.0");
 
 program.addHelpText(
   "after",

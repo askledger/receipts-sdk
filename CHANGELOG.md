@@ -4,7 +4,7 @@ All notable changes to the AskLedger Receipts SDK will be documented in this fil
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (with the caveat that until v1.0, breaking changes may occur between minor versions).
 
-## [Unreleased]
+## [0.11.0] — 2026-07-08
 
 ### Added — receipt schema extensions (all OPTIONAL and additive; existing receipts sign/verify unchanged)
 
