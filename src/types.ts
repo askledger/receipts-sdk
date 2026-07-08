@@ -30,8 +30,13 @@ export interface EventContext {
 export interface EventSubject {
   ai_vendor?: string;       // "anthropic" | "openai" | "google" | "bedrock" | ...
   ai_model?: string;        // "claude-sonnet-4-6" | "gpt-4-turbo" | ...
+  ai_model_version?: string; // pinned snapshot, e.g. "claude-sonnet-4-20250514"
+  base_model?: string;       // the base a fine-tune derives from (with fine_tune_id)
   ai_provider?: string;     // "direct" | "gateway:portkey" | "gateway:litellm" | ...
   ai_capability?: string;   // "text-generation" | "code-completion" | "embedding" | ...
+  model_card_hash?: string;    // digest of the model card in force
+  fine_tune_id?: string;       // for internal / fine-tuned models
+  system_prompt_hash?: string; // digest of the system prompt that governed the call
 }
 
 export interface EventPayload {
@@ -108,8 +113,71 @@ export interface EvidenceRef {
   alg?: string;
   /** Optional locator (URI/URL/URN) where the referenced artifact can be retrieved. */
   uri?: string;
-  /** Optional consumer-defined status, e.g. "pass" | "fail" | "unknown". */
+  /** Optional consumer-defined status, e.g. "pass" | "fail" | "unknown" | "applied" | "verified". */
   status?: string;
+  /** Optional mathematical/logical value this artifact asserts, e.g. "credit_score >= 650". */
+  mathematical_value?: string;
+  /** Optional proof system the artifact came from, e.g. "lean" | "rule_check" | "smt". */
+  proof_type?: string;
+}
+
+/** A single rule within a policy context (text and/or machine form). */
+export interface PolicyRule {
+  rule_id: string;
+  expression?: string;        // human-readable, e.g. "credit_score >= 650"
+  mathematical_form?: string; // machine form, e.g. "credit_score >= 650"
+  source?: string;            // "internal_policy" | "regulatory" | ...
+  weight?: number;
+}
+
+/**
+ * OPTIONAL. The policy/ruleset that governed the decision, captured for audit
+ * and as the bridge to later verification. Additive: absent on receipts that
+ * don't use it; when present, part of the canonical bytes and the signature.
+ * Note: `decision.policy_bundle_hash` / `applied_policies` remain the canonical
+ * governance fields; this block adds the human/mathematical rule detail.
+ */
+export interface PolicyContext {
+  policy_bundle_id?: string;
+  policy_bundle_hash?: string;
+  version?: string;
+  domain?: string;            // "loan_decision" | "tax" | ...
+  applied_rules?: PolicyRule[];
+  mathematical_constraints?: string;
+  rule_encoding_format?: string; // "simple_expression" | "lean" | "catala" | ...
+}
+
+/** A reference to a proof artifact produced by a verifier (by digest). */
+export interface ProofArtifact {
+  kind: string;               // "lean_proof" | "rule_check" | "mathematical_proof"
+  hash: string;
+  alg?: string;
+  uri?: string;
+  size_bytes?: number;
+}
+
+/**
+ * OPTIONAL. The result of checking/verifying the decision against its rules.
+ * Additive. NOTE: `confidence_score` is meaningful only for probabilistic
+ * (rule_based/hybrid) verification; a true formal proof is binary.
+ */
+export interface VerificationBlock {
+  enabled?: boolean;
+  verification_type?: "formal" | "rule_based" | "hybrid";
+  status?: "verified" | "failed" | "pending" | "not_applicable";
+  proof_artifact?: ProofArtifact;
+  failed_rules?: string[];
+  confidence_score?: number;
+  verifier_version?: string;
+}
+
+/** OPTIONAL. A human-facing summary of the decision outcome and its drivers. */
+export interface DecisionSummary {
+  outcome?: DecisionVerdict;
+  risk_score?: number;
+  reason_codes?: string[];
+  human_override?: boolean;
+  override_reason?: string | null;
 }
 
 export interface Receipt {
@@ -119,6 +187,9 @@ export interface Receipt {
   issued_at: string;        // RFC 3339 with nanosecond precision
   event: RawEvent;
   decision?: DecisionBlock;
+  decision_summary?: DecisionSummary;
+  policy_context?: PolicyContext;
+  verification?: VerificationBlock;
   provenance?: ProvenanceBlock;
   /**
    * OPTIONAL. References to external evidence/attestation artifacts, by digest.
@@ -127,6 +198,15 @@ export interface Receipt {
    * covered by both `integrity.receipt_hash` and the signature.
    */
   evidence_refs?: EvidenceRef[];
+  /**
+   * OPTIONAL forward-compatibility map for experimental / not-yet-standardized
+   * attributes (e.g. `data_provenance`, `compliance`), keyed by a namespaced
+   * name. Additive and signed like everything else — it is part of the canonical
+   * bytes, so anything placed here is covered by `integrity.receipt_hash` and the
+   * signature. Promote a field to a first-class receipt field only once its shape
+   * is proven in real use; until then it lives here without freezing the schema.
+   */
+  extensions?: Record<string, unknown>;
   integrity: IntegrityBlock;
 }
 

@@ -16,6 +16,9 @@ import type {
   KeyPair,
   ProvenanceBlock,
   DecisionBlock,
+  DecisionSummary,
+  PolicyContext,
+  VerificationBlock,
   EvidenceRef,
 } from "./types.js";
 
@@ -23,6 +26,12 @@ interface SignReceiptOptions {
   event: RawEvent;
   keypair: KeyPair;
   decision?: DecisionBlock;
+  /** OPTIONAL human-facing summary of the decision outcome and drivers. */
+  decisionSummary?: DecisionSummary;
+  /** OPTIONAL policy/ruleset that governed the decision (audit + verification bridge). */
+  policyContext?: PolicyContext;
+  /** OPTIONAL result of checking/verifying the decision against its rules. */
+  verification?: VerificationBlock;
   provenance?: ProvenanceBlock;
   /**
    * OPTIONAL references to external evidence/attestation artifacts (by digest).
@@ -30,12 +39,18 @@ interface SignReceiptOptions {
    * the receipt_hash and the signature.
    */
   evidenceRefs?: EvidenceRef[];
+  /**
+   * OPTIONAL forward-compatibility map for experimental attributes (e.g.
+   * data_provenance, compliance). Signed like everything else; promote to a
+   * first-class field only once its shape is proven.
+   */
+  extensions?: Record<string, unknown>;
   /** ISO timestamp; defaults to now() */
   issuedAt?: string;
 }
 
 export function signReceipt(opts: SignReceiptOptions): SignedReceipt {
-  const { event, keypair, decision, provenance, evidenceRefs, issuedAt } = opts;
+  const { event, keypair, decision, decisionSummary, policyContext, verification, provenance, evidenceRefs, extensions, issuedAt } = opts;
   const span = startSpan("pl.sign", { tenant_id: event.tenant_id, kid: keypair.kid });
   const t0 = performance.now();
   let ok = false;
@@ -53,8 +68,12 @@ export function signReceipt(opts: SignReceiptOptions): SignedReceipt {
       issued_at: issuedAt ?? new Date().toISOString(),
       event,
       ...(decision !== undefined && { decision }),
+      ...(decisionSummary !== undefined && { decision_summary: decisionSummary }),
+      ...(policyContext !== undefined && { policy_context: policyContext }),
+      ...(verification !== undefined && { verification }),
       ...(provenance !== undefined && { provenance }),
       ...(evidenceRefs !== undefined && { evidence_refs: evidenceRefs }),
+      ...(extensions !== undefined && { extensions }),
       integrity: {
         previous_receipt_hash: prev.previous_receipt_hash,
         receipt_hash: "",

@@ -4,6 +4,29 @@ All notable changes to the AskLedger Receipts SDK will be documented in this fil
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (with the caveat that until v1.0, breaking changes may occur between minor versions).
 
+## [Unreleased]
+
+### Added — receipt schema extensions (all OPTIONAL and additive; existing receipts sign/verify unchanged)
+
+- **`policy_context`** — the policy/ruleset that governed a decision: `policy_bundle_id`,
+  `policy_bundle_hash`, `version`, `domain`, `applied_rules[]` (with `expression` /
+  `mathematical_form` / `source` / `weight`), `mathematical_constraints`, and a
+  pluggable `rule_encoding_format` (`simple_expression` today; `lean` / `catala` later).
+- **`verification`** — the result of checking a decision against its rules: `status`,
+  `verification_type` (`formal` / `rule_based` / `hybrid`), `proof_artifact` (by digest),
+  `failed_rules`, `confidence_score`, `verifier_version`. Note: `confidence_score` is
+  meaningful only for probabilistic (`rule_based`/`hybrid`) checks; a formal proof is binary.
+- **`decision_summary`** — `outcome`, `risk_score`, `reason_codes`, `human_override`, `override_reason`.
+- **`evidence_refs`** extended with `mathematical_value` and `proof_type` (e.g. `lean`).
+- **Subject governance fields** — `ai_model_version`, `base_model`, `model_card_hash`,
+  `fine_tune_id`, `system_prompt_hash`.
+- **`extensions`** — a namespaced, forward-compatibility map for experimental attributes
+  (e.g. `data_provenance`, `compliance`) that are captured and signed now and promoted to
+  first-class fields only once their shape is proven, so the core format stays stable.
+
+Every field above is covered by RFC 8785 canonicalization, the Ed25519 signature, and the
+hash chain — tamper-evident like the rest of the receipt.
+
 ## [0.10.0] — 2026-07-08
 
 ### Added
