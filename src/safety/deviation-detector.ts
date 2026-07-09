@@ -63,14 +63,25 @@ const SEV_SCORE: Record<"low" | "medium" | "high", number> = {
 export function detectDeviation(input: DeviationCheckInput): DeviationResult {
   const findings: DeviationFinding[] = [];
 
-  // 1. PII appeared in the response that wasn't in the request
-  if (input.output_pii?.count && input.output_pii.count > (input.input_pii?.count ?? 0)) {
-    const newCount = input.output_pii.count - (input.input_pii?.count ?? 0);
-    findings.push({
-      category: "pii_introduced_in_response",
-      severity: newCount >= 3 ? "high" : "medium",
-      detail: `Response contains ${newCount} PII match(es) that were not present in the input. Possible unauthorized data lookup or prompt-injection-induced exfiltration.`,
-    });
+  // 1. PII appeared in the response that the request did not justify. Compare
+  // BY CATEGORY, not just by count: a substituted PII type (e.g. an SSN in the
+  // response when the request only had an email) is a leak even when the total
+  // count is unchanged. Also flag any net increase in count.
+  {
+    const inCats = new Set(Object.keys(input.input_pii?.categories ?? {}));
+    const newCats = Object.keys(input.output_pii?.categories ?? {}).filter((c) => !inCats.has(c));
+    const extraByCount = Math.max(0, (input.output_pii?.count ?? 0) - (input.input_pii?.count ?? 0));
+    if (newCats.length > 0 || extraByCount > 0) {
+      findings.push({
+        category: "pii_introduced_in_response",
+        // A brand-new PII category is high severity even at the same total count.
+        severity: newCats.length > 0 || extraByCount >= 3 ? "high" : "medium",
+        detail:
+          newCats.length > 0
+            ? `Response introduced PII categories not present in the request: ${newCats.join(", ")}. Possible unauthorized data lookup or prompt-injection-induced exfiltration.`
+            : `Response contains ${extraByCount} more PII match(es) than the input. Possible unauthorized data lookup or prompt-injection-induced exfiltration.`,
+      });
+    }
   }
 
   // 2. PII leaked to a public-facing surface — ANY PII fires this rule

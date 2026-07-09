@@ -64,6 +64,14 @@ export class FileChainStateStore implements ChainStateStore {
     newReceiptHash: string,
     newReceiptId: string
   ): Promise<ChainState> {
+    // Compare-and-set: re-read the persisted head and refuse to advance if it
+    // moved since `previousState` was loaded. Best-effort without an OS lock,
+    // but it catches read-modify-write interleaving and most cross-process
+    // races. Use PostgresChainStateStore for strict multi-writer guarantees.
+    const current = loadChainState(previousState.tenant_id);
+    if (current.chain_height !== previousState.chain_height) {
+      throw new ConcurrentChainWriteError(previousState.tenant_id, current.chain_height);
+    }
     const next = advanceChain(previousState, newReceiptHash, newReceiptId);
     saveChainState(next);
     return next;

@@ -37,12 +37,55 @@ export {
 } from "./chain.js";
 export {
   signReceipt,
+  signReceiptWithStore,
   canonicalSigningPayload,
   canonicalHashingPayload,
   prettySignedReceipt,
   canonicalSignedReceipt,
 } from "./receipt.js";
-export { verifyReceipt, type VerifyResult, type VerifyOptions } from "./verify.js";
+export { verifyReceipt, verifyChain, type VerifyResult, type VerifyOptions, type ChainVerifyResult } from "./verify.js";
+export {
+  timestampReceipt,
+  verifyReceiptTimestamps,
+  receiptTimestampImprint,
+  type TimestampClient,
+  type TimestampVerdict,
+  type TimestampFormat,
+} from "./timestamp.js";
+// Layer 3 — Rule-Based Correctness / Assurance.
+export {
+  assuranceLevel,
+  checkRules,
+  type AssuranceLevel,
+  type AssuranceName,
+  type AssuranceAssessment,
+  type RuleCheckResult,
+  type RuleEvaluation,
+} from "./assurance.js";
+// Layer 2 — Execution Traceability: deterministic workflow reconstruction.
+export {
+  reconstructWorkflow,
+  verifyWorkflow,
+  type WorkflowStep,
+  type WorkflowGraph,
+  type WorkflowVerifyResult,
+} from "./workflow-graph.js";
+// Layer 4 — Pre-Execution Guardian / Verdict (prevent, then prove).
+export {
+  actionHash,
+  signPreVerdict,
+  verifyPreVerdict,
+  assertActionCleared,
+  preVerdictEvidenceRef,
+  reviewNofM,
+  type MultiReviewResult,
+  type Verdict,
+  type ProposedAction,
+  type ReviewDecision,
+  type PreVerdict,
+  type SignedPreVerdict,
+  type PreVerdictVerification,
+} from "./guardian.js";
 export {
   validateEvent,
   validateKeyPair,

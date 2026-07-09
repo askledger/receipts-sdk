@@ -44,6 +44,12 @@ let uninstallers: Array<() => void> = [];
 export interface InstallHandle {
   uninstall: () => void;
   readonly config: { tenantId: string; ingestUrl: string; kid: string };
+  /**
+   * Resolves once every vendor SDK wrap has been attempted. `installReceipts`
+   * returns synchronously, but the wraps load lazily; await `ready` before
+   * making AI calls if you need every early call instrumented.
+   */
+  readonly ready: Promise<void>;
 }
 
 export function installReceipts(opts: InstallOptions): InstallHandle {
@@ -51,6 +57,7 @@ export function installReceipts(opts: InstallOptions): InstallHandle {
     return {
       uninstall: () => undefined,
       config: { tenantId: opts.tenantId, ingestUrl: opts.ingestUrl ?? "", kid: opts.keypair?.kid ?? "" },
+      ready: Promise.resolve(),
     };
   }
   installed = true;
@@ -58,21 +65,23 @@ export function installReceipts(opts: InstallOptions): InstallHandle {
   const cfg = resolve(opts);
   const onReceipt = (r: SignedReceipt) => { void emit(cfg, r); };
 
-  if (!opts.disable?.openai) tryWrapSdk("openai", (mod) => {
+  const pending: Promise<void>[] = [];
+  if (!opts.disable?.openai) pending.push(tryWrapSdk("openai", (mod) => {
     if (mod?.OpenAI) patchConstructor(mod, "OpenAI", (instance) =>
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       wrapOpenAI(instance as any, { tenantId: cfg.tenantId, keypair: cfg.keypair, onReceipt }));
-  });
+  }));
 
-  if (!opts.disable?.anthropic) tryWrapSdk("@anthropic-ai/sdk", (mod) => {
+  if (!opts.disable?.anthropic) pending.push(tryWrapSdk("@anthropic-ai/sdk", (mod) => {
     if (mod?.default) patchConstructor(mod, "default", (instance) =>
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       wrapAnthropic(instance as any, { tenantId: cfg.tenantId, keypair: cfg.keypair, onReceipt }));
-  });
+  }));
 
   return {
     uninstall: () => { for (const u of uninstallers) try { u(); } catch { /* ignore */ } installed = false; uninstallers = []; },
     config: { tenantId: cfg.tenantId, ingestUrl: cfg.ingestUrl, kid: cfg.keypair.kid },
+    ready: Promise.all(pending).then(() => undefined),
   };
 }
 
@@ -98,11 +107,19 @@ function resolve(opts: InstallOptions): ResolvedConfig {
   };
 }
 
-function tryWrapSdk(modName: string, apply: (mod: Record<string, unknown>) => void): void {
-  // Lazy import so missing optional deps don't break the install.
-  import(/* @vite-ignore */ modName as string)
-    .then((m) => { try { apply(m as Record<string, unknown>); } catch { /* swallow */ } })
-    .catch(() => { /* dep not installed — OK */ });
+function tryWrapSdk(modName: string, apply: (mod: Record<string, unknown>) => void): Promise<void> {
+  // Lazy import so missing optional deps don't break the install. Returns a
+  // promise so installReceipts can expose a `ready` gate; a wrap error is
+  // surfaced (not silently swallowed) while a missing dep stays a no-op.
+  return import(/* @vite-ignore */ modName as string)
+    .then((m) => {
+      try {
+        apply(m as Record<string, unknown>);
+      } catch (e) {
+        console.warn(`[askledger] failed to instrument "${modName}":`, (e as Error).message);
+      }
+    })
+    .catch(() => { /* dep not installed — expected, no-op */ });
 }
 
 function patchConstructor(

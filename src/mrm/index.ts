@@ -40,7 +40,10 @@ export interface WorkpaperInput {
 export interface ModelEntry {
   model_id: string;
   invocations: number;
-  unique_users: number;
+  // Distinct tenant_ids seen for this model. Receipts carry no end-user
+  // identity, so this is NOT a user count — reporting it as "unique_users"
+  // would overstate a substantiated figure in a regulator workpaper.
+  distinct_tenants: number;
   block_rate: number;
   flag_rate: number;
   error_rate: number;
@@ -133,7 +136,7 @@ function buildModelInventory(rs: ReceiptSummary[]): ModelEntry[] {
   }
   return Array.from(by.entries())
     .map(([model_id, arr]) => {
-      const users = new Set(arr.map((r) => r.tenant_id + ":" + (r.applied_policies[0] ?? "")));
+      const tenants = new Set(arr.map((r) => r.tenant_id));
       const blocks = arr.filter((r) => r.decision === "block").length;
       const flags  = arr.filter((r) => r.decision === "flag").length;
       const errors = arr.filter((r) => r.outcome === "error").length;
@@ -141,7 +144,7 @@ function buildModelInventory(rs: ReceiptSummary[]): ModelEntry[] {
       return {
         model_id,
         invocations: arr.length,
-        unique_users: users.size,
+        distinct_tenants: tenants.size,
         block_rate: round(blocks / arr.length),
         flag_rate: round(flags / arr.length),
         error_rate: round(errors / arr.length),

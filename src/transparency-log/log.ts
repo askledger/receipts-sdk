@@ -211,19 +211,26 @@ export class TransparencyLog {
     const leaves = this.leafHashes.slice(0, second_size);
     const path: string[] = [];
 
+    // RFC 6962 SUBPROOF(m, D[start:end], b). The previous version lacked the
+    // `m == subtree_size` base case and pushed nodes in the wrong order, so its
+    // proofs did not verify against a standard RFC 9162 verifier.
     function inner(start: number, end: number, m: number, b: boolean) {
       const n = end - start;
-      if (n <= 1) return;
+      // Base case: the first tree exactly fills this subtree. When it is still
+      // the original tree (b), the verifier already knows this root, so emit
+      // nothing; otherwise emit this subtree's root.
+      if (m - start === n) {
+        if (!b) path.push(bytesToHex(rootFromLeaves(leaves.slice(start, end))));
+        return;
+      }
       let k = 1;
       while (k * 2 < n) k *= 2;
       if (m - start <= k) {
-        if (m - start < k || !b) {
-          path.push(bytesToHex(rootFromLeaves(leaves.slice(start + k, end))));
-        }
         inner(start, start + k, m, b);
+        path.push(bytesToHex(rootFromLeaves(leaves.slice(start + k, end))));
       } else {
-        path.push(bytesToHex(rootFromLeaves(leaves.slice(start, start + k))));
         inner(start + k, end, m, false);
+        path.push(bytesToHex(rootFromLeaves(leaves.slice(start, start + k))));
       }
     }
     inner(0, second_size, first_size, true);
@@ -277,6 +284,85 @@ export class TransparencyLog {
     if (!result) return false;
     if (result.pos !== proof.audit_path.length) return false;
     return bytesToHex(result.hash) === expectedRootHex.toLowerCase();
+  }
+
+  /**
+   * Verify an RFC 9162 consistency proof: that a log of `first_size` with root
+   * `first_root_hex` is a prefix of a log of `second_size` with root
+   * `second_root_hex`. Recomputes BOTH roots from the proof and checks them, so
+   * any rewrite of history between the two tree heads is detected. Standard
+   * algorithm (RFC 6962 s2.1.2) — interoperates with external verifiers.
+   */
+  static verifyConsistency(
+    first_size: number,
+    first_root_hex: string,
+    second_size: number,
+    second_root_hex: string,
+    proof: string[]
+  ): boolean {
+    if (first_size < 0 || second_size < first_size) return false;
+    const firstRoot = hexToBytes(first_root_hex);
+    const secondRoot = hexToBytes(second_root_hex);
+    if (firstRoot.length !== 32 || secondRoot.length !== 32) return false;
+    if (first_size === second_size) {
+      return proof.length === 0 && bytesToHex(firstRoot) === bytesToHex(secondRoot);
+    }
+    if (first_size === 0) return true; // an empty tree is a prefix of any tree
+
+    const nodes = proof.map(hexToBytes);
+    if (nodes.some((h) => h.length !== 32)) return false;
+    let pi = 0;
+    const pop = (): Uint8Array | null => (pi < nodes.length ? nodes[pi++] : null);
+
+    let node = first_size - 1;
+    let lastNode = second_size - 1;
+    // Shift past the common lower bits: while `node` is a right child, ascend.
+    while (node % 2 === 1) {
+      node = Math.floor(node / 2);
+      lastNode = Math.floor(lastNode / 2);
+    }
+
+    // Seed: if first_size is a power of two, the seed is first_root (implied and
+    // not carried in the proof); otherwise it is the first proof node.
+    let oldHash: Uint8Array;
+    let newHash: Uint8Array;
+    if (node > 0) {
+      const seed = pop();
+      if (!seed) return false;
+      oldHash = seed;
+      newHash = seed;
+    } else {
+      oldHash = firstRoot;
+      newHash = firstRoot;
+    }
+
+    while (node > 0) {
+      if (node % 2 === 1) {
+        const next = pop();
+        if (!next) return false;
+        oldHash = hashNode(next, oldHash);
+        newHash = hashNode(next, newHash);
+      } else if (node < lastNode) {
+        const next = pop();
+        if (!next) return false;
+        newHash = hashNode(newHash, next);
+      }
+      node = Math.floor(node / 2);
+      lastNode = Math.floor(lastNode / 2);
+    }
+
+    while (lastNode > 0) {
+      const next = pop();
+      if (!next) return false;
+      newHash = hashNode(newHash, next);
+      lastNode = Math.floor(lastNode / 2);
+    }
+
+    return (
+      pi === nodes.length &&
+      bytesToHex(oldHash) === first_root_hex.toLowerCase() &&
+      bytesToHex(newHash) === second_root_hex.toLowerCase()
+    );
   }
 
   /** Return the recent STH history. */

@@ -40,3 +40,6 @@ __pycache__/
 # macOS Finder duplicates
 * 2.*
 * 2
+
+# Local demo / scratch data (not part of the SDK)
+sandbox/

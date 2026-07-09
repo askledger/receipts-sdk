@@ -87,8 +87,13 @@ export function citeReceipt(
   for (const template of templates) {
     const tid = templateId(template);
     for (const art of template.articles) {
-      const present = art.satisfied_by_fields.filter((path) =>
-        getByPath(signed.receipt as unknown as Record<string, unknown>, path) !== undefined
+      // Resolve each required field against the receipt body AND the outer
+      // envelope, so evidence that lives on the SignedReceipt (e.g. timestamps)
+      // is credited instead of always reading as absent.
+      const rec = signed.receipt as unknown as Record<string, unknown>;
+      const env = signed as unknown as Record<string, unknown>;
+      const present = art.satisfied_by_fields.filter(
+        (path) => getByPath(rec, path) !== undefined || getByPath(env, path) !== undefined
       );
       if (present.length === 0) continue;
       const confidence = Number((present.length / art.satisfied_by_fields.length).toFixed(2));

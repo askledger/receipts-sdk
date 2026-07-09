@@ -68,6 +68,14 @@ export class ApprovalWorkflow {
     if (this.sm.state !== "pending") {
       throw new Error(`Cannot submit decision; workflow is ${this.sm.state}`);
     }
+    // Reject decisions submitted after the approval window closed. A malformed
+    // or missing expiresAt parses to NaN, which is never "past", so it is a no-op.
+    const deadline = Date.parse(this.request.expiresAt);
+    if (Number.isFinite(deadline) && Date.now() >= deadline) {
+      await this.sm.transition("expired", { actor: d.approver });
+      await this.sm.transition("done");
+      throw new Error(`Cannot submit decision; approval window expired at ${this.request.expiresAt}`);
+    }
     if (!this.request.approvers.includes(d.approver)) {
       throw new Error(`Approver ${d.approver} not in allowed set`);
     }

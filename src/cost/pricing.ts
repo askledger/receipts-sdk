@@ -19,7 +19,9 @@ export const PRICING: Record<ModelKey, VendorPricing> = {
   // OpenAI
   "openai:gpt-5":                  { input_per_1k: 0.005,   output_per_1k: 0.015 },
   "openai:gpt-5-mini":             { input_per_1k: 0.00025, output_per_1k: 0.001 },
+  "openai:gpt-5-nano":             { input_per_1k: 0.00005, output_per_1k: 0.0004 },
   "openai:gpt-4o":                 { input_per_1k: 0.0025,  output_per_1k: 0.01 },
+  "openai:gpt-4o-mini":            { input_per_1k: 0.00015, output_per_1k: 0.0006 },
   // Google
   "google:gemini-2-5-pro":         { input_per_1k: 0.00125, output_per_1k: 0.01 },
   "google:gemini-2-5-flash":       { input_per_1k: 0.000075,output_per_1k: 0.0003 },

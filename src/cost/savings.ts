@@ -23,8 +23,9 @@ export interface PeriodSummary {
   to: string | null;
   requests: number;
   totalTokens: number;
+  pricedTokens: number; // priced-model tokens — the denominator for the blended rate
   costUsd: number;
-  costPer1kTokens: number; // blended rate = costUsd / (totalTokens/1000)
+  costPer1kTokens: number; // blended rate = costUsd / (pricedTokens/1000)
   costPerRequest: number;
   byModel: { key: string; requests: number; costUsd: number }[];
 }
@@ -69,14 +70,20 @@ function round(n: number, dp = 6): number {
 }
 
 export function toPeriodSummary(s: DashboardSummary): PeriodSummary {
-  const tokens = s.totalTokens;
-  const costPer1kTokens = tokens > 0 ? (s.costUsd / tokens) * 1000 : 0;
+  // Blended rate uses PRICED tokens only: cost comes solely from priced models,
+  // so dividing by ALL tokens would understate the rate and let volume routed to
+  // an unpriced/unknown model manufacture "efficiency". Fall back to totalTokens
+  // for older summaries that predate the pricedTokens field.
+  const priced = s.pricedTokens ?? s.totalTokens;
+  const rateTokens = priced > 0 ? priced : s.totalTokens;
+  const costPer1kTokens = rateTokens > 0 ? (s.costUsd / rateTokens) * 1000 : 0;
   const costPerRequest = s.requests > 0 ? s.costUsd / s.requests : 0;
   return {
     from: s.period.from,
     to: s.period.to,
     requests: s.requests,
-    totalTokens: tokens,
+    totalTokens: s.totalTokens,
+    pricedTokens: priced,
     costUsd: round(s.costUsd, 4),
     costPer1kTokens: round(costPer1kTokens),
     costPerRequest: round(costPerRequest),
@@ -110,7 +117,8 @@ export function buildBaseline(
 function computeSavings(baseline: PeriodSummary, current: PeriodSummary) {
   const baselineRatePer1k = baseline.costPer1kTokens;
   const currentRatePer1k = current.costPer1kTokens;
-  const currentAtBaselineRate = (current.totalTokens / 1000) * baselineRatePer1k;
+  const currentPricedTokens = current.pricedTokens ?? current.totalTokens;
+  const currentAtBaselineRate = (currentPricedTokens / 1000) * baselineRatePer1k;
   const normalizedSavingsUsd = currentAtBaselineRate - current.costUsd;
   const normalizedSavingsPct =
     currentAtBaselineRate > 0 ? (normalizedSavingsUsd / currentAtBaselineRate) * 100 : 0;

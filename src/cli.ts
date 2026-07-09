@@ -72,12 +72,13 @@ import {
 } from "./index.js";
 import {
   summarizeReceipts,
+  summarizeWorkloads,
   renderDashboardHtml,
   fmtUsd,
   fmtTokens,
   type DashboardSummary,
 } from "./cost/dashboard.js";
-import { parseUsageExport, receiptsFromWorkloads } from "./cost/ingest.js";
+import { parseUsageExport } from "./cost/ingest.js";
 import {
   buildBaseline,
   proveSavings,
@@ -873,8 +874,10 @@ program
       console.log(paint(c.amber, "  No usage rows recognized — expected an OpenAI or Anthropic usage export (JSON)."));
       process.exit(0);
     }
-    const { receipts, totalRequests, scale } = receiptsFromWorkloads(workloads);
-    const summary = summarizeReceipts(receipts);
+    // Exact aggregation from the bill rows — no sampling — so the numbers are
+    // precise at any bill size and match the signed baseline/prove figures.
+    const summary = summarizeWorkloads(workloads);
+    const totalRequests = summary.requests;
 
     if (opts.html) {
       const outPath = typeof opts.html === "string" ? opts.html : "askledger-scan.html";
@@ -883,10 +886,10 @@ program
       return;
     }
     if (opts.json) {
-      console.log(JSON.stringify({ totalRequests, scale, summary }, null, 2));
+      console.log(JSON.stringify({ totalRequests, scale: 1, summary }, null, 2));
       return;
     }
-    printScan(summary, totalRequests, scale, files.length);
+    printScan(summary, totalRequests, 1, files.length);
   });
 
 // Shared savings printer (used by `dashboard` and `scan`). `scale` (>=1) undoes
@@ -1073,8 +1076,8 @@ function loadOrCreateKeypair(keyPath: string): KeyPair {
 
 function summarizeExport(files: string[]): DashboardSummary {
   const workloads = files.flatMap((f) => parseUsageExport(fs.readFileSync(f, "utf-8")));
-  const { receipts } = receiptsFromWorkloads(workloads);
-  return summarizeReceipts(receipts);
+  // Exact, unsampled aggregation for the SIGNED baseline/prove artifacts.
+  return summarizeWorkloads(workloads);
 }
 
 program

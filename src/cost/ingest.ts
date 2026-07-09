@@ -12,8 +12,10 @@ import type { SignedReceipt } from "../types.js";
 // specific patterns (…-mini) are tested first.
 export function normalizeModel(raw: string): { vendor: string; model: string } {
   const s = String(raw ?? "").toLowerCase();
+  if (/gpt-5-nano/.test(s)) return { vendor: "openai", model: "gpt-5-nano" };
   if (/gpt-5-mini/.test(s)) return { vendor: "openai", model: "gpt-5-mini" };
   if (/gpt-5/.test(s)) return { vendor: "openai", model: "gpt-5" };
+  if (/gpt-4o-mini/.test(s)) return { vendor: "openai", model: "gpt-4o-mini" };
   if (/gpt-4o/.test(s)) return { vendor: "openai", model: "gpt-4o" };
   if (/opus/.test(s)) return { vendor: "anthropic", model: "claude-opus-4-6" };
   if (/sonnet/.test(s)) return { vendor: "anthropic", model: "claude-sonnet-4-6" };
@@ -51,6 +53,26 @@ function num(v: unknown): number {
   return Number.isFinite(n) && n > 0 ? n : 0;
 }
 
+// First candidate that is a non-empty string (numbers are stringified). Unlike
+// `??`, this skips "" so an empty snapshot_id does not shadow a real model.
+function firstStr(...vals: unknown[]): string {
+  for (const v of vals) {
+    if (typeof v === "string" && v.trim() !== "") return v;
+    if (typeof v === "number" && Number.isFinite(v)) return String(v);
+  }
+  return "";
+}
+
+// First candidate that parses to a positive finite number. Unlike `??`, this
+// skips a present-but-zero field (e.g. n_requests: 0) that should fall through.
+function firstNum(...vals: unknown[]): number {
+  for (const v of vals) {
+    const n = Number(v);
+    if (Number.isFinite(n) && n > 0) return n;
+  }
+  return 0;
+}
+
 // Parse one export document (JSON text) into normalized workload rows. Accepts
 // a top-level array, or an object wrapping the rows under data/usage/results.
 // Recognizes OpenAI's usage shape (snapshot_id / n_requests / n_*_tokens_total)
@@ -68,20 +90,20 @@ export function parseUsageExport(text: string): Workload[] {
   const out: Workload[] = [];
   for (const r of rows) {
     if (!r || typeof r !== "object") continue;
-    const modelRaw = r.snapshot_id ?? r.model ?? r.model_id ?? "";
-    const requests = num(r.n_requests ?? r.requests ?? r.count);
+    const modelRaw = firstStr(r.snapshot_id, r.model, r.model_id);
+    const requests = firstNum(r.n_requests, r.requests, r.count);
     if (requests <= 0) continue;
-    const inputTotal = num(
-      r.n_context_tokens_total ?? r.input_tokens ?? r.prompt_tokens ?? r.context_tokens
+    const inputTotal = firstNum(
+      r.n_context_tokens_total, r.input_tokens, r.prompt_tokens, r.context_tokens
     );
-    const outputTotal = num(
-      r.n_generated_tokens_total ?? r.output_tokens ?? r.completion_tokens ?? r.generated_tokens
+    const outputTotal = firstNum(
+      r.n_generated_tokens_total, r.output_tokens, r.completion_tokens, r.generated_tokens
     );
     const { vendor, model } = normalizeModel(modelRaw);
     out.push({
       vendor,
       model,
-      app: String(r.api_key_name ?? r.workspace ?? r.project ?? r.project_id ?? r.api_key ?? r.app ?? "unknown"),
+      app: firstStr(r.api_key_name, r.workspace, r.project, r.project_id, r.api_key, r.app) || "unknown",
       requests,
       inputTotal,
       outputTotal,
@@ -109,18 +131,23 @@ export function receiptsFromWorkloads(
 ): IngestResult {
   const cap = opts.maxReceipts ?? 200_000;
   const totalRequests = workloads.reduce((s, w) => s + w.requests, 0);
-  const scale = totalRequests > cap ? totalRequests / cap : 1;
+  const targetScale = totalRequests > cap ? totalRequests / cap : 1;
   const receipts: SignedReceipt[] = [];
   let idx = 0;
   for (const w of workloads) {
     if (w.requests <= 0) continue;
     const inAvg = Math.round(w.inputTotal / w.requests);
     const outAvg = Math.round(w.outputTotal / w.requests);
-    const n = Math.max(1, Math.round(w.requests / scale));
+    const n = Math.max(1, Math.round(w.requests / targetScale));
     for (let i = 0; i < n; i++) {
       receipts.push(mkReceipt(w, inAvg, outAvg, idx++));
     }
   }
+  // Recovery factor = real requests / receipts ACTUALLY emitted. The max(1, …)
+  // floor means a "wide" bill (many tiny rows) emits ~every row, so a fixed
+  // totalRequests/cap would over-inflate scaled totals in a signed artifact.
+  // Deriving scale from the real emitted count keeps request-count scaling exact.
+  const scale = receipts.length > 0 ? totalRequests / receipts.length : 1;
   return { receipts, totalRequests, scale };
 }
 

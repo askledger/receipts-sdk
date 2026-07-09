@@ -4,6 +4,55 @@ All notable changes to the AskLedger Receipts SDK will be documented in this fil
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (with the caveat that until v1.0, breaking changes may occur between minor versions).
 
+## [0.12.0] — 2026-07-10
+
+### Added — the four-layer model (Prevent, then Prove)
+
+Layers 1–3 (prove what happened, how, and whether it was correct) were already the core of
+the SDK. This release adds Layer 4 (prevent bad actions before they run) and hardens all four
+to enterprise grade. Every addition is additive; existing receipts sign and verify unchanged.
+
+- **Layer 4 — Pre-Execution Guardian** (`guardian.ts`). An independent reviewer signs a
+  verdict over a proposed action *before* it executes:
+  - `signPreVerdict(action, review, opts)` binds a verdict (`approve` / `concerns` / `reject`)
+    to `actionHash(action) = sha256(canonicalize({tenant_id, action_type, payload}))`, and
+    **enforces reviewer independence** (throws if the reviewer is the actor).
+  - `verifyPreVerdict(signed, action, opts)` returns per-check results
+    (`signature_valid`, `hash_matches`, `binds_to_action`, `not_expired`).
+  - `assertActionCleared(...)` gates execution; `reviewNofM(...)` enforces N-of-M approval with
+    a hard veto on any reject; `preVerdictEvidenceRef(...)` links the L4 verdict into the L1 receipt.
+- **Layer 3 — Assurance & rule-based correctness** (`assurance.ts`).
+  - `assuranceLevel(signed, opts)` grades a receipt on the published ladder
+    **L0 Declared → L1 Signed → L2 Attested → L3 Anchored** (cumulative), matching
+    `/trust/assurance-levels` exactly.
+  - `checkRules(policy, values, opts)` — deterministic rule evaluator (numeric comparisons +
+    string equality; missing values fail closed) producing a `rule_based` verification block.
+    A rule check is recorded evidence, never presented as a formal proof.
+- **Layer 2 — Execution traceability** (`workflow-graph.ts`).
+  - `reconstructWorkflow(receipts, opts)` deterministically rebuilds a multi-step workflow DAG
+    (Kahn topological sort, `chain_height` then `id` tie-break) with roots, leaves, missing
+    parents, and an acyclicity check.
+  - `verifyWorkflow(receipts, opts)` verifies every receipt and the graph's completeness.
+- **Layer 1 — Cryptographic evidence** (`verify.ts`, `timestamp.ts`).
+  - `verifyChain(receipts, opts)` verifies a full per-tenant hash chain end to end
+    (height-sorted, predecessor-linked, genesis-completeness).
+  - Timestamp binding: `timestampReceipt` / `verifyReceiptTimestamps` bind an RFC 3161 token to
+    the canonical signing payload; verification now checks `timestamp_imprint_matches` and
+    `chain_position_attested`.
+
+### Fixed (audit hardening)
+
+- **Transparency log** — `proveConsistency` rewritten to correct RFC 6962 semantics; added
+  static `verifyConsistency`.
+- **Chain concurrency** — added `signReceiptWithStore` (async compare-and-swap with retry on
+  `ConcurrentChainWriteError`) plus a CAS-backed `FileChainStateStore`, closing a fork window
+  under concurrent writers. Sync `signReceipt` remains the single-writer path.
+- **Cost engine** — fixed a sampling bug where baseline/prove used a sampled summary without
+  `scale` (exact aggregation via `summarizeWorkloads`); corrected `gpt-4o-mini` / `gpt-5-nano`
+  model normalization and pricing (previously mispriced as `gpt-4o`).
+- **Numeric safety** — `assertSafeNumbers` rejects integer values outside the IEEE-754
+  safe-integer range before signing.
+
 ## [0.11.0] — 2026-07-08
 
 ### Added — receipt schema extensions (all OPTIONAL and additive; existing receipts sign/verify unchanged)

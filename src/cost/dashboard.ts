@@ -20,6 +20,7 @@
 
 import { priceFor, costUsd } from "./pricing.js";
 import type { SignedReceipt } from "../types.js";
+import type { Workload } from "./ingest.js";
 
 export interface ModelStat {
   vendor: string;
@@ -77,6 +78,7 @@ export interface DashboardSummary {
   inputTokens: number;
   outputTokens: number;
   totalTokens: number;
+  pricedTokens: number; // tokens on PRICED models only — the denominator for the blended rate
   costUsd: number; // estimate; excludes unpriced models
   pricedRequests: number;
   unpricedRequests: number;
@@ -233,6 +235,8 @@ export function summarizeReceipts(receipts: SignedReceipt[]): DashboardSummary {
   let totalCost = 0;
   let pricedRequests = 0;
   let unpricedRequests = 0;
+  let pricedInputTokens = 0;
+  let pricedOutputTokens = 0;
   let chainHeight: number | null = null;
   let signedReceipts = 0;
   let withEvidenceRefs = 0;
@@ -277,8 +281,13 @@ export function summarizeReceipts(receipts: SignedReceipt[]): DashboardSummary {
     inputTokens += input;
     outputTokens += output;
     totalCost += cost;
-    if (priced) pricedRequests += 1;
-    else unpricedRequests += 1;
+    if (priced) {
+      pricedRequests += 1;
+      pricedInputTokens += input;
+      pricedOutputTokens += output;
+    } else {
+      unpricedRequests += 1;
+    }
 
     const ms = models.get(key) ?? {
       vendor,
@@ -365,6 +374,7 @@ export function summarizeReceipts(receipts: SignedReceipt[]): DashboardSummary {
     inputTokens,
     outputTokens,
     totalTokens: inputTokens + outputTokens,
+    pricedTokens: pricedInputTokens + pricedOutputTokens,
     costUsd: totalCost,
     pricedRequests,
     unpricedRequests,
@@ -378,6 +388,112 @@ export function summarizeReceipts(receipts: SignedReceipt[]): DashboardSummary {
     chainHeight,
     signedReceipts,
     withEvidenceRefs,
+    period: { from, to },
+  };
+}
+
+/**
+ * Summarize an imported bill EXACTLY from aggregated (model × app × period)
+ * rows — no per-request expansion, no sampling, no scale factor. The signed
+ * baseline/prove path and `scan` both use this, so their figures are exact and
+ * always agree regardless of bill size (this removes the last sampling-precision
+ * residual on pathological mixed bills).
+ */
+export function summarizeWorkloads(workloads: Workload[]): DashboardSummary {
+  const models = new Map<string, ModelStat>();
+  const groups = new Map<string, GroupStat>();
+  const apps = new Map<string, NamedCount>();
+  const envs = new Map<string, NamedCount>();
+
+  let requests = 0, inputTokens = 0, outputTokens = 0, totalCost = 0;
+  let pricedRequests = 0, unpricedRequests = 0, pricedInputTokens = 0, pricedOutputTokens = 0;
+  let from: string | null = null, to: string | null = null;
+
+  for (const w of workloads) {
+    if (w.requests <= 0) continue;
+    const key = `${w.vendor}:${w.model}`;
+    const input = w.inputTotal;
+    const output = w.outputTotal;
+    const price = priceFor(w.vendor, w.model);
+    const priced = price !== null;
+    const cost = price ? costUsd(price, { input, output }) : 0;
+
+    requests += w.requests;
+    inputTokens += input;
+    outputTokens += output;
+    totalCost += cost;
+    if (priced) {
+      pricedRequests += w.requests;
+      pricedInputTokens += input;
+      pricedOutputTokens += output;
+    } else {
+      unpricedRequests += w.requests;
+    }
+    if (w.at) {
+      if (from === null || w.at < from) from = w.at;
+      if (to === null || w.at > to) to = w.at;
+    }
+
+    const ms = models.get(key) ?? {
+      vendor: w.vendor, model: w.model, key, requests: 0, inputTokens: 0,
+      outputTokens: 0, costUsd: 0, priced, avgOutputTokens: 0, topApp: null,
+    };
+    ms.requests += w.requests; ms.inputTokens += input; ms.outputTokens += output; ms.costUsd += cost;
+    models.set(key, ms);
+
+    const appName = w.app || "unknown";
+    const gk = `${key} ${appName}`;
+    const g = groups.get(gk) ?? {
+      modelKey: key, vendor: w.vendor, model: w.model, app: appName,
+      requests: 0, inputTokens: 0, outputTokens: 0, costUsd: 0, priced,
+    };
+    g.requests += w.requests; g.inputTokens += input; g.outputTokens += output; g.costUsd += cost;
+    groups.set(gk, g);
+
+    const a = apps.get(appName) ?? { name: appName, requests: 0, costUsd: 0 };
+    a.requests += w.requests; a.costUsd += cost; apps.set(appName, a);
+    const e = envs.get("production") ?? { name: "production", requests: 0, costUsd: 0 };
+    e.requests += w.requests; e.costUsd += cost; envs.set("production", e);
+  }
+
+  const groupList = Array.from(groups.values());
+  for (const [k, ms] of models) {
+    ms.avgOutputTokens = ms.requests > 0 ? Math.round(ms.outputTokens / ms.requests) : 0;
+    let topApp: string | null = null;
+    let topReq = -1;
+    for (const g of groupList) {
+      if (g.modelKey === k && g.requests > topReq) { topReq = g.requests; topApp = g.app; }
+    }
+    ms.topApp = topApp;
+  }
+
+  const modelList = Array.from(models.values()).sort((a, b) => b.costUsd - a.costUsd || b.requests - a.requests);
+  const suggestions = buildSuggestions(groupList, totalCost);
+  const potentialSavings = suggestions.filter((x) => x.confidence === "high").reduce((s, x) => s + x.estSavings, 0);
+  const reviewSavings = suggestions.filter((x) => x.confidence === "review").reduce((s, x) => s + x.estSavings, 0);
+  const appList = Array.from(apps.values()).sort((a, b) => b.costUsd - a.costUsd || b.requests - a.requests);
+  const envList = Array.from(envs.values()).sort((a, b) => b.requests - a.requests);
+
+  return {
+    receipts: requests,
+    requests,
+    inputTokens,
+    outputTokens,
+    totalTokens: inputTokens + outputTokens,
+    pricedTokens: pricedInputTokens + pricedOutputTokens,
+    costUsd: totalCost,
+    pricedRequests,
+    unpricedRequests,
+    models: modelList,
+    apps: appList,
+    environments: envList,
+    suggestions,
+    potentialSavings,
+    reviewSavings,
+    tenants: [],
+    chainHeight: null,
+    signedReceipts: 0,
+    withEvidenceRefs: 0,
     period: { from, to },
   };
 }
@@ -607,4 +723,52 @@ export function renderDashboardHtml(
 </div>
 </body>
 </html>`;
+}
+
+/**
+ * Undo the uniform downsampling that `receiptsFromWorkloads` applies to a very
+ * large imported bill. Every EXTENSIVE quantity (receipt/request counts, tokens,
+ * dollars) scales linearly by `scale`; INTENSIVE quantities (blended rates,
+ * per-request averages, spend shares) and identifiers are left untouched.
+ *
+ * Sampling is uniform and preserves each receipt's per-call averages, so this
+ * exactly recovers full-volume totals. No-op when `scale <= 1`. This is what
+ * makes `scan` and `baseline`/`prove` agree on absolute spend for big bills.
+ */
+export function scaleSummary(s: DashboardSummary, scale: number): DashboardSummary {
+  if (!(scale > 1)) return s;
+  const n = (x: number) => Math.round(x * scale); // integer counts
+  const d = (x: number) => x * scale; // dollars / tokens carried as-is
+  return {
+    ...s,
+    receipts: n(s.receipts),
+    requests: n(s.requests),
+    pricedRequests: n(s.pricedRequests),
+    unpricedRequests: n(s.unpricedRequests),
+    inputTokens: n(s.inputTokens),
+    outputTokens: n(s.outputTokens),
+    totalTokens: n(s.totalTokens),
+    pricedTokens: n(s.pricedTokens),
+    costUsd: d(s.costUsd),
+    potentialSavings: d(s.potentialSavings),
+    reviewSavings: d(s.reviewSavings),
+    signedReceipts: n(s.signedReceipts),
+    withEvidenceRefs: n(s.withEvidenceRefs),
+    models: s.models.map((m) => ({
+      ...m,
+      requests: n(m.requests),
+      inputTokens: n(m.inputTokens),
+      outputTokens: n(m.outputTokens),
+      costUsd: d(m.costUsd),
+    })),
+    apps: s.apps.map((a) => ({ ...a, requests: n(a.requests), costUsd: d(a.costUsd) })),
+    environments: s.environments.map((e) => ({ ...e, requests: n(e.requests), costUsd: d(e.costUsd) })),
+    suggestions: s.suggestions.map((sg) => ({
+      ...sg,
+      requests: n(sg.requests),
+      currentCost: d(sg.currentCost),
+      projectedCost: d(sg.projectedCost),
+      estSavings: d(sg.estSavings),
+    })),
+  };
 }
