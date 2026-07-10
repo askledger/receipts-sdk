@@ -41,6 +41,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "demo": "npm run build && node dist/cli.js sign examples/event.json && node dist/cli.js verify .ledger/last-receipt.json",
+    "demo:layers": "tsx examples/08-four-layers-end-to-end.ts",
     "keygen": "npm run build && node dist/cli.js keygen",
     "bench": "npm run build && node scripts/bench.mjs",
     "sbom": "node scripts/generate-sbom.mjs",
@@ -77,6 +78,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "tsx": "^4.23.0",
     "typescript": "^5.4.0",
     "vitest": "^3.2.6"
   },
