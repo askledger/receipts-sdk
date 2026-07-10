@@ -43,3 +43,6 @@ __pycache__/
 
 # Local demo / scratch data (not part of the SDK)
 sandbox/
+
+# Generated SBOM (produced in CI/release, not committed)
+sbom.cyclonedx.json

@@ -58,6 +58,10 @@ jobs:
       - uses: actions/setup-node@v6
         with: { node-version: "20" }
       - run: npm ci
+      # Produce the CycloneDX SBOM the checklist's G.1 check looks for. It is
+      # generated (not committed) so it stays in sync with dependencies; the same
+      # generator runs at release time in release.yml.
+      - run: node scripts/generate-sbom.mjs > sbom.cyclonedx.json
       - run: npx tsx tools/verify-hardening.ts
 
   sbom:

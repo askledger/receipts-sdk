@@ -36,7 +36,7 @@ savings **signed and verifiable** — that is the paid tier.
 
 ## Project status
 
-**v0.11.0 · live on npm.** The cryptographic core is hardened and
+**v0.12.1 · live on npm.** The cryptographic core is hardened and
 independently verifiable — cross-language conformance tests enforce
 byte-identical receipts across the TypeScript, Python, Go, Rust, and
 Java SDKs, and a machine-checked hardening checklist runs in CI. SDK,
@@ -442,25 +442,23 @@ We are not reinventing the cryptographic primitives. We are composing them into 
 
 ## Roadmap
 
-### v0.2 (next)
-- Rust reference verifier
-- Python SDK
-- Go SDK
-- RFC 3161 timestamping integration (FreeTSA + DigiCert)
-- Merkle commitments + transparency log integration
-- HSM signing reference (PKCS#11)
+### Shipped
+- Five language implementations, one wire format: TypeScript on npm; Python, Go, Rust and Java from source, all cross-verified against shared conformance vectors
+- The four-layer model: cryptographic evidence (L1), execution traceability (L2), correctness and assurance (L3), and a pre-execution guardian (L4)
+- RFC 3161 timestamping, Merkle commitments and a transparency log, and HSM/KMS signing (AWS KMS, Azure Key Vault, GCP KMS, PKCS#11)
+- Verified savings (sign a baseline, prove the realized saving, verify it) and zero-instrumentation spend scan
+- Browser playground and verifier, plus SLSA provenance and a CycloneDX SBOM on every release
 
-### v0.3
-- Reference implementations in 5 more languages
-- Receipt browser (web UI)
+### Next
+- Publish the Python, Rust and Java SDKs to their registries (PyPI, crates.io, Maven Central)
+- Transparency-log connector (Rekor)
 - Bridge to OpenTelemetry GenAI conventions
-- Customer-managed-key reference design
+- Customer-managed-key reference deployments
 
-### v1.0 (target: Year 2)
-- Stable wire format
+### Toward v1.0
+- Stable wire format with versioning guarantees
 - Linux Foundation AI hosted standard
-- Conformance test suite
-- Third-party verifier ecosystem
+- A third-party verifier ecosystem
 
 ---
 
