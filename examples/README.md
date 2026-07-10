@@ -15,6 +15,7 @@ Concrete usage patterns showing how to integrate the Receipts SDK into real syst
 | `06-healthcare-cds.ts` | A clinical decision support call, receipted |
 | `07-government-eligibility.ts` | An eligibility determination, receipted |
 | `08-four-layers-end-to-end.ts` | **All four layers in one run:** guardian (L4) blocks a bad wire, the run is hash-chained (L1) and traced as a DAG (L2), and the decision is rule-checked and graded (L3) |
+| `09-prove-the-savings.ts` | **Prove the savings, don't claim them:** sign a baseline, prove an efficiency-normalized saving against it, verify independently, and watch a forged number get rejected |
 
 ## Running an example
 
@@ -28,7 +29,8 @@ The four-layer walkthrough has its own shortcut:
 ```bash
 npm install
 npm run demo:layers        # runs 08-four-layers-end-to-end.ts
+npm run demo:savings       # runs 09-prove-the-savings.ts
 ```
 
-It prints a per-layer pass/fail report and exits non-zero if anything fails to
-verify, so it doubles as an integration smoke test.
+Both print a pass/fail report and exit non-zero if anything fails to verify, so
+they double as integration smoke tests.
