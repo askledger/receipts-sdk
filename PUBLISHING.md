@@ -55,11 +55,15 @@ Maven Central is stricter than the others. Before `publish-java.yml` can work:
 2. Register at **https://central.sonatype.com**, verify the namespace, and generate a
    **portal token** (user + password).
 3. Create a **GPG key**, publish the public key to a keyserver, and export the private key.
-4. Add the signing + publishing plugins to `pom.xml`
-   (`maven-gpg-plugin` + `central-publishing-maven-plugin`).
+4. ~~Add the signing + publishing plugins to `pom.xml`.~~ **Done.** `pom.xml` already includes
+   `central-publishing-maven-plugin` (deploy phase) plus `maven-source`, `maven-javadoc` and
+   `maven-gpg` in a `release` profile, and `<scm>` / `<developers>` blocks. Nothing to add.
 5. Add repo secrets: `CENTRAL_TOKEN_USER`, `CENTRAL_TOKEN_PASS`,
    `MAVEN_GPG_PRIVATE_KEY`, `MAVEN_GPG_PASSPHRASE`.
 6. Release with `git tag java-v0.1.0 && git push origin java-v0.1.0`.
+
+So the only remaining prerequisites are account/credential steps (1, 2, 3, 5), which need a
+person: the pom and workflow are ready.
 
 ## Notes
 

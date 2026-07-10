@@ -20,6 +20,21 @@
     </license>
   </licenses>
 
+  <!-- Required by Maven Central. -->
+  <developers>
+    <developer>
+      <id>askledger</id>
+      <name>AskLedger</name>
+      <url>https://askledger.org</url>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:https://github.com/askledger/receipts-sdk.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/askledger/receipts-sdk.git</developerConnection>
+    <url>https://github.com/askledger/receipts-sdk</url>
+  </scm>
+
   <properties>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
@@ -52,6 +67,67 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>3.2.5</version>
       </plugin>
+      <!-- Publishes to the Sonatype Central Portal on `mvn deploy`. Binds to the
+           deploy phase only, so plain `mvn verify` never tries to publish. The
+           server id must match `server-id: central` in publish-java.yml. -->
+      <plugin>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
+        <version>0.7.0</version>
+        <extensions>true</extensions>
+        <configuration>
+          <publishingServerId>central</publishingServerId>
+          <autoPublish>true</autoPublish>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
+
+  <!-- Signing + source/javadoc jars are Central requirements, but they need a GPG
+       key and passphrase. They live in a `release` profile so ordinary builds and
+       `mvn verify` in CI do not require a key. publish-java.yml deploys with
+       `-Prelease`. -->
+  <profiles>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>3.3.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals><goal>jar-no-fork</goal></goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>3.11.2</version>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals><goal>jar</goal></goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>3.2.7</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals><goal>sign</goal></goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

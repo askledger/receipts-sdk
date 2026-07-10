@@ -46,4 +46,4 @@ jobs:
           CENTRAL_TOKEN_USER: ${{ secrets.CENTRAL_TOKEN_USER }}
           CENTRAL_TOKEN_PASS: ${{ secrets.CENTRAL_TOKEN_PASS }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-        run: mvn -B --no-transfer-progress -Dgpg.passphrase="$MAVEN_GPG_PASSPHRASE" deploy
+        run: mvn -B --no-transfer-progress -Prelease -Dgpg.passphrase="$MAVEN_GPG_PASSPHRASE" deploy
