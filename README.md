@@ -298,7 +298,7 @@ single verifiable evidence bundle:
 # 1) Key
 node dist/cli.js keygen --out keys.json
 
-# 2) Sign, optionally BIND an external correctness proof (Layer 3, repeatable).
+# 2) Sign, optionally BIND an external correctness proof (Layer 4, repeatable).
 #    file=<path> is read and SHA-256-hashed for you; or pass hash=<hexdigest>.
 node dist/cli.js sign examples/event.json --key keys.json --out r1.json \
   --evidence-ref "kind=rule-check,file=./rule-report.json,status=pass"
@@ -444,7 +444,7 @@ We are not reinventing the cryptographic primitives. We are composing them into 
 
 ### Shipped
 - Five language implementations, one wire format: TypeScript on npm; Python, Go, Rust and Java from source, all cross-verified against shared conformance vectors
-- The four-layer model: cryptographic evidence (L1), execution traceability (L2), correctness and assurance (L3), and a pre-execution guardian (L4)
+- The four-layer proof engine, prevent-first: a pre-execution guardian (prevents the wrong action), cryptographic evidence (proves what happened), execution traceability (proves how), and rule-based assurance (proves why)
 - RFC 3161 timestamping, Merkle commitments and a transparency log, and HSM/KMS signing (AWS KMS, Azure Key Vault, GCP KMS, PKCS#11)
 - Verified savings (sign a baseline, prove the realized saving, verify it) and zero-instrumentation spend scan
 - Browser playground and verifier, plus SLSA provenance and a CycloneDX SBOM on every release

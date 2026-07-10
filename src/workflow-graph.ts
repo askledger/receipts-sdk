@@ -1,5 +1,5 @@
 /**
- * Layer 2, Execution Traceability: deterministic workflow reconstruction.
+ * Layer 3, Execution Traceability: deterministic workflow reconstruction.
  *
  * A multi-step run (an agent workflow, a pipeline) leaves one receipt per step,
  * each recording its parent step(s) in `provenance.parent_receipt_ids` and the
@@ -152,7 +152,7 @@ export function verifyWorkflow(
   for (const r of inRun) {
     const res = verifyReceipt(r, { publicKeys: opts.publicKeys });
     // For a workflow DAG we require content integrity (hash + signature); the
-    // linear per-tenant chain position is Layer 1's job (verifyChain).
+    // linear per-tenant chain position is Layer 2's job (verifyChain).
     if (!(res.checks.canonical_hash_matches && res.checks.signature_valid && res.checks.timestamp_imprint_matches !== false)) {
       allVerified = false;
       errors.push(`receipt ${r.receipt.receipt_id} failed content verification`);

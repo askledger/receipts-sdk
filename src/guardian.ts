@@ -1,12 +1,12 @@
 /**
- * Layer 4, Pre-Execution Guardian / Verdict.
+ * Layer 1, Pre-Execution Guardian / Verdict.
  *
  * Layers 1 to 3 PROVE what happened, how, and why, after the fact. This layer
  * PREVENTS: before an irreversible action runs, an independent reviewer issues a
  * verdict (approve / concerns / reject), and that verdict is signed and
  * cryptographically BOUND to the exact action it judged. The action proceeds
  * only if it clears, and the pre-verdict is itself a first-class, auditable
- * artifact that plugs into a receipt as evidence (linking Layer 4 back to Layer 1).
+ * artifact that plugs into a receipt as evidence (linking Layer 1 back to Layer 2).
  *
  * The SDK does NOT decide the verdict. A reviewer (a policy engine, a separate
  * model, or a human) does. The SDK binds, signs, verifies, and gates, and
@@ -180,8 +180,8 @@ export function assertActionCleared(
 
 /**
  * Turn a signed pre-verdict into an EvidenceRef so the action's receipt
- * (Layer 1) can carry a signed reference to its own pre-approval. This links
- * Layer 4 to Layer 1: the permanent record shows the action was cleared before
+ * (Layer 2) can carry a signed reference to its own pre-approval. This links
+ * Layer 1 to Layer 2: the permanent record shows the action was cleared before
  * it ran, by whom, and with what verdict.
  */
 export function preVerdictEvidenceRef(signed: SignedPreVerdict): EvidenceRef {

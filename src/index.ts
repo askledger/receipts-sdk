@@ -52,7 +52,7 @@ export {
   type TimestampVerdict,
   type TimestampFormat,
 } from "./timestamp.js";
-// Layer 3, Rule-Based Correctness / Assurance.
+// Layer 4, Rule-Based Correctness / Assurance.
 export {
   assuranceLevel,
   checkRules,
@@ -62,7 +62,7 @@ export {
   type RuleCheckResult,
   type RuleEvaluation,
 } from "./assurance.js";
-// Layer 2, Execution Traceability: deterministic workflow reconstruction.
+// Layer 3, Execution Traceability: deterministic workflow reconstruction.
 export {
   reconstructWorkflow,
   verifyWorkflow,
@@ -70,7 +70,7 @@ export {
   type WorkflowGraph,
   type WorkflowVerifyResult,
 } from "./workflow-graph.js";
-// Layer 4, Pre-Execution Guardian / Verdict (prevent, then prove).
+// Layer 1, Pre-Execution Guardian / Verdict (prevent, then prove).
 export {
   actionHash,
   signPreVerdict,

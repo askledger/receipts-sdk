@@ -4,6 +4,16 @@ All notable changes to the AskLedger Receipts SDK will be documented in this fil
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (with the caveat that until v1.0, breaking changes may occur between minor versions).
 
+## [0.12.4] - 2026-07-11
+
+### Changed (docs + comments only, no API or behavior changes)
+
+- Renumbered the five-layer model to **prevent-first**, to match the website. Layer 1 is now
+  the Pre-Execution Guardian (prevents the wrong action), followed by Cryptographic evidence (2),
+  Execution traceability (3), Rule-based assurance (4), and Enablement & ROI (5). Updated the
+  README and the source comments accordingly; the README's roadmap layer line is now
+  number-light so it stays consistent across future numbering changes.
+
 ## [0.12.3] - 2026-07-11
 
 ### Changed (docs only)

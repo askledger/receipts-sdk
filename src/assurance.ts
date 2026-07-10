@@ -1,5 +1,5 @@
 /**
- * Layer 3, Rule-Based Correctness / Assurance.
+ * Layer 4, Rule-Based Correctness / Assurance.
  *
  * Two pieces:
  *  1. `assuranceLevel()` classifies a receipt L0 to L3 by what it actually
@@ -141,7 +141,7 @@ function evalExpr(expr: string, values: Record<string, Scalar>): { passed: boole
 /**
  * Evaluate a policy's rules against a decision's recorded values. Deterministic
  * and bounded: no code execution, only comparisons on the supplied values.
- * Returns a VerificationBlock you sign into the receipt (Layer 3 evidence).
+ * Returns a VerificationBlock you sign into the receipt (Layer 4 evidence).
  */
 export function checkRules(
   policy: PolicyContext,

@@ -11,7 +11,7 @@
  *
  *   ledger-cli verify <receipt.json> [--key <path>]
  *       Verify a signed receipt against a public key. Reports any
- *       attached evidence_refs (Layer 3 correctness bindings).
+ *       attached evidence_refs (Layer 4 correctness bindings).
  *
  *   ledger-cli sign <event.json> [--evidence-ref <spec>]...
  *       Attach one or more external correctness/attestation proofs at
@@ -142,7 +142,7 @@ function writeJSON(filepath: string, value: unknown): void {
  * When `file=` is given, the file is read, its SHA-256 is computed via the
  * SDK's `sha256String` helper, and `alg=sha-256` / `hash=<digest>` are set.
  * Collecting the specs and passing them to `signReceipt({ evidenceRefs })`
- * binds the external correctness proof into the signed receipt body (Layer 3).
+ * binds the external correctness proof into the signed receipt body (Layer 4).
  */
 function parseEvidenceRefSpec(spec: string): EvidenceRef {
   const fields: Record<string, string> = {};
@@ -246,7 +246,7 @@ program
     // Load event
     const event = readJSON<RawEvent>(eventPath);
 
-    // Build evidence_refs (Layer 3) from repeatable --evidence-ref specs.
+    // Build evidence_refs (Layer 4) from repeatable --evidence-ref specs.
     const evidenceRefs: EvidenceRef[] = (opts.evidenceRef as string[]).map(
       parseEvidenceRefSpec
     );
@@ -272,7 +272,7 @@ program
     if (evidenceRefs.length > 0) {
       const kinds = evidenceRefs.map((r) => r.kind).join(", ");
       console.log(`  evidence_refs:        ${evidenceRefs.length} attached (${kinds})`);
-      console.log(`                        bound into signed body (Layer 3 correctness binding)`);
+      console.log(`                        bound into signed body (Layer 4 correctness binding)`);
     }
     console.log(`  written to:           ${opts.out}\n`);
   });
