@@ -8,7 +8,7 @@ Open-source, vendor-neutral cryptographic trust substrate for enterprise AI. Eve
 [![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org)
 [![Spec](https://img.shields.io/badge/PL--RFC-001…010-blueviolet)](spec/README.md)
 [![Conformance](https://img.shields.io/badge/conformance-CL1%2FCL2%2FCL3-blue)](conformance/README.md)
-[![Tests](https://img.shields.io/badge/tests-304%20passing-brightgreen)](#testing)
+[![Tests](https://img.shields.io/badge/tests-438%20passing-brightgreen)](#testing)
 [![Hardening](https://img.shields.io/badge/hardening-66%2F66%20PASS-brightgreen)](docs/security/HARDENING_CHECKLIST.md)
 
 ---
@@ -36,7 +36,7 @@ savings **signed and verifiable**: that is the paid tier.
 
 ## Project status
 
-**v0.12.1 · live on npm.** The cryptographic core is hardened and
+**v0.12 · live on npm.** The cryptographic core is hardened and
 independently verifiable, cross-language conformance tests enforce
 byte-identical receipts across the TypeScript, Python, Go, Rust, and
 Java SDKs, and a machine-checked hardening checklist runs in CI. SDK,
@@ -526,7 +526,7 @@ Errors from the wrapped client always propagate, receipts never take down the AI
 
 | SDK | Language | Status | Conformance |
 |---|---|---|---|
-| `@askledger/receipts-sdk` | TypeScript / Node 18+ / browsers | v0.12.1 on npm · 442 tests (438 pass, 4 HSM-live skipped) | Reference |
+| `@askledger/receipts-sdk` | TypeScript / Node 18+ / browsers | live on npm · 442 tests (438 pass, 4 HSM-live skipped) | Reference |
 | `askledger-receipts` (Python, import `askledger.receipts`) | Python 3.10+ | From source (not yet on PyPI) · cross-verified against TS vectors | Cross-verified |
 | `github.com/askledger/receipts-sdk/go-sdk` | Go 1.22+ | `go get` (git-based) · cross-verified against TS vectors | Cross-verified |
 | `askledger-receipts` (Rust crate) | Rust 1.75+ | From source (git dep, not yet on crates.io) · cross-verified against TS vectors | Cross-verified |

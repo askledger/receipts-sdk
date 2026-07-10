@@ -4,6 +4,14 @@ All notable changes to the AskLedger Receipts SDK will be documented in this fil
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (with the caveat that until v1.0, breaking changes may occur between minor versions).
 
+## [0.12.3] - 2026-07-11
+
+### Changed (docs only)
+
+- Made the README version references patch-agnostic (the status line and the SDK-matrix row) so
+  the npm page no longer lags a patch behind on each release. Updated the tests badge to 438.
+- Removed an em-dash from the package.json `description`, which is shown on the npm page.
+
 ## [0.12.2] - 2026-07-11
 
 ### Changed (docs + polish, no API or behavior changes)
