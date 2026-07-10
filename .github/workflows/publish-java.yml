@@ -2,9 +2,9 @@ name: Publish Java SDK to Maven Central
 
 # TEMPLATE — needs extra setup before it will work. See PUBLISHING.md.
 # Prerequisites:
-#   1. Fix java-sdk/pom.xml groupId: currently "io.projectledger" (stale, pre-rename).
-#      Change to a namespace you can VERIFY on Sonatype Central, e.g. "io.github.askledger"
-#      (auto-verified via GitHub) or a domain you own (e.g. "org.askledger").
+#   1. Verify the groupId namespace on Sonatype Central. pom.xml uses "org.askledger" and the
+#      Java package is "org.askledger.receipts"; verify the askledger.org domain (you own it),
+#      or switch both to "io.github.askledger" for GitHub-based auto-verification.
 #   2. Add the maven-gpg-plugin + central-publishing-maven-plugin (or nexus-staging) to pom.xml.
 #   3. Repo secrets: CENTRAL_TOKEN_USER, CENTRAL_TOKEN_PASS (Sonatype Central portal token),
 #      MAVEN_GPG_PRIVATE_KEY (ASCII-armored), MAVEN_GPG_PASSPHRASE.

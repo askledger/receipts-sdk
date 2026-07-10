@@ -4,6 +4,23 @@ All notable changes to the AskLedger Receipts SDK will be documented in this fil
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (with the caveat that until v1.0, breaking changes may occur between minor versions).
 
+## [0.12.1] — 2026-07-10
+
+### Fixed — identity cleanup (no API changes)
+
+- Removed the stale `projectledger` identity left over from before the rename. The published
+  README no longer tells developers the Python import is `projectledger.receipts` or the Java
+  coordinate is `io.projectledger:receipts-sdk`.
+- **Python** package renamed `projectledger.receipts` → `askledger.receipts` (import path,
+  tests, README). Distribution name was already `askledger-receipts`.
+- **Java** package renamed `io.projectledger.receipts` → `org.askledger.receipts`, matching the
+  existing `org.askledger` groupId in `pom.xml`.
+- Corrected a stale SDK-matrix row in the README (`v0.6.0 · 304 tests` → current).
+- Updated `PUBLISHING.md` and `publish-java.yml` notes to reflect the corrected namespaces.
+
+The published TypeScript package `@askledger/receipts-sdk` was already correct; this release
+refreshes the npm README and cleans the cross-language identity. No code or API changes.
+
 ## [0.12.0] — 2026-07-10
 
 ### Added — the four-layer model (Prevent, then Prove)

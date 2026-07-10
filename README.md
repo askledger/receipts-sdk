@@ -528,11 +528,11 @@ Errors from the wrapped client always propagate — receipts never take down the
 
 | SDK | Language | Status | Conformance |
 |---|---|---|---|
-| `@askledger/receipts-sdk` | TypeScript / Node 18+ / browsers | v0.6.0 on npm · 304 tests passing | Reference |
-| `askledger-receipts` (Python, import `projectledger.receipts`) | Python 3.10+ | From source (not yet on PyPI) · cross-verified against TS vectors | Cross-verified |
+| `@askledger/receipts-sdk` | TypeScript / Node 18+ / browsers | v0.12.1 on npm · 442 tests (438 pass, 4 HSM-live skipped) | Reference |
+| `askledger-receipts` (Python, import `askledger.receipts`) | Python 3.10+ | From source (not yet on PyPI) · cross-verified against TS vectors | Cross-verified |
 | `github.com/askledger/receipts-sdk/go-sdk` | Go 1.22+ | `go get` (git-based) · cross-verified against TS vectors | Cross-verified |
 | `askledger-receipts` (Rust crate) | Rust 1.75+ | From source (git dep, not yet on crates.io) · cross-verified against TS vectors | Cross-verified |
-| `io.projectledger:receipts-sdk` (Java) | Java 17+ | From source (not yet on Maven Central) · cross-verified against TS vectors | Cross-verified |
+| `org.askledger:receipts-sdk` (Java) | Java 17+ | From source (not yet on Maven Central) · cross-verified against TS vectors | Cross-verified |
 
 Wire-format compatibility is enforced by [shared conformance vectors](test/conformance/) that every SDK must pass.
 

@@ -13,7 +13,7 @@ pip install git+https://github.com/askledger/receipts-sdk.git#subdirectory=pytho
 ## Quick start
 
 ```python
-from projectledger.receipts import sign_receipt, verify_receipt, generate_keypair
+from askledger.receipts import sign_receipt, verify_receipt, generate_keypair
 
 kp = generate_keypair()
 event = {

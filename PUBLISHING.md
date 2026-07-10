@@ -47,11 +47,11 @@ so releases are independent.
 
 Maven Central is stricter than the others. Before `publish-java.yml` can work:
 
-1. **Fix the groupId.** `java-sdk/pom.xml` currently declares
-   `<groupId>io.projectledger</groupId>` — a leftover from before the rename. Change it to a
-   namespace you can verify on Sonatype Central. Easiest: **`io.github.askledger`**
-   (auto-verified because you own the `askledger` GitHub org). Update the Java package imports
-   to match if you change the base package.
+1. **Verify the namespace.** `java-sdk/pom.xml` uses `<groupId>org.askledger</groupId>` and the
+   Java package is `org.askledger.receipts`. On Sonatype Central, verify the **`askledger.org`**
+   domain (you own it) to claim `org.askledger`. If you would rather skip DNS verification,
+   switch the groupId and the Java package base to **`io.github.askledger`**, which is
+   auto-verified because you own the `askledger` GitHub org.
 2. Register at **https://central.sonatype.com**, verify the namespace, and generate a
    **portal token** (user + password).
 3. Create a **GPG key**, publish the public key to a keyserver, and export the private key.

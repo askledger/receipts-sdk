@@ -6,7 +6,7 @@ import pathlib
 
 import pytest
 
-from projectledger.receipts import canonicalize, sha256_hex
+from askledger.receipts import canonicalize, sha256_hex
 
 HERE = pathlib.Path(__file__).resolve().parent
 VECTORS = HERE.parent.parent / "test" / "conformance"
@@ -33,7 +33,7 @@ def test_python_signs_typescript_verifies_roundtrip():
     from here, but we can check that the Python implementation produces
     a receipt the TS verifier would accept.
     """
-    from projectledger.receipts import generate_keypair, sign_receipt, verify_receipt
+    from askledger.receipts import generate_keypair, sign_receipt, verify_receipt
 
     kp = generate_keypair()
     event = {

@@ -2,43 +2,43 @@
 # Format: glob  @owner1 @owner2
 
 # Default — every file has at least one reviewer.
-*                                   @projectledger/maintainers
+*                                   @askledger/maintainers
 
 # Cryptographic core — TWO reviewers required, one must be from @crypto.
-/src/crypto.ts                      @projectledger/crypto @projectledger/maintainers
-/src/canonicalize.ts                @projectledger/crypto @projectledger/maintainers
-/src/receipt.ts                     @projectledger/crypto @projectledger/maintainers
-/src/verify.ts                      @projectledger/crypto @projectledger/maintainers
-/src/chain*.ts                      @projectledger/crypto @projectledger/maintainers
-/src/merkle.ts                      @projectledger/crypto @projectledger/maintainers
-/src/signing-provider.ts            @projectledger/crypto @projectledger/maintainers
-/src/fips.ts                        @projectledger/crypto @projectledger/maintainers
-/src/hsm/**                         @projectledger/crypto @projectledger/maintainers
+/src/crypto.ts                      @askledger/crypto @askledger/maintainers
+/src/canonicalize.ts                @askledger/crypto @askledger/maintainers
+/src/receipt.ts                     @askledger/crypto @askledger/maintainers
+/src/verify.ts                      @askledger/crypto @askledger/maintainers
+/src/chain*.ts                      @askledger/crypto @askledger/maintainers
+/src/merkle.ts                      @askledger/crypto @askledger/maintainers
+/src/signing-provider.ts            @askledger/crypto @askledger/maintainers
+/src/fips.ts                        @askledger/crypto @askledger/maintainers
+/src/hsm/**                         @askledger/crypto @askledger/maintainers
 
 # Cross-language SDKs — at least one owner per language.
-/python/**                          @projectledger/sdk-python
-/go-sdk/**                          @projectledger/sdk-go
-/rust-sdk/**                        @projectledger/sdk-rust
-/java-sdk/**                        @projectledger/sdk-java
+/python/**                          @askledger/sdk-python
+/go-sdk/**                          @askledger/sdk-go
+/rust-sdk/**                        @askledger/sdk-rust
+/java-sdk/**                        @askledger/sdk-java
 
 # Policy templates — review by compliance + the originating regulator's owner.
-/src/policy-templates/**            @projectledger/compliance @projectledger/maintainers
+/src/policy-templates/**            @askledger/compliance @askledger/maintainers
 
 # Console — UI + RBAC.
-/console/src/lib/auth.ts            @projectledger/security
-/console/src/lib/rbac.ts            @projectledger/security
-/console/src/lib/tenant-context.ts  @projectledger/security
-/console/src/middleware.ts          @projectledger/security
-/console/**                         @projectledger/console
+/console/src/lib/auth.ts            @askledger/security
+/console/src/lib/rbac.ts            @askledger/security
+/console/src/lib/tenant-context.ts  @askledger/security
+/console/src/middleware.ts          @askledger/security
+/console/**                         @askledger/console
 
 # Browser extension.
-/browser-extension/**               @projectledger/extension @projectledger/security
+/browser-extension/**               @askledger/extension @askledger/security
 
 # Documentation.
-/docs/operations/**                 @projectledger/sre
-/docs/security/**                   @projectledger/security
-/docs/strategy/**                   @projectledger/maintainers
+/docs/operations/**                 @askledger/sre
+/docs/security/**                   @askledger/security
+/docs/strategy/**                   @askledger/maintainers
 
 # CI / supply chain.
-/.github/**                         @projectledger/sre
-/tools/**                           @projectledger/sre
+/.github/**                         @askledger/sre
+/tools/**                           @askledger/sre
