@@ -1,7 +1,7 @@
 // Turn a budget-guard decision into a signed receipt. The receipt names
 // the org policy that fired, the actor whose call was throttled, and
 // the threshold ratio. This is the artifact a developer points at when
-// asked "why did the AI not run" — proof the policy did it, not them.
+// asked "why did the AI not run", proof the policy did it, not them.
 
 import type { BudgetAction } from "./budget.js";
 

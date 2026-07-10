@@ -1,5 +1,5 @@
 /**
- * HIPAA Security Rule (45 CFR Part 164 Subpart C) — pre-built template.
+ * HIPAA Security Rule (45 CFR Part 164 Subpart C), pre-built template.
  *
  * Applies to covered entities and business associates handling Protected
  * Health Information (PHI). Increasingly relevant to AI deployments
@@ -14,7 +14,7 @@ import type { PolicyTemplate } from "./types.js";
 
 export const HIPAA_SECURITY_RULE: PolicyTemplate = {
   regulator: "ISO_42001",  // closest existing enum; HIPAA-specific Regulator key in future revision
-  name: "HIPAA Security Rule — AI processing of PHI",
+  name: "HIPAA Security Rule, AI processing of PHI",
   version: "45-CFR-164-Subpart-C",
   published_at: "2003-02-20",
   summary:
@@ -28,7 +28,7 @@ export const HIPAA_SECURITY_RULE: PolicyTemplate = {
       id: "164.308.a.1.ii.D",
       title: "Information System Activity Review",
       requirement:
-        "Implement procedures to regularly review records of information system activity — including AI invocations that touch PHI.",
+        "Implement procedures to regularly review records of information system activity, including AI invocations that touch PHI.",
       pillar: "accountability",
       satisfied_by_fields: ["integrity.receipt_hash", "event.context.user_id", "event.payload.input_classification"],
       severity: "high",
@@ -48,7 +48,7 @@ export const HIPAA_SECURITY_RULE: PolicyTemplate = {
       id: "164.308.a.4",
       title: "Information Access Management",
       requirement:
-        "Access to PHI must be authorized and recorded — including access through AI inference systems.",
+        "Access to PHI must be authorized and recorded, including access through AI inference systems.",
       pillar: "accountability",
       satisfied_by_fields: ["event.context.user_id", "event.context.service_id", "decision.decision"],
       severity: "high",
@@ -78,7 +78,7 @@ export const HIPAA_SECURITY_RULE: PolicyTemplate = {
       id: "164.312.e",
       title: "Transmission Security",
       requirement:
-        "Implement technical security measures to guard against unauthorized access to electronic PHI being transmitted — including to AI inference endpoints.",
+        "Implement technical security measures to guard against unauthorized access to electronic PHI being transmitted, including to AI inference endpoints.",
       pillar: "security",
       satisfied_by_fields: ["event.subject.ai_provider", "event.context.region"],
       severity: "high",

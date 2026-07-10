@@ -1,7 +1,7 @@
 // Free, local, single-tenant usage & cost dashboard.
 //
-// Aggregates a set of signed receipts you already produced — no network, no
-// account, no hosted service — into the numbers a team most wants on day one:
+// Aggregates a set of signed receipts you already produced, no network, no
+// account, no hosted service, into the numbers a team most wants on day one:
 // how many AI calls, which models, how many tokens, and an ESTIMATED cost from
 // the built-in pricing table. It also surfaces the trust signals that make
 // AskLedger different from a plain usage meter: how many receipts are signed,
@@ -9,12 +9,12 @@
 // (evidence_refs).
 //
 // Honesty boundaries (kept deliberately tight so the free view never
-// overclaims — see the open-core split):
+// overclaims, see the open-core split):
 //   • Cost is an ESTIMATE derived from instrumented receipts and the local
 //     PRICING table. Models not in the table are counted but priced at $0 and
 //     reported separately as "unpriced", never silently folded into the total.
 //   • This sees ONLY the receipts you hand it. It cannot discover shadow AI or
-//     join billing/identity signals — that is the hosted/enterprise tier.
+//     join billing/identity signals, that is the hosted/enterprise tier.
 //   • It is single-tenant: it summarizes whatever receipts are present and
 //     lists the tenant ids it saw, but does no cross-tenant attribution.
 
@@ -31,7 +31,7 @@ export interface ModelStat {
   outputTokens: number;
   costUsd: number;
   priced: boolean; // false => model absent from the PRICING table
-  avgOutputTokens: number; // outputTokens / requests — a "how heavy is this workload" signal
+  avgOutputTokens: number; // outputTokens / requests, a "how heavy is this workload" signal
   topApp: string | null; // source_system that used this model the most
 }
 
@@ -44,13 +44,13 @@ export interface NamedCount {
 /**
  * A single, honest cost-saving suggestion produced entirely from your local
  * receipts. This is the FREE, heuristic subset of the enterprise
- * recommendation engine: it only flags "over-tiering" — a premium model used
- * for short/simple calls that a cheaper same-vendor tier usually handles — and
+ * recommendation engine: it only flags "over-tiering", a premium model used
+ * for short/simple calls that a cheaper same-vendor tier usually handles, and
  * it quantifies the opportunity with an EXACT counterfactual: what those same
  * recorded calls would have cost on `toModel`, using their actual token counts.
  *
  * It deliberately does NOT model quality, cascade acceptance, cache hit-rates,
- * or use-case fit — those need richer telemetry and are the paid tier. So every
+ * or use-case fit, those need richer telemetry and are the paid tier. So every
  * suggestion is framed as "test this," never "you will save this."
  */
 export interface SavingsSuggestion {
@@ -59,7 +59,7 @@ export interface SavingsSuggestion {
   requests: number; // calls that would be affected
   shareOfSpendPct: number; // fromModel's share of total estimated spend (0..100)
   avgOutputTokens: number; // evidence the workload is light
-  avgInputTokens: number; // context size — high input can mean the big model is warranted
+  avgInputTokens: number; // context size, high input can mean the big model is warranted
   // "high" = short output AND modest input AND an adjacent same-family tier: a
   // low-risk swap we'll put in the headline number. "review" = worth trying but
   // the swap carries real quality risk (heavy input context, or a cross-family
@@ -78,7 +78,7 @@ export interface DashboardSummary {
   inputTokens: number;
   outputTokens: number;
   totalTokens: number;
-  pricedTokens: number; // tokens on PRICED models only — the denominator for the blended rate
+  pricedTokens: number; // tokens on PRICED models only, the denominator for the blended rate
   costUsd: number; // estimate; excludes unpriced models
   pricedRequests: number;
   unpricedRequests: number;
@@ -87,7 +87,7 @@ export interface DashboardSummary {
   environments: NamedCount[]; // by event.context.environment
   suggestions: SavingsSuggestion[]; // over-tiering opportunities (free heuristic)
   potentialSavings: number; // sum of estSavings for HIGH-confidence suggestions only (the defensible headline)
-  reviewSavings: number; // sum of estSavings for "review" suggestions (real quality risk — not counted as confident)
+  reviewSavings: number; // sum of estSavings for "review" suggestions (real quality risk, not counted as confident)
   tenants: string[];
   chainHeight: number | null; // max integrity.chain_height seen
   signedReceipts: number; // receipts carrying >=1 signature
@@ -105,7 +105,7 @@ function bump(map: Map<string, NamedCount>, name: string, cost: number): void {
 // A premium model -> the cheaper same-vendor tier a light workload can usually
 // move to. Only pairs where both sides are in the PRICING table are used, so
 // the counterfactual cost is always real. `sameFamily` marks an adjacent tier
-// of the SAME family/generation (opus->sonnet, gpt-5->gpt-5-mini) — a low-risk
+// of the SAME family/generation (opus->sonnet, gpt-5->gpt-5-mini), a low-risk
 // swap. A cross-family/generation move (gpt-4o->gpt-5-mini) is a bigger quality
 // change, so it can only ever be surfaced as "review", never as confident.
 const DOWNSHIFT: Record<string, { to: string; sameFamily: boolean }> = {
@@ -118,17 +118,17 @@ const DOWNSHIFT: Record<string, { to: string; sameFamily: boolean }> = {
 
 // A workload is a downshift candidate when its average completion is short.
 // Long generations are where a premium model earns its keep, so we don't nudge
-// those — keep the big model's capacity for the heavy, high-value calls.
+// those, keep the big model's capacity for the heavy, high-value calls.
 const LIGHT_OUTPUT_TOKENS = 800;
 
 // Short output alone is NOT enough. A call that feeds a large input context
 // (RAG, long documents, big system prompts) often genuinely needs the stronger
 // model even when its answer is brief. Above this average input size we don't
-// claim the saving with confidence — it becomes a "review" flag instead. This
+// claim the saving with confidence, it becomes a "review" flag instead. This
 // is the fix for the heuristic being "input-blind".
 const LIGHT_INPUT_TOKENS = 4000;
 
-// A (model × application) workload — the granularity at which over-tiering is
+// A (model × application) workload, the granularity at which over-tiering is
 // judged. Grouping by model alone would let a few heavy calls mask a large,
 // light, over-tiered workload sitting under the same model.
 interface GroupStat {
@@ -167,7 +167,7 @@ function buildSuggestions(groups: GroupStat[], totalCost: number): SavingsSugges
     const estSavings = g.costUsd - projectedCost;
     if (estSavings <= 0) continue;
 
-    // Confidence: high only when the swap is genuinely low-risk — an adjacent
+    // Confidence: high only when the swap is genuinely low-risk, an adjacent
     // same-family tier AND the workload isn't feeding heavy context. Anything
     // else is real (the repricing is exact) but carries quality risk, so it's
     // reported for review, never folded into the headline savings number.
@@ -180,13 +180,13 @@ function buildSuggestions(groups: GroupStat[], totalCost: number): SavingsSugges
     let reason: string;
     if (confidence === "high") {
       reason =
-        `${head} — short enough that ${ds.to} usually handles them. Those same calls repriced on ${ds.to} cost ${fmtUsd(projectedCost)} vs ${fmtUsd(g.costUsd)}. Route this workload to ${ds.to} and keep ${g.model} for the heavy, high-value calls.`;
+        `${head}, short enough that ${ds.to} usually handles them. Those same calls repriced on ${ds.to} cost ${fmtUsd(projectedCost)} vs ${fmtUsd(g.costUsd)}. Route this workload to ${ds.to} and keep ${g.model} for the heavy, high-value calls.`;
     } else if (heavyContext) {
       reason =
-        `${head}, but each also feeds a large input context (avg ${avgIn.toLocaleString()} tokens) — long-context work often needs the stronger model, so review a sample before switching. If quality holds, ${money}.`;
+        `${head}, but each also feeds a large input context (avg ${avgIn.toLocaleString()} tokens), long-context work often needs the stronger model, so review a sample before switching. If quality holds, ${money}.`;
     } else {
       reason =
-        `${head}, short enough to try ${ds.to} — but this crosses model families (${g.model} → ${ds.to}), a bigger quality change, so test on a sample first. If quality holds, ${money}.`;
+        `${head}, short enough to try ${ds.to}, but this crosses model families (${g.model} → ${ds.to}), a bigger quality change, so test on a sample first. If quality holds, ${money}.`;
     }
 
     out.push({
@@ -309,7 +309,7 @@ export function summarizeReceipts(receipts: SignedReceipt[]): DashboardSummary {
 
     const appName = r.event?.source_system || "unknown";
     // Over-tiering aggregation excludes governed decisions (a receipt with a
-    // policy decision block, e.g. a loan approval) — there the stronger model
+    // policy decision block, e.g. a loan approval), there the stronger model
     // is often a considered choice, not waste. Spend/usage totals count all.
     const governed = r.decision?.decision != null;
     if (!governed) {
@@ -394,7 +394,7 @@ export function summarizeReceipts(receipts: SignedReceipt[]): DashboardSummary {
 
 /**
  * Summarize an imported bill EXACTLY from aggregated (model × app × period)
- * rows — no per-request expansion, no sampling, no scale factor. The signed
+ * rows, no per-request expansion, no sampling, no scale factor. The signed
  * baseline/prove path and `scan` both use this, so their figures are exact and
  * always agree regardless of bill size (this removes the last sampling-precision
  * residual on pathological mixed bills).
@@ -523,7 +523,7 @@ function esc(s: string): string {
 /**
  * Render the summary as a self-contained HTML page (no external assets, no
  * scripts, safe to open from disk). `generatedAt` is passed in so this stays
- * pure — the CLI supplies the timestamp.
+ * pure, the CLI supplies the timestamp.
  */
 export function renderDashboardHtml(
   summary: DashboardSummary,
@@ -567,7 +567,7 @@ export function renderDashboardHtml(
 
   const unpricedNote =
     summary.unpricedRequests > 0
-      ? `<p class="note">${summary.unpricedRequests.toLocaleString()} request(s) used a model not in the local pricing table — counted, but excluded from the cost estimate and marked <b>unpriced</b>.</p>`
+      ? `<p class="note">${summary.unpricedRequests.toLocaleString()} request(s) used a model not in the local pricing table, counted, but excluded from the cost estimate and marked <b>unpriced</b>.</p>`
       : "";
 
   const savingsCard = summary.suggestions.length
@@ -585,7 +585,7 @@ export function renderDashboardHtml(
       </div>`
       )
       .join("")}
-    <p class="note">These are <b>heuristic</b> over-tiering flags. The savings figure reprices the <em>same</em> recorded calls on the cheaper tier — exact arithmetic, but it can't judge output quality. Only <b>confident</b> flags (short output, modest input context, an adjacent same-family tier) count toward the headline number; <b>review</b> flags (heavy input context or a cross-family swap) are shown separately because they carry real quality risk — test on a sample before switching. Automated verified-savings (baseline → signed proof) is the AskLedger platform.</p>
+    <p class="note">These are <b>heuristic</b> over-tiering flags. The savings figure reprices the <em>same</em> recorded calls on the cheaper tier, exact arithmetic, but it can't judge output quality. Only <b>confident</b> flags (short output, modest input context, an adjacent same-family tier) count toward the headline number; <b>review</b> flags (heavy input context or a cross-family swap) are shown separately because they carry real quality risk, test on a sample before switching. Automated verified-savings (baseline → signed proof) is the AskLedger platform.</p>
   </div>`
     : "";
 
@@ -718,7 +718,7 @@ export function renderDashboardHtml(
   </div>
 
   <div class="foot">
-    <b>How to read this.</b> Cost is an <b>estimate</b> computed locally from your instrumented receipts and AskLedger's built-in pricing table — not a bill. It reflects only the receipts you generated on this machine; it cannot see un-instrumented (shadow) AI, and it does not join billing or identity data. Cross-system discovery, verified savings, and hosted dashboards are the enterprise tier. Every number above is backed by a signed, independently verifiable receipt.
+    <b>How to read this.</b> Cost is an <b>estimate</b> computed locally from your instrumented receipts and AskLedger's built-in pricing table, not a bill. It reflects only the receipts you generated on this machine; it cannot see un-instrumented (shadow) AI, and it does not join billing or identity data. Cross-system discovery, verified savings, and hosted dashboards are the enterprise tier. Every number above is backed by a signed, independently verifiable receipt.
   </div>
 </div>
 </body>

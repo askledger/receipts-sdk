@@ -1,5 +1,5 @@
 /**
- * Reference Transparency Log — RFC 9162 (Certificate Transparency v2)
+ * Reference Transparency Log, RFC 9162 (Certificate Transparency v2)
  * style append-only Merkle tree.
  *
  * This reference implementation uses an in-memory tree suitable for
@@ -9,7 +9,7 @@
  *
  * Operators MUST publish STHs on a fixed cadence (default: every 5
  * minutes). The signed STH chain is what gives the world the ability
- * to detect log rewrites — including ones we would attempt ourselves.
+ * to detect log rewrites, including ones we would attempt ourselves.
  */
 
 import { sha256 as sha256Fn } from "@noble/hashes/sha2";
@@ -291,7 +291,7 @@ export class TransparencyLog {
    * `first_root_hex` is a prefix of a log of `second_size` with root
    * `second_root_hex`. Recomputes BOTH roots from the proof and checks them, so
    * any rewrite of history between the two tree heads is detected. Standard
-   * algorithm (RFC 6962 s2.1.2) — interoperates with external verifiers.
+   * algorithm (RFC 6962 s2.1.2), interoperates with external verifiers.
    */
   static verifyConsistency(
     first_size: number,

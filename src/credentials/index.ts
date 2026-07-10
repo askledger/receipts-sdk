@@ -116,7 +116,7 @@ export function buildSalarySlipEvent(opts: {
 /**
  * Returns true iff the supplied canonical document bytes produce the
  * same document_hash recorded on the event. This is how a verifier in
- * Singapore confirms a salary slip from a Mumbai employer — no third
+ * Singapore confirms a salary slip from a Mumbai employer, no third
  * party.
  */
 export function verifyDocumentBinding(event: RawEvent, canonicalDocument: string): boolean {

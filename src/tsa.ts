@@ -173,7 +173,7 @@ export interface TSAClientOptions {
  * Network RFC 3161 client. Sends a TimeStampReq to the configured TSA
  * and returns the raw DER-encoded TimeStampResp.
  *
- * The response is opaque to this SDK — it is stored verbatim in the
+ * The response is opaque to this SDK, it is stored verbatim in the
  * receipt envelope. Verification of the TSA signature is the verifier's
  * responsibility (they hold the TSA's CA certificate).
  */
@@ -235,7 +235,7 @@ export class TSAClient {
  * Synchronous in-process TSA stub for tests and offline development.
  *
  * Produces a deterministic non-network token containing the imprint and
- * a timestamp string. NOT a valid RFC 3161 token — for tests only.
+ * a timestamp string. NOT a valid RFC 3161 token, for tests only.
  */
 export class StubTSAClient {
   constructor(public readonly id: string = "stub-tsa") {}

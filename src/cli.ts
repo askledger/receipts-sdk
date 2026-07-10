@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * ledger-cli — command-line interface for the Receipts SDK.
+ * ledger-cli, command-line interface for the Receipts SDK.
  *
  * Commands:
  *   ledger-cli keygen [--out <path>]
@@ -21,7 +21,7 @@
  *
  *   ledger-cli bundle <receipt-or-chain files...> [--out <path>] [--title <t>] [--tenant <id>]
  *       Build an evidence bundle (Merkle root + inclusion proofs + pack
- *       hash) from many signed receipts — one verifiable artifact.
+ *       hash) from many signed receipts, one verifiable artifact.
  *
  *   ledger-cli verify-bundle <bundle.json> [--key <keypair.json>]
  *       Verify an evidence bundle: pack integrity, receipt inclusion,
@@ -31,7 +31,7 @@
  *       Ask your receipts a question in plain English. The offline parser
  *       handles common questions for free; --llm (needs @anthropic-ai/sdk +
  *       ANTHROPIC_API_KEY) handles free-form phrasing. Every answer is grounded
- *       in real receipts and cites their ids — the NL layer never invents data.
+ *       in real receipts and cites their ids, the NL layer never invents data.
  *
  *   ledger-cli alerts [paths...] [--json]
  *       Flag the receipts most worth a look: blocked/denied decisions, sensitive
@@ -49,9 +49,9 @@
  *       Run a full keygen + sign + verify cycle end-to-end.
  *
  * Three layers, one CLI:
- *   Integrity     — keygen / sign / verify (hash chain + Ed25519)
- *   Traceability  — bundle / verify-bundle (Merkle evidence bundle)
- *   Correctness   — sign --evidence-ref (binds an EXTERNAL proof; the SDK
+ *   Integrity    , keygen / sign / verify (hash chain + Ed25519)
+ *   Traceability , bundle / verify-bundle (Merkle evidence bundle)
+ *   Correctness  , sign --evidence-ref (binds an EXTERNAL proof; the SDK
  *                   binds it into the signed body, it does not itself verify).
  */
 
@@ -109,7 +109,7 @@ const c = {
 function paint(color: string, s: string): string { return `${color}${s}${c.reset}`; }
 function shortHash(h: string): string { return `${h.slice(0,8)}…${h.slice(-6)}`; }
 // Neutralize ANSI/control characters in receipt-authored strings before printing
-// them to a terminal — a receipt from another party (e.g. inside an evidence
+// them to a terminal, a receipt from another party (e.g. inside an evidence
 // bundle you received) could otherwise embed escape sequences to spoof output.
 function clean(s: string): string { return String(s).replace(/[\u0000-\u001f\u007f-\u009f]/g, "\uFFFD"); }
 function rule(): string { return paint(c.gray, "─".repeat(78)); }
@@ -198,7 +198,7 @@ program.addHelpText(
   `
 Start here:
   $ ledger-cli scan <usage-export.json>   See your wasted AI spend from an existing
-                                          OpenAI/Anthropic bill — no instrumentation.
+                                          OpenAI/Anthropic bill, no instrumentation.
 
 Then, once you're emitting signed receipts:
   dashboard · query · alerts · verify · bundle
@@ -309,7 +309,7 @@ program
       const refs = signed.receipt.evidence_refs;
       if (refs && refs.length > 0) {
         const kinds = refs.map((r) => r.kind).join(", ");
-        console.log(`  evidence refs: ${refs.length} (${kinds}) — covered by this signature`);
+        console.log(`  evidence refs: ${refs.length} (${kinds}), covered by this signature`);
       }
     } else {
       console.log("\x1b[31m✗ RECEIPT INVALID\x1b[0m");
@@ -473,7 +473,7 @@ program
 // ---------- demo ----------
 program
   .command("quickstart")
-  .description("60-second hello world — keygen + first signed receipt + verify + badge URL")
+  .description("60-second hello world, keygen + first signed receipt + verify + badge URL")
   .action(async () => {
     const { quickstart } = await import("./cli/quickstart.js");
     process.exit(await quickstart());
@@ -481,7 +481,7 @@ program
 
 program
   .command("demo")
-  .description("Run a full demo — keygen, chain of 5 receipts, verify, tamper, evidence pack")
+  .description("Run a full demo, keygen, chain of 5 receipts, verify, tamper, evidence pack")
   .option("--fast", "Skip the cinematic pauses", false)
   .action(async (opts) => {
     const pause = opts.fast ? 0 : 350;
@@ -503,7 +503,7 @@ program
     await sleep(pause);
     console.log(`   ${paint(c.green, "✓")} kid          ${paint(c.gold, kp.kid)}`);
     console.log(`   ${paint(c.green, "✓")} public_key   ${paint(c.gold, kp.public_key)}`);
-    console.log(`   ${paint(c.gray, "  (private key never printed — stays at " + KEYS_DIR + "/demo.json)")}`);
+    console.log(`   ${paint(c.gray, "  (private key never printed, stays at " + KEYS_DIR + "/demo.json)")}`);
 
     // 2) Sign chain
     await sleep(pause);
@@ -574,7 +574,7 @@ program
     // 4) Tamper
     await sleep(pause);
     console.log("");
-    console.log(paint(c.cyan + c.bold, "④ Adversarial test — tamper with receipt #3"));
+    console.log(paint(c.cyan + c.bold, "④ Adversarial test, tamper with receipt #3"));
     console.log(paint(c.gray, "   Mutating event.subject.ai_model from 'gpt-5' → 'downgraded-model-7b'"));
     const tampered = JSON.parse(JSON.stringify(chain)) as SignedReceipt[];
     tampered[2].receipt.event.subject!.ai_model = "downgraded-model-7b";
@@ -818,7 +818,7 @@ program
       console.log(
         paint(
           c.gray,
-          `   ! ${summary.unpricedRequests} request(s) used a model not in the pricing table — counted, excluded from the cost estimate.`
+          `   ! ${summary.unpricedRequests} request(s) used a model not in the pricing table, counted, excluded from the cost estimate.`
         )
       );
     }
@@ -826,22 +826,22 @@ program
     console.log(
       paint(
         c.gray,
-        "   Estimate from your local receipts only — not a bill, and blind to un-instrumented AI. HTML report: ledger-cli dashboard --html"
+        "   Estimate from your local receipts only, not a bill, and blind to un-instrumented AI. HTML report: ledger-cli dashboard --html"
       )
     );
     console.log("");
   });
 
-// ---------- scan (import an existing provider bill — the zero-instrumentation front door) ----------
+// ---------- scan (import an existing provider bill, the zero-instrumentation front door) ----------
 program
   .command("scan [files...]")
-  .description("Estimate wasted AI spend from an existing OpenAI/Anthropic usage export — no receipts, no instrumentation")
+  .description("Estimate wasted AI spend from an existing OpenAI/Anthropic usage export, no receipts, no instrumentation")
   .option("--json", "output the full summary as JSON")
   .option("--html [path]", "write a self-contained HTML report instead")
   .action((files: string[], opts) => {
     if (!files || files.length === 0) {
       console.log("");
-      console.log(paint(c.bold, "  See your wasted AI spend — from a bill you already have."));
+      console.log(paint(c.bold, "  See your wasted AI spend, from a bill you already have."));
       console.log("");
       console.log(paint(c.gray, "  usage: ") + paint(c.bold, "ledger-cli scan <usage-export.json> [more.json ...]"));
       console.log("");
@@ -871,10 +871,10 @@ program
       }
     }
     if (workloads.length === 0) {
-      console.log(paint(c.amber, "  No usage rows recognized — expected an OpenAI or Anthropic usage export (JSON)."));
+      console.log(paint(c.amber, "  No usage rows recognized, expected an OpenAI or Anthropic usage export (JSON)."));
       process.exit(0);
     }
-    // Exact aggregation from the bill rows — no sampling — so the numbers are
+    // Exact aggregation from the bill rows, no sampling, so the numbers are
     // precise at any bill size and match the signed baseline/prove figures.
     const summary = summarizeWorkloads(workloads);
     const totalRequests = summary.requests;
@@ -915,7 +915,7 @@ function printSavings(summary: DashboardSummary, scale: number): void {
   console.log(
     paint(
       c.gray,
-      "   Only [confident] flags count toward the headline. [review] = heavy input context or a cross-family swap — test a sample first."
+      "   Only [confident] flags count toward the headline. [review] = heavy input context or a cross-family swap, test a sample first."
     )
   );
   console.log("");
@@ -951,13 +951,13 @@ function printScan(summary: DashboardSummary, totalRequests: number, scale: numb
   if (summary.suggestions.length > 0) printSavings(summary, S);
   if (scale > 1) {
     console.log(
-      paint(c.gray, `   (Large bill — sampled 1:${scale.toFixed(1)} for speed; dollar figures scaled to full volume.)`)
+      paint(c.gray, `   (Large bill, sampled 1:${scale.toFixed(1)} for speed; dollar figures scaled to full volume.)`)
     );
   }
   console.log(
     paint(
       c.gray,
-      "   Estimate from your provider export, repriced on AskLedger's pricing table — not a promise. Sign at capture to make savings verifiable (Pro)."
+      "   Estimate from your provider export, repriced on AskLedger's pricing table, not a promise. Sign at capture to make savings verifiable (Pro)."
     )
   );
   console.log("");
@@ -971,7 +971,7 @@ function printAlerts(alerts: Alert[], json: boolean): void {
   if (json) { console.log(JSON.stringify(alerts, null, 2)); return; }
   console.log("");
   if (alerts.length === 0) {
-    console.log(paint(c.green, "  ✓ No alerts — nothing critical in these receipts."));
+    console.log(paint(c.green, "  ✓ No alerts, nothing critical in these receipts."));
     console.log("");
     return;
   }
@@ -1009,7 +1009,7 @@ function printQueryResult(r: QueryResult, json: boolean): void {
     console.log("");
   }
   if (r.citations.length) {
-    console.log(paint(c.gray, "  Every result is backed by a signed receipt — verify any id with: ledger-cli verify <receipt.json>"));
+    console.log(paint(c.gray, "  Every result is backed by a signed receipt, verify any id with: ledger-cli verify <receipt.json>"));
     console.log("");
   }
 }

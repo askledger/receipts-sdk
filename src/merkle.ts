@@ -135,7 +135,7 @@ export function buildBatch(receipts: SignedReceipt[]): MerkleBatch {
  *
  * Promotion handling: if at some level the leaf is the last (odd) node
  * with no sibling, no entry was added to audit_path at that level. The
- * verifier walks `levelSize` levels — at each level it either consumes
+ * verifier walks `levelSize` levels, at each level it either consumes
  * an audit_path entry (if a sibling exists) or skips (the node was
  * promoted unchanged).
  */

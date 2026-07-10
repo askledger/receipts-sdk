@@ -118,7 +118,7 @@ function buildSignedReceipt(
  * SINGLE-WRITER. Within one Node process this is safe (the body build and the
  * chain save run synchronously without interleaving). For concurrent or
  * multi-process signing on a shared chain, use `signReceiptWithStore` with a
- * compare-and-set store — otherwise two writers can fork the chain at the same
+ * compare-and-set store, otherwise two writers can fork the chain at the same
  * height.
  */
 export function signReceipt(opts: SignReceiptOptions): SignedReceipt {

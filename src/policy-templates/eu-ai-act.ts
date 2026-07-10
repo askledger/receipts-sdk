@@ -1,5 +1,5 @@
 /**
- * EU AI Act — Regulation 2024/1689 — pre-built policy template.
+ * EU AI Act, Regulation 2024/1689, pre-built policy template.
  *
  * High-risk AI system obligations become applicable on 2 August 2026.
  * Fines up to EUR 35,000,000 or 7% of global annual turnover for the
@@ -10,7 +10,7 @@ import type { PolicyTemplate } from "./types.js";
 
 export const EU_AI_ACT: PolicyTemplate = {
   regulator: "EU_AI_ACT",
-  name: "EU AI Act (Regulation 2024/1689) — High-Risk Obligations",
+  name: "EU AI Act (Regulation 2024/1689), High-Risk Obligations",
   version: "2024.07",
   published_at: "2024-07-12",
   effective_deadline: "2026-08-02",

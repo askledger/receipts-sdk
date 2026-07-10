@@ -1,5 +1,5 @@
 /**
- * ISO/IEC 42001 — AI Management Systems — pre-built policy template.
+ * ISO/IEC 42001, AI Management Systems, pre-built policy template.
  *
  * The first international standard for AI management systems. Already
  * appearing in approximately 40% of EU enterprise AI procurement RFPs.
@@ -9,7 +9,7 @@ import type { PolicyTemplate } from "./types.js";
 
 export const ISO_42001: PolicyTemplate = {
   regulator: "ISO_42001",
-  name: "ISO/IEC 42001 — AI Management Systems",
+  name: "ISO/IEC 42001, AI Management Systems",
   version: "2023",
   published_at: "2023-12-18",
   summary:

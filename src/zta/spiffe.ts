@@ -16,9 +16,9 @@
 export interface SpiffeId {
   /** e.g. "spiffe://example.com/payments/api" */
   uri: string;
-  /** Trust domain — e.g. "example.com" */
+  /** Trust domain, e.g. "example.com" */
   trustDomain: string;
-  /** Path — e.g. "payments/api" */
+  /** Path, e.g. "payments/api" */
   path: string;
 }
 

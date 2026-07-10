@@ -1,5 +1,5 @@
 /**
- * ISO/IEC 27001:2022 — Information Security Management Systems.
+ * ISO/IEC 27001:2022, Information Security Management Systems.
  *
  * The universal information security standard. Applies to every
  * industry: financial services, healthcare, manufacturing, government,
@@ -14,7 +14,7 @@ import type { PolicyTemplate } from "./types.js";
 
 export const ISO_27001_AI: PolicyTemplate = {
   regulator: "ISO_42001",
-  name: "ISO/IEC 27001:2022 — AI-Relevant Controls",
+  name: "ISO/IEC 27001:2022, AI-Relevant Controls",
   version: "2022",
   published_at: "2022-10-25",
   summary:
@@ -54,7 +54,7 @@ export const ISO_27001_AI: PolicyTemplate = {
       id: "A.8.16",
       title: "Monitoring Activities",
       requirement:
-        "Networks, systems, and applications — including AI systems — shall be monitored for anomalous behavior and appropriate actions taken.",
+        "Networks, systems, and applications, including AI systems, shall be monitored for anomalous behavior and appropriate actions taken.",
       pillar: "performance_monitoring",
       satisfied_by_fields: ["event.payload.metadata.safety", "event.payload.metadata.injection"],
       source_citation: "ISO/IEC 27001:2022 Annex A.8.16",

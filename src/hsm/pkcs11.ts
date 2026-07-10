@@ -1,5 +1,5 @@
 /**
- * PKCS#11 signing provider — vendor-neutral HSM access.
+ * PKCS#11 signing provider, vendor-neutral HSM access.
  *
  * Works with any PKCS#11 v2.40 / v3.0 module:
  *   - Thales Luna / DPoD

@@ -1,5 +1,5 @@
 /**
- * Receipt verification — independent of any Ledger server.
+ * Receipt verification, independent of any Ledger server.
  *
  * A regulator or customer holding only:
  *   - the SignedReceipt
@@ -29,7 +29,7 @@ export interface VerifyResult {
      * Whether this receipt's CHAIN POSITION was actually attested here. True
      * when genesis was checked or a predecessor was supplied; false for a
      * mid-chain receipt verified alone (its signature/hash are still valid, but
-     * its place in the chain was not checked — supply the predecessor to attest).
+     * its place in the chain was not checked, supply the predecessor to attest).
      */
     chain_position_attested: boolean;
     /**
@@ -86,7 +86,7 @@ export function verifyReceipt(
   let anySignatureValid = false;
   for (const sig of signed.signatures) {
     // Algorithm allowlist: only Ed25519 (EdDSA) is supported. Reject any other
-    // `alg` explicitly rather than silently running Ed25519 — this closes the
+    // `alg` explicitly rather than silently running Ed25519, this closes the
     // algorithm-confusion gap where a signature's alg could be rewritten.
     if (sig.alg !== "EdDSA") {
       result.errors.push(`Unsupported signature alg=${sig.alg} for kid=${sig.kid} (only EdDSA)`);
@@ -115,7 +115,7 @@ export function verifyReceipt(
   //    - Genesis consistency (checkable even without the predecessor):
   //      chain_height === 1 iff previous_receipt_hash === GENESIS_HASH.
   //    A mid-chain receipt (height > 1) verified without its predecessor leaves
-  //    chain_link_valid undefined — its signature/hash are valid but its chain
+  //    chain_link_valid undefined, its signature/hash are valid but its chain
   //    position is not attested here; supply the predecessor (or full chain).
   const integrity = signed.receipt.integrity;
   const height = integrity.chain_height;

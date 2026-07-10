@@ -4,13 +4,13 @@
  * The SDK does not assume any particular key custody model. Production
  * deployments plug in:
  *   - SoftwareSigningProvider (default, keys in-memory)
- *   - PKCS#11 / HSM provider (FIPS 140-3 Level 3 — e.g. CloudHSM, Thales)
+ *   - PKCS#11 / HSM provider (FIPS 140-3 Level 3, e.g. CloudHSM, Thales)
  *   - AWS KMS provider (Asymmetric Sign API)
  *   - GCP KMS provider (asymmetricSign)
  *   - Azure Key Vault provider (sign)
  *   - SPIFFE SVID provider for workload identity
  *
- * The interface intentionally exposes only `sign` and metadata — never
+ * The interface intentionally exposes only `sign` and metadata, never
  * the raw private key. An HSM-backed provider can implement this
  * interface without ever returning key bytes to memory.
  *
@@ -54,7 +54,7 @@ export interface SigningProvider {
 }
 
 /**
- * Software backend — keys live in memory. Suitable for development,
+ * Software backend, keys live in memory. Suitable for development,
  * local testing, browser playground, and SMB self-hosted deployments.
  *
  * NOT suitable for regulated BFSI production. Use an HSM-backed

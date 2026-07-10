@@ -146,7 +146,7 @@ export class AwsKmsSigningProvider implements SigningProvider {
     }
     return new FipsSigningProvider(this, {
       provider: "AWS KMS (kms-fips endpoint)",
-      cmvp_certificate: "AWS KMS FIPS 140-3 Level 3 — per AWS public attestation",
+      cmvp_certificate: "AWS KMS FIPS 140-3 Level 3, per AWS public attestation",
       attestation: true,
     });
   }

@@ -4,9 +4,23 @@ All notable changes to the AskLedger Receipts SDK will be documented in this fil
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (with the caveat that until v1.0, breaking changes may occur between minor versions).
 
-## [0.12.1] — 2026-07-10
+## [0.12.2] - 2026-07-11
 
-### Fixed — identity cleanup (no API changes)
+### Changed (docs + polish, no API or behavior changes)
+
+- Refreshed the npm README: corrected a stale `v0.11.0` status line to the current version and
+  rewrote the roadmap, which had listed already-shipped work (all five SDKs, RFC 3161
+  timestamping, Merkle commitments, HSM/KMS signing) as "next".
+- Removed em-dashes from the README, CHANGELOG, and all CLI/console output strings for a
+  consistent house style. The `"—"` empty-value markers in CLI tables are unchanged.
+- CI reliability: the security-scan hardening checklist now generates the CycloneDX SBOM its
+  G.1 check looks for (via the existing generator), so it passes 66/66 instead of failing.
+  Raised the vitest timeout to 20s so heavy receipt-generation tests no longer flake under
+  full-suite parallelism.
+
+## [0.12.1] - 2026-07-10
+
+### Fixed, identity cleanup (no API changes)
 
 - Removed the stale `projectledger` identity left over from before the rename. The published
   README no longer tells developers the Python import is `projectledger.receipts` or the Java
@@ -21,15 +35,15 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 The published TypeScript package `@askledger/receipts-sdk` was already correct; this release
 refreshes the npm README and cleans the cross-language identity. No code or API changes.
 
-## [0.12.0] — 2026-07-10
+## [0.12.0] - 2026-07-10
 
-### Added — the four-layer model (Prevent, then Prove)
+### Added, the four-layer model (Prevent, then Prove)
 
 Layers 1–3 (prove what happened, how, and whether it was correct) were already the core of
 the SDK. This release adds Layer 4 (prevent bad actions before they run) and hardens all four
 to enterprise grade. Every addition is additive; existing receipts sign and verify unchanged.
 
-- **Layer 4 — Pre-Execution Guardian** (`guardian.ts`). An independent reviewer signs a
+- **Layer 4, Pre-Execution Guardian** (`guardian.ts`). An independent reviewer signs a
   verdict over a proposed action *before* it executes:
   - `signPreVerdict(action, review, opts)` binds a verdict (`approve` / `concerns` / `reject`)
     to `actionHash(action) = sha256(canonicalize({tenant_id, action_type, payload}))`, and
@@ -38,19 +52,19 @@ to enterprise grade. Every addition is additive; existing receipts sign and veri
     (`signature_valid`, `hash_matches`, `binds_to_action`, `not_expired`).
   - `assertActionCleared(...)` gates execution; `reviewNofM(...)` enforces N-of-M approval with
     a hard veto on any reject; `preVerdictEvidenceRef(...)` links the L4 verdict into the L1 receipt.
-- **Layer 3 — Assurance & rule-based correctness** (`assurance.ts`).
+- **Layer 3, Assurance & rule-based correctness** (`assurance.ts`).
   - `assuranceLevel(signed, opts)` grades a receipt on the published ladder
     **L0 Declared → L1 Signed → L2 Attested → L3 Anchored** (cumulative), matching
     `/trust/assurance-levels` exactly.
-  - `checkRules(policy, values, opts)` — deterministic rule evaluator (numeric comparisons +
+  - `checkRules(policy, values, opts)`, deterministic rule evaluator (numeric comparisons +
     string equality; missing values fail closed) producing a `rule_based` verification block.
     A rule check is recorded evidence, never presented as a formal proof.
-- **Layer 2 — Execution traceability** (`workflow-graph.ts`).
+- **Layer 2, Execution traceability** (`workflow-graph.ts`).
   - `reconstructWorkflow(receipts, opts)` deterministically rebuilds a multi-step workflow DAG
     (Kahn topological sort, `chain_height` then `id` tie-break) with roots, leaves, missing
     parents, and an acyclicity check.
   - `verifyWorkflow(receipts, opts)` verifies every receipt and the graph's completeness.
-- **Layer 1 — Cryptographic evidence** (`verify.ts`, `timestamp.ts`).
+- **Layer 1, Cryptographic evidence** (`verify.ts`, `timestamp.ts`).
   - `verifyChain(receipts, opts)` verifies a full per-tenant hash chain end to end
     (height-sorted, predecessor-linked, genesis-completeness).
   - Timestamp binding: `timestampReceipt` / `verifyReceiptTimestamps` bind an RFC 3161 token to
@@ -59,61 +73,61 @@ to enterprise grade. Every addition is additive; existing receipts sign and veri
 
 ### Fixed (audit hardening)
 
-- **Transparency log** — `proveConsistency` rewritten to correct RFC 6962 semantics; added
+- **Transparency log**: `proveConsistency` rewritten to correct RFC 6962 semantics; added
   static `verifyConsistency`.
-- **Chain concurrency** — added `signReceiptWithStore` (async compare-and-swap with retry on
+- **Chain concurrency**: added `signReceiptWithStore` (async compare-and-swap with retry on
   `ConcurrentChainWriteError`) plus a CAS-backed `FileChainStateStore`, closing a fork window
   under concurrent writers. Sync `signReceipt` remains the single-writer path.
-- **Cost engine** — fixed a sampling bug where baseline/prove used a sampled summary without
+- **Cost engine**: fixed a sampling bug where baseline/prove used a sampled summary without
   `scale` (exact aggregation via `summarizeWorkloads`); corrected `gpt-4o-mini` / `gpt-5-nano`
   model normalization and pricing (previously mispriced as `gpt-4o`).
-- **Numeric safety** — `assertSafeNumbers` rejects integer values outside the IEEE-754
+- **Numeric safety**: `assertSafeNumbers` rejects integer values outside the IEEE-754
   safe-integer range before signing.
 
-## [0.11.0] — 2026-07-08
+## [0.11.0] - 2026-07-08
 
-### Added — receipt schema extensions (all OPTIONAL and additive; existing receipts sign/verify unchanged)
+### Added, receipt schema extensions (all OPTIONAL and additive; existing receipts sign/verify unchanged)
 
-- **`policy_context`** — the policy/ruleset that governed a decision: `policy_bundle_id`,
+- **`policy_context`**: the policy/ruleset that governed a decision: `policy_bundle_id`,
   `policy_bundle_hash`, `version`, `domain`, `applied_rules[]` (with `expression` /
   `mathematical_form` / `source` / `weight`), `mathematical_constraints`, and a
   pluggable `rule_encoding_format` (`simple_expression` today; `lean` / `catala` later).
-- **`verification`** — the result of checking a decision against its rules: `status`,
+- **`verification`**: the result of checking a decision against its rules: `status`,
   `verification_type` (`formal` / `rule_based` / `hybrid`), `proof_artifact` (by digest),
   `failed_rules`, `confidence_score`, `verifier_version`. Note: `confidence_score` is
   meaningful only for probabilistic (`rule_based`/`hybrid`) checks; a formal proof is binary.
-- **`decision_summary`** — `outcome`, `risk_score`, `reason_codes`, `human_override`, `override_reason`.
+- **`decision_summary`**: `outcome`, `risk_score`, `reason_codes`, `human_override`, `override_reason`.
 - **`evidence_refs`** extended with `mathematical_value` and `proof_type` (e.g. `lean`).
-- **Subject governance fields** — `ai_model_version`, `base_model`, `model_card_hash`,
+- **Subject governance fields**: `ai_model_version`, `base_model`, `model_card_hash`,
   `fine_tune_id`, `system_prompt_hash`.
-- **`extensions`** — a namespaced, forward-compatibility map for experimental attributes
+- **`extensions`**: a namespaced, forward-compatibility map for experimental attributes
   (e.g. `data_provenance`, `compliance`) that are captured and signed now and promoted to
   first-class fields only once their shape is proven, so the core format stays stable.
 
 Every field above is covered by RFC 8785 canonicalization, the Ed25519 signature, and the
-hash chain — tamper-evident like the rest of the receipt.
+hash chain, tamper-evident like the rest of the receipt.
 
-## [0.10.0] — 2026-07-08
+## [0.10.0] - 2026-07-08
 
 ### Added
 
-- **Verified savings — `ledger-cli baseline` / `prove` / `verify-savings`**
+- **Verified savings, `ledger-cli baseline` / `prove` / `verify-savings`**
   (`src/cost/savings.ts`). Sign a tamper-evident baseline of your AI spend,
   prove the realized saving against it in a later period, and let anyone verify
   that proof independently. `verifySavingsProof` checks the Ed25519 signature
   **and** recomputes the savings math from the figures in the proof, so a
   skeptic (a CFO, a customer) can trust the number without trusting whoever
-  produced it. The headline saving is **efficiency-normalized** — the current
+  produced it. The headline saving is **efficiency-normalized**: the current
   period's tokens priced at the baseline blended rate, minus what they actually
-  cost — so a change in volume cannot manufacture a saving. Signed over RFC 8785
+  cost, so a change in volume cannot manufacture a saving. Signed over RFC 8785
   canonical bytes. New API exports: `buildBaseline`, `proveSavings`,
   `verifyBaseline`, `verifySavingsProof`, `toPeriodSummary`, and their types.
 
-## [0.9.0] — 2026-07-08
+## [0.9.0] - 2026-07-08
 
 ### Added
 
-- **`ledger-cli scan <usage-export.json>`** — see your wasted AI spend from a
+- **`ledger-cli scan <usage-export.json>`**: see your wasted AI spend from a
   provider bill you **already have**, with no instrumentation and no receipts.
   Reads OpenAI (`snapshot_id` / `n_requests` / `n_*_tokens_total`) and Anthropic
   (`model` / `requests` / `input_tokens` / `output_tokens`) usage exports (plus a
@@ -128,32 +142,32 @@ hash chain — tamper-evident like the rest of the receipt.
 
 ### Changed
 
-- **Over-tiering savings are now confidence-tiered — the estimate is honest.**
+- **Over-tiering savings are now confidence-tiered, the estimate is honest.**
   The heuristic was input-blind: it flagged high-context RAG (short output but
   large input) as waste. Each `SavingsSuggestion` now carries
   `confidence: "high" | "review"` and `avgInputTokens`. **High** (the headline
   `potentialSavings`) requires an adjacent *same-family* tier, avg input ≤ 4000,
-  and avg output ≤ 800 — a genuinely low-risk swap. **Review** (`reviewSavings`,
+  and avg output ≤ 800, a genuinely low-risk swap. **Review** (`reviewSavings`,
   reported separately, never in the headline) covers heavy-context or
   cross-family swaps (e.g. `gpt-4o` → `gpt-5-mini`) that carry real quality risk.
   CLI and HTML dashboards show both tiers.
 
-## [0.8.0] — 2026-07-07
+## [0.8.0] - 2026-07-07
 
 ### Added
 
 - **Natural-language query over receipts** (`ledger-cli query "<question>"`,
   `src/query/index.ts`). An offline, deterministic parser (`parseQuery`) +
   executor (`runQuery`) answer plain-English questions grounded in real
-  receipts — every result cites the receipt ids it came from. Optional `--llm`
+  receipts, every result cites the receipt ids it came from. Optional `--llm`
   mode is **provider-neutral**: pass a `complete` function to plug in any model,
   or use the built-in Claude default (lazy `@anthropic-ai/sdk`,
   `ANTHROPIC_API_KEY`). Either way the model only emits a validated
   `StructuredQuery`, never receipt data.
 - **Alerts engine** (`ledger-cli alerts`, `src/query/alerts.ts`). Explainable
-  rules — blocked/denied decisions, sensitive data (pii/pci/mnpi), unsigned
+  rules, blocked/denied decisions, sensitive data (pii/pci/mnpi), unsigned
   records, high-stakes decisions with no bound evidence, over-tiering, and cost
-  spikes — each naming the receipt ids behind it. Honest defaults; `runAlerts`
+  spikes, each naming the receipt ids behind it. Honest defaults; `runAlerts`
   accepts caller-supplied rules; a throwing rule can't take the run down.
 - Exported `parseQuery` / `runQuery` / `answerQuery` / `flattenReceipt` /
   `runAlerts` / `perReceiptRule` / `DEFAULT_RULES` / `parseQueryLLM` /
@@ -168,7 +182,7 @@ hash chain — tamper-evident like the rest of the receipt.
   `verify-bundle` build and check a Merkle-rooted evidence bundle (Layer 2).
   Added `buildEvidenceBundle` / `verifyEvidenceBundleIntegrity` /
   `verifyAllReceiptsInBundle` aliases and a `quickstart` command.
-- **Optional `evidence_refs` on receipts.** Strictly additive — receipts without
+- **Optional `evidence_refs` on receipts.** Strictly additive, receipts without
   it sign and verify identically; when present it is covered by the signature.
 - **Free local usage & cost dashboard** (`ledger-cli dashboard [paths...]
   [--html]`, `src/cost/dashboard.ts`). Single-tenant, offline: estimated spend,
@@ -179,12 +193,12 @@ hash chain — tamper-evident like the rest of the receipt.
   API for programmatic use.
 - **Over-tiering savings suggestions** in the dashboard. Flags premium models
   used for short/simple calls, grouped by (model × application), and quantifies
-  each with an exact counterfactual — the same recorded calls repriced on the
+  each with an exact counterfactual, the same recorded calls repriced on the
   cheaper same-vendor tier. Heuristic hints framed to *test*, not a promise;
   the deep recommendation engine and verified-savings (baseline → signed proof)
   remain the hosted platform.
 
-## [0.7.0] — 2026-07-04
+## [0.7.0] - 2026-07-04
 
 ### Security & correctness hardening
 
@@ -192,21 +206,21 @@ Hardens the cryptographic guarantees and closes the gaps found in a full
 multi-language security + correctness audit.
 
 #### Security
-- **Verifier algorithm allowlist** — every SDK (TS/Python/Go/Rust/Java) now
+- **Verifier algorithm allowlist**: every SDK (TS/Python/Go/Rust/Java) now
   rejects any signature whose `alg` is not `EdDSA` before Ed25519 verification,
   closing algorithm-confusion.
-- **Chain continuity enforced on verify** — with a predecessor, verification
+- **Chain continuity enforced on verify**: with a predecessor, verification
   requires `chain_height === prev + 1` (not just the hash link); genesis
   consistency (`chain_height 1` ⇔ `GENESIS_HASH`) is checked even without the
   predecessor. Dropped or reordered receipts are now rejected.
-- **Admin console** — session cookie is HMAC-signed (forgery-proof) and the
+- **Admin console**: session cookie is HMAC-signed (forgery-proof) and the
   dev-login helper is hard-disabled in production builds.
-- **Browser extension** — service-worker message trust boundary; the OIDC
+- **Browser extension**: service-worker message trust boundary; the OIDC
   `id_token` is now verified (JWS signature against the issuer JWKS +
   iss/aud/exp/nonce); honest key-storage docs.
 
 #### Correctness
-- **Cross-language canonicalization parity** — fixed Go's HTML-escaping and
+- **Cross-language canonicalization parity**: fixed Go's HTML-escaping and
   ECMAScript number formatting across Python/Go/Rust/Java, so a receipt signed
   by one SDK verifies byte-identically in every other. Shared conformance
   vectors expanded 7 → 43 and enforced in CI across all five languages.
@@ -219,7 +233,7 @@ multi-language security + correctness audit.
   (cargo-audit / pip-audit / govulncheck) added to CI; the previously-broken
   security-scan workflow fixed.
 
-## [0.6.0] — 2026-06-13
+## [0.6.0] - 2026-06-13
 
 ### Become-the-default release
 
@@ -227,30 +241,30 @@ This release lowers the install friction to zero so any developer or
 company can adopt AskLedger receipts without thinking.
 
 #### Added
-- **`@askledger/receipts-sdk/vendor-kit`** — one-call auto-
+- **`@askledger/receipts-sdk/vendor-kit`**: one-call auto-
   instrumentation. `installReceipts({ tenantId: "acme" })` hooks every
   Anthropic and OpenAI client constructor in the process; every AI
   call from that point on emits a signed receipt. Lazy-loads vendor
   SDKs so missing optional deps don't break the install.
-- **`pl quickstart`** — interactive 60-second flow: keygen → sign a
+- **`pl quickstart`**: interactive 60-second flow: keygen → sign a
   sample receipt → verify → emit badge URL.
-- **`scripts/install.sh`** — `curl -sSL github.com/askledger/receipts-sdk | bash`
+- **`scripts/install.sh`**: `curl -sSL github.com/askledger/receipts-sdk | bash`
   installs the CLI globally and runs quickstart.
-- **`POST /api/ingest`** — vendor-kit-instrumented processes POST
+- **`POST /api/ingest`**: vendor-kit-instrumented processes POST
   signed receipts here; the handler verifies signature + tenant
   binding + chain monotonicity.
-- **10 RFC spec drafts** — `spec/PL-RFC-001` through `PL-RFC-010` —
+- **10 RFC spec drafts**: `spec/PL-RFC-001` through `PL-RFC-010`,
   receipt schema, canonical bytes, chain semantics, transparency log,
   evidence pack, identity binding, capture semantics, policy + decision
   block, cost ledger, carbon ledger.
-- **`@askledger/conformance`** package — CL1/CL2/CL3 levels for
+- **`@askledger/conformance`** package, CL1/CL2/CL3 levels for
   external SDKs to self-test and earn the conformance badge.
-- **Integrations** — LiteLLM Python callback (upstream-PR-ready),
+- **Integrations**: LiteLLM Python callback (upstream-PR-ready),
   Cursor MCP server, Claude Code skill.
-- **Subpath exports** — `@askledger/receipts-sdk/vendor-kit`,
+- **Subpath exports**: `@askledger/receipts-sdk/vendor-kit`,
   `/adapters/openai`, `/adapters/anthropic`, `/adapters/fetch`,
   `/adapters/langchain`.
-- **CLI rename** — primary `pl` binary; `ledger-cli` preserved as alias.
+- **CLI rename**: primary `pl` binary; `ledger-cli` preserved as alias.
 
 #### Changed
 - Package version bumped from 0.1.0 to 0.6.0 to reflect five rounds
@@ -289,7 +303,7 @@ company can adopt AskLedger receipts without thinking.
 - Bridge to OpenTelemetry GenAI conventions
 - Conformance test suite
 
-## [0.1.0] — 2026-05-13
+## [0.1.0] - 2026-05-13
 
 ### Added
 - Initial reference TypeScript implementation of the AskLedger Receipts protocol

@@ -129,7 +129,7 @@ export class OpaDecisionClient {
       if (this.opts.onReceipt) await this.opts.onReceipt(receipt);
     } catch (e) {
       // Decision receipt failures are LOGGED but do not block the auth
-      // decision — the platform's primary path is the OPA verdict, the
+      // decision, the platform's primary path is the OPA verdict, the
       // receipt is the attestation.
       // eslint-disable-next-line no-console
       console.error("[opa-client] receipt sign failed:", e);

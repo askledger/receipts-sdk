@@ -24,7 +24,7 @@ import {
   sha256Hex,
 } from "./common.js";
 
-// Minimal LangChain types we touch — duck-typed to avoid coupling.
+// Minimal LangChain types we touch, duck-typed to avoid coupling.
 type Serialized = { id?: string[]; kwargs?: { model?: string; model_name?: string } };
 
 export class ReceiptsCallbackHandler {

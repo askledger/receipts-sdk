@@ -1,5 +1,5 @@
 /**
- * AI Use-Case Registry — Credo AI pattern.
+ * AI Use-Case Registry, Credo AI pattern.
  *
  * Every AI use case in production is registered with an owner, a risk
  * tier, the regulatory frameworks in scope, and the approved model
@@ -8,7 +8,7 @@
  * Registry entries are themselves tamper-evident: each entry has a
  * content hash that the SDK validates on every lookup. Changes to a
  * use case produce a new version with a new hash and a parent pointer
- * to the prior version — so the registry has its own append-only history.
+ * to the prior version, so the registry has its own append-only history.
  */
 
 import { sha256 as sha256Fn } from "@noble/hashes/sha2";
@@ -34,9 +34,9 @@ export interface UseCase {
   name: string;
   /** Description of the business purpose. */
   description: string;
-  /** Named accountable executive — usually an email or directory id. */
+  /** Named accountable executive, usually an email or directory id. */
   business_owner: string;
-  /** Technical owner — usually an engineering lead. */
+  /** Technical owner, usually an engineering lead. */
   technical_owner: string;
   /** Tenant scope. */
   tenant_id: string;
@@ -46,7 +46,7 @@ export interface UseCase {
   lifecycle: UseCaseLifecycle;
   /** Regulatory frameworks in scope. */
   regulators: Regulator[];
-  /** Approved model registry ids — only these models may serve this use case. */
+  /** Approved model registry ids, only these models may serve this use case. */
   approved_model_ids: string[];
   /** Data classifications the use case is approved to process. */
   approved_data_classifications: ("public" | "internal" | "pii_redacted" | "pii" | "pci" | "mnpi")[];
@@ -65,7 +65,7 @@ export class UseCaseRegistry {
 
   /**
    * Hash a use case entry for tamper detection. The hash itself is not
-   * stored on the entry — registries are append-only, so the hash is
+   * stored on the entry, registries are append-only, so the hash is
    * regenerated on read.
    */
   static entryHash(entry: UseCase): string {
@@ -103,7 +103,7 @@ export class UseCaseRegistry {
 
   /**
    * Validate that a receipt's event is consistent with the registered
-   * use case. Returns structured findings — the caller decides what to
+   * use case. Returns structured findings, the caller decides what to
    * do with them.
    */
   validateUsage(

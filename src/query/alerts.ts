@@ -1,7 +1,7 @@
 // Alerts over signed receipts.
 //
 // A small, explainable rules engine that flags the receipts most worth a human
-// look — blocked decisions, sensitive data, unsigned records, over-tiering,
+// look, blocked decisions, sensitive data, unsigned records, over-tiering,
 // cost spikes, high-stakes decisions with no bound evidence. Ships with honest
 // default rules; callers can add their own. Every alert names the exact
 // receipt ids behind it, so it is checkable, not a black box.
@@ -61,7 +61,7 @@ export const DEFAULT_RULES: AlertRule[] = [
     severity: "high",
     title: "Blocked / denied decisions",
     test: (r) => r.decision === "block",
-    detail: (n) => `${n} decision(s) were blocked. Each is a high-stakes outcome someone may contest — confirm they were correct and defensible.`,
+    detail: (n) => `${n} decision(s) were blocked. Each is a high-stakes outcome someone may contest, confirm they were correct and defensible.`,
   }),
   perReceiptRule({
     id: "sensitive-data",
@@ -75,7 +75,7 @@ export const DEFAULT_RULES: AlertRule[] = [
     severity: "high",
     title: "Unsigned receipts",
     test: (r) => !r.signed,
-    detail: (n) => `${n} receipt(s) carry no signature — they can't be independently verified. Sign at capture or investigate the gap.`,
+    detail: (n) => `${n} receipt(s) carry no signature, they can't be independently verified. Sign at capture or investigate the gap.`,
   }),
   perReceiptRule({
     id: "high-stakes-no-evidence",
@@ -89,7 +89,7 @@ export const DEFAULT_RULES: AlertRule[] = [
     severity: "medium",
     title: "Flagged or awaiting approval",
     test: (r) => r.decision === "flag" || r.decision === "require-approval",
-    detail: (n) => `${n} decision(s) were flagged or require approval — make sure none are stuck unresolved.`,
+    detail: (n) => `${n} decision(s) were flagged or require approval, make sure none are stuck unresolved.`,
   }),
   // Aggregate rule: over-tiering, reusing the dashboard's savings analysis.
   {
@@ -133,7 +133,7 @@ export const DEFAULT_RULES: AlertRule[] = [
       const matched = rows.filter((r) => r.capturedAt.slice(0, 10) === spike[0]);
       return {
         matched,
-        detail: `${spike[0]} cost ${fmtUsd(spike[1])} — about ${(spike[1] / (median || 1)).toFixed(1)}× a typical day (${fmtUsd(median)}). Check for a runaway job or a pricing change.`,
+        detail: `${spike[0]} cost ${fmtUsd(spike[1])}, about ${(spike[1] / (median || 1)).toFixed(1)}× a typical day (${fmtUsd(median)}). Check for a runaway job or a pricing change.`,
       };
     },
   },

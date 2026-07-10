@@ -1,6 +1,6 @@
 // Per-receipt carbon attribution. Reference numbers from public sources
 // (Hugging Face Energy Score, OpenAI sustainability reports, Anthropic
-// disclosures) — order of magnitude not financial-grade. Refresh the
+// disclosures), order of magnitude not financial-grade. Refresh the
 // table when vendors publish updated figures.
 
 export interface EnergyProfile {

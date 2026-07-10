@@ -11,8 +11,8 @@ export type BudgetAction = "allow" | "warn" | "throttle" | "deny";
 export interface BudgetLimits {
   monthly_usd: number;
   warn_at: number;        // 0..1, e.g. 0.75
-  throttle_at: number;    // 0..1, e.g. 0.90 — slow but allow
-  deny_at: number;        // 0..1, e.g. 1.00 — block
+  throttle_at: number;    // 0..1, e.g. 0.90, slow but allow
+  deny_at: number;        // 0..1, e.g. 1.00, block
 }
 
 export interface BudgetState {

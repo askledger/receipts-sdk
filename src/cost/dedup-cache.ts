@@ -5,7 +5,7 @@
 //
 // Hashing uses sha256 over canonical JSON of {prompt, model, tools}.
 // We don't include tenant_id in the hash so cross-tenant cache sharing
-// is technically possible — but the lookup is scoped per-tenant, so a
+// is technically possible, but the lookup is scoped per-tenant, so a
 // hit only occurs when the SAME tenant served the SAME prompt.
 
 import { createHash } from "node:crypto";

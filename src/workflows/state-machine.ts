@@ -1,5 +1,5 @@
 /**
- * Workflow state machine — the spine of every end-to-end Project
+ * Workflow state machine, the spine of every end-to-end Project
  * Ledger workflow.
  *
  * Every workflow (receipt-signing flow, approval flow, evidence-pack

@@ -2,7 +2,7 @@
 //
 // The offline parser in ./index.ts handles common phrasing for free. This adds
 // a "bring your own Claude API key" path for free-form questions: the model
-// only translates the question into a StructuredQuery — it never sees or
+// only translates the question into a StructuredQuery, it never sees or
 // invents receipt data. The query then runs against your real, signed receipts
 // exactly as the deterministic path does, so answers stay grounded and cited.
 //
@@ -16,14 +16,14 @@ import type { DecisionVerdict } from "../types.js";
 /**
  * Bring-your-own-model hook. Given the system prompt and the user's question,
  * return the model's raw text reply. This is provider-neutral: back it with
- * OpenAI, Gemini, a local model, or anything else — AskLedger only needs the
+ * OpenAI, Gemini, a local model, or anything else, AskLedger only needs the
  * text, and only ever uses it to build a StructuredQuery, never as data.
  */
 export type CompleteFn = (input: { system: string; prompt: string }) => Promise<string>;
 
 export interface LLMQueryOptions {
   /**
-   * Provider-neutral completion function. When set, no vendor SDK is loaded —
+   * Provider-neutral completion function. When set, no vendor SDK is loaded,
    * this is how you "plug in your own model" (OpenAI/Gemini/local/etc.).
    */
   complete?: CompleteFn;
@@ -45,7 +45,7 @@ const VERDICTS: DecisionVerdict[] = ["allow", "block", "flag", "require-approval
 function systemPrompt(now: Date): string {
   return [
     "You translate a natural-language question about AI 'receipts' (signed records of AI calls) into a JSON query object.",
-    "Output ONLY the JSON object — no prose, no markdown, no code fences.",
+    "Output ONLY the JSON object, no prose, no markdown, no code fences.",
     "",
     "Shape:",
     '{ "intent": "list"|"count"|"aggregate", "metric": "count"|"cost"|"tokens", "groupBy"?: "model"|"app"|"vendor"|"decision"|"environment"|"day", "limit": number, "wantsAlerts"?: boolean,',
@@ -168,6 +168,6 @@ export async function parseQueryLLM(nl: string, opts: LLMQueryOptions = {}): Pro
   try {
     return coerce(base, extractJson(text));
   } catch {
-    return base; // model returned something unparseable — degrade to offline parse
+    return base; // model returned something unparseable, degrade to offline parse
   }
 }

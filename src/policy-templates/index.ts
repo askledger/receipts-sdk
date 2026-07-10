@@ -1,5 +1,5 @@
 /**
- * Policy template library — pre-built regulatory framework mappings.
+ * Policy template library, pre-built regulatory framework mappings.
  *
  * Five templates ship today: CBUAE, EU AI Act, SAMA, ISO 42001, NIST RMF.
  * More are added in subsequent releases (SR 26-2, PRA SS1/23, RBI FREE-AI).
@@ -116,7 +116,7 @@ export function citeAgainstAll(signed: SignedReceipt): Citation[] {
 }
 
 /**
- * Build a compact regulator-pillar map for a receipt — for the demo UI.
+ * Build a compact regulator-pillar map for a receipt, for the demo UI.
  */
 export function summarizeCoverage(citations: Citation[]): Record<Regulator, number> {
   const out = {} as Record<Regulator, number>;

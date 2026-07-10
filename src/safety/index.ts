@@ -1,9 +1,9 @@
 /**
- * Content-safety module — Plane 4 (Decision) Pillar 6 (Shadow AI).
+ * Content-safety module, Plane 4 (Decision) Pillar 6 (Shadow AI).
  *
  * Real PII detection (regex + Luhn + IBAN MOD-97), classification-
  * deviation heuristics, and shadow-AI policy enforcement. Everything
- * runs locally — no LLM, no external call.
+ * runs locally, no LLM, no external call.
  *
  * Findings flow into the receipt's payload.metadata.safety so the
  * audit trail captures every flagged event.

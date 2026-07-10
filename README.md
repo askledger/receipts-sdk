@@ -15,7 +15,7 @@ Open-source, vendor-neutral cryptographic trust substrate for enterprise AI. Eve
 
 ## See your wasted AI spend in 60 seconds
 
-No instrumentation, no signup, nothing leaves your machine — point it at a usage
+No instrumentation, no signup, nothing leaves your machine, point it at a usage
 export you already have:
 
 ```bash
@@ -28,16 +28,16 @@ npx @askledger/receipts-sdk scan ~/Downloads/usage.json
 
 You get a per-model spend breakdown and an over-tiering savings estimate, split
 into **confident** (safe, same-family swaps) and **review** (heavy-context or
-cross-family — test a sample first). The confident number is the one we'd stake
+cross-family, test a sample first). The confident number is the one we'd stake
 our name on. Then instrument your app to make the tracking continuous and the
-savings **signed and verifiable** — that is the paid tier.
+savings **signed and verifiable**: that is the paid tier.
 
 ---
 
 ## Project status
 
 **v0.12.1 · live on npm.** The cryptographic core is hardened and
-independently verifiable — cross-language conformance tests enforce
+independently verifiable, cross-language conformance tests enforce
 byte-identical receipts across the TypeScript, Python, Go, Rust, and
 Java SDKs, and a machine-checked hardening checklist runs in CI. SDK,
 integrations, browser extension, console, public verifier, specification,
@@ -128,7 +128,7 @@ You'll see output like:
 
 ```
 ────────────────────────────────────────────────────────────────────────
-AskLedger — Receipts SDK · Demo
+AskLedger, Receipts SDK · Demo
 ────────────────────────────────────────────────────────────────────────
 
 1. Generating Ed25519 keypair…
@@ -191,11 +191,11 @@ That's it. The receipt is in `.ledger/last-receipt.json`. The keypair is in `.le
 }
 ```
 
-Every field is part of the canonical hash. Any modification to any field — including reordering keys — breaks the signature.
+Every field is part of the canonical hash. Any modification to any field, including reordering keys, breaks the signature.
 
 ### Optional: `evidence_refs`
 
-A receipt **MAY** carry an optional top-level `evidence_refs` array that references external evidence or attestation artifacts by digest (the artifact itself is never embedded). It is strictly additive — receipts without it sign and verify exactly as before — and when present it is part of the canonical bytes, so it is covered by both `integrity.receipt_hash` and the signature.
+A receipt **MAY** carry an optional top-level `evidence_refs` array that references external evidence or attestation artifacts by digest (the artifact itself is never embedded). It is strictly additive, receipts without it sign and verify exactly as before, and when present it is part of the canonical bytes, so it is covered by both `integrity.receipt_hash` and the signature.
 
 ```json
 "evidence_refs": [
@@ -256,7 +256,7 @@ console.log(result.valid); // true
 ## CLI reference
 
 The CLI ships as a `bin`, so once the package is published you can run it
-directly with `npx` — no clone or build required:
+directly with `npx`, no clone or build required:
 
 ```bash
 # Verify a receipt against a public key (published form)
@@ -291,14 +291,14 @@ node dist/cli.js demo
 
 ### End-to-end: keygen → sign → verify → bundle → verify-bundle
 
-The CLI drives all three layers by hand — one keypair, a signed chain, and a
+The CLI drives all three layers by hand, one keypair, a signed chain, and a
 single verifiable evidence bundle:
 
 ```bash
 # 1) Key
 node dist/cli.js keygen --out keys.json
 
-# 2) Sign — optionally BIND an external correctness proof (Layer 3, repeatable).
+# 2) Sign, optionally BIND an external correctness proof (Layer 3, repeatable).
 #    file=<path> is read and SHA-256-hashed for you; or pass hash=<hexdigest>.
 node dist/cli.js sign examples/event.json --key keys.json --out r1.json \
   --evidence-ref "kind=rule-check,file=./rule-report.json,status=pass"
@@ -315,7 +315,7 @@ node dist/cli.js bundle r1.json r2.json --out bundle.json --title "Q3 Evidence"
 #    Exits non-zero on any failure.
 node dist/cli.js verify-bundle bundle.json --key keys.json
 
-# 6) See what it all cost — a local, single-tenant usage & cost dashboard
+# 6) See what it all cost, a local, single-tenant usage & cost dashboard
 #    built from your own signed receipts (scans .ledger/ by default).
 node dist/cli.js dashboard
 node dist/cli.js dashboard --html   # writes a self-contained HTML report
@@ -323,46 +323,46 @@ node dist/cli.js dashboard --html   # writes a self-contained HTML report
 
 **Three layers, one CLI:**
 
-- **Integrity** — `sign` / `verify` (RFC 8785 hash chain + Ed25519). The receipt is authentic and untampered.
-- **Traceability** — `bundle` / `verify-bundle` (Merkle evidence bundle). Many receipts → one artifact with a single root hash.
-- **Correctness** — `sign --evidence-ref` binds an **external** proof's digest into the signed body.
+- **Integrity**: `sign` / `verify` (RFC 8785 hash chain + Ed25519). The receipt is authentic and untampered.
+- **Traceability**: `bundle` / `verify-bundle` (Merkle evidence bundle). Many receipts → one artifact with a single root hash.
+- **Correctness**: `sign --evidence-ref` binds an **external** proof's digest into the signed body.
 
 > **Honest scope:** the SDK **binds** an external correctness proof into the signed
 > receipt (its digest is covered by the signature). It does **not** perform formal
-> verification — the proof is produced by an external prover; the SDK makes it
+> verification, the proof is produced by an external prover; the SDK makes it
 > tamper-evident and auditable. An *evidence bundle* and an *evidence pack* are the
 > same artifact (the `buildEvidenceBundle` / `buildEvidencePack` API names are aliases).
 
-### See your spend & savings — the free local dashboard
+### See your spend & savings, the free local dashboard
 
 `dashboard` turns the receipts you already signed into the numbers a team wants
-on day one — no account, no network, no hosted service:
+on day one, no account, no network, no hosted service:
 
 ```bash
 node dist/cli.js dashboard [paths...]   # defaults to scanning .ledger/
 node dist/cli.js dashboard --html [path]
 ```
 
-- **Spend & usage** — estimated cost, requests, tokens, and per-model / per-app
+- **Spend & usage**: estimated cost, requests, tokens, and per-model / per-app
   breakdowns, computed locally from the built-in pricing table.
-- **Savings opportunities** — flags *over-tiered* workloads (a premium model
+- **Savings opportunities**: flags *over-tiered* workloads (a premium model
   doing short, simple calls) grouped by (model × application), and quantifies
   each with an **exact counterfactual**: the same recorded calls repriced on the
   cheaper same-vendor tier. It nudges only light workloads, so the big model
   keeps the heavy, high-value calls.
-- **Integrity** — how many receipts are signed, the chain height, and how many
+- **Integrity**: how many receipts are signed, the chain height, and how many
   carry correctness bindings.
 
 > **Honest scope:** cost is an **estimate** from your instrumented receipts and
-> the local pricing table — not a bill. Unknown models are counted but excluded
+> the local pricing table, not a bill. Unknown models are counted but excluded
 > and flagged, never guessed. This is single-tenant and blind to un-instrumented
 > ("shadow") AI; the savings figures are heuristic hints to **test**, not a
 > promise. Cross-system discovery, billing ingestion, and **verified savings**
 > (baseline → signed proof) are the hosted AskLedger platform.
 
-### Ask your receipts — natural-language query & alerts
+### Ask your receipts, natural-language query & alerts
 
-Ask a question in plain English and get an answer grounded in real receipts —
+Ask a question in plain English and get an answer grounded in real receipts,
 every result cites the receipt ids it came from, so it's checkable, never
 invented:
 
@@ -374,10 +374,10 @@ node dist/cli.js query "gpt-5 calls over $0.05 last week" --llm   # free-form
 node dist/cli.js alerts                                # flag the critical stuff
 ```
 
-- **`query`** — an offline, deterministic parser handles common questions for
+- **`query`**: an offline, deterministic parser handles common questions for
   free (filter / count / aggregate over model, app, decision, time, cost and
   token thresholds, sensitive data, evidence and signature state). `--llm`
-  handles free-form phrasing — the model only turns your words into a query; the
+  handles free-form phrasing, the model only turns your words into a query; the
   data always comes from signed receipts. It's **provider-neutral**: the CLI's
   `--llm` uses `@anthropic-ai/sdk` (optional dep) + `ANTHROPIC_API_KEY` by
   default, but programmatically you can plug in **any** model by passing a
@@ -391,14 +391,14 @@ node dist/cli.js alerts                                # flag the critical stuff
   });
   const result = runQuery(receipts, q); // grounded + cited, as always
   ```
-- **`alerts`** — an explainable rules engine that flags what's worth a look:
+- **`alerts`**: an explainable rules engine that flags what's worth a look:
   blocked/denied decisions, sensitive data (pii/pci/mnpi), unsigned records,
   high-stakes decisions with no bound evidence, over-tiering, and cost spikes.
   Each alert names the exact receipt ids behind it. Ships honest defaults; add
   your own rules programmatically via `runAlerts(receipts, { extraRules })`.
 
 > **Honest scope:** the NL layer decides *which* receipts to show and how to
-> summarize them — it never asserts anything the receipts don't already say, and
+> summarize them, it never asserts anything the receipts don't already say, and
 > it reports how it interpreted the question. Local and single-tenant; hosted,
 > real-time, cross-system query and alerting is the enterprise tier.
 
@@ -417,9 +417,9 @@ node dist/cli.js alerts                                # flag the critical stuff
 | **Post-quantum readiness** | Hybrid signature scheme planned for v2 (Ed25519 + Dilithium) | Practical quantum threats are 8–12 years out; retention is 7–10 years. Migration plan documented. |
 
 **Implementation libraries:**
-- [`@noble/ed25519`](https://github.com/paulmillr/noble-ed25519) — audited pure-TypeScript Ed25519
-- [`@noble/hashes`](https://github.com/paulmillr/noble-hashes) — audited hashing
-- [`canonicalize`](https://www.npmjs.com/package/canonicalize) — RFC 8785 implementation
+- [`@noble/ed25519`](https://github.com/paulmillr/noble-ed25519), audited pure-TypeScript Ed25519
+- [`@noble/hashes`](https://github.com/paulmillr/noble-hashes), audited hashing
+- [`canonicalize`](https://www.npmjs.com/package/canonicalize), RFC 8785 implementation
 
 ---
 
@@ -436,7 +436,7 @@ This SDK composes with rather than competes against the standards already used i
 | [OWASP AIBOM](https://owaspaibom.org/) | AI Bill of Materials populated from receipts |
 | [SPIFFE/SPIRE](https://spiffe.io/) | Workload identity for service-to-service calls |
 
-We are not reinventing the cryptographic primitives. We are composing them into a layer specifically for **AI runtime accountability** — which none of the existing standards target.
+We are not reinventing the cryptographic primitives. We are composing them into a layer specifically for **AI runtime accountability**: which none of the existing standards target.
 
 ---
 
@@ -468,7 +468,7 @@ A browser-based playground and verifier ship in this repository at
 [`site/playground.html`](site/playground.html) and
 [`site/verify.html`](site/verify.html). Open either file in a browser
 to generate a keypair, sign a sample event, and verify the resulting
-receipt — entirely client-side, no server, no install.
+receipt, entirely client-side, no server, no install.
 
 A hosted version is live at
 [askledger.github.io/receipts-sdk/playground.html](https://askledger.github.io/receipts-sdk/playground.html).
@@ -479,7 +479,7 @@ A hosted version is live at
 
 | Document | What's inside |
 |---|---|
-| [**Receipts Protocol Spec v0.1**](docs/RECEIPTS_PROTOCOL.md) | The formal envelope, schema, hashing and verification rules — IETF-style. Candidate for Linux Foundation AI hosting. |
+| [**Receipts Protocol Spec v0.1**](docs/RECEIPTS_PROTOCOL.md) | The formal envelope, schema, hashing and verification rules, IETF-style. Candidate for Linux Foundation AI hosting. |
 | [**Architecture**](docs/ARCHITECTURE.md) | Layered overview, file-by-file walk-through, design decisions, performance numbers. |
 | [**Examples folder**](examples/README.md) | End-to-end integration patterns. |
 | [**Python SDK**](python-sdk/README.md) | Wire-format compatible Python implementation. |
@@ -490,7 +490,7 @@ A hosted version is live at
 
 ---
 
-## Auto-capture adapters — supporting any AI tool
+## Auto-capture adapters, supporting any AI tool
 
 The SDK ships drop-in capture adapters so every AI invocation in your stack emits a signed receipt without changing application code.
 
@@ -518,7 +518,7 @@ const resp = await client.chat.completions.create({...});
 console.log(resp.x_ledger_receipt_id);   // cryptographic evidence id
 ```
 
-Errors from the wrapped client always propagate — receipts never take down the AI call they instrument.
+Errors from the wrapped client always propagate, receipts never take down the AI call they instrument.
 
 ---
 
@@ -545,7 +545,7 @@ These are the v0.2 surface that turns the reference SDK into a production-deploy
 | `SoftwareSigningProvider` | In-memory Ed25519 keys | Dev, browser playground, SMB |
 | `HSMSigningProvider` | Interface for PKCS#11 / AWS CloudHSM / Azure Key Vault / GCP KMS | Regulated BFSI, FIPS-required deployments |
 | `TSAClient` (RFC 3161) | Real RFC 3161 TimeStampReq encoder + network client (default: FreeTSA; commercial TSAs via Basic Auth) | When you need independently provable "when this was signed" |
-| `buildBatch` / `verifyInclusion` (Merkle) | SHA-256 binary Merkle tree with inclusion proofs (RFC 9162 leaf/internal prefix scheme — second-preimage safe) | Batch commitment to a transparency log; prove a single receipt belonged to the committed set |
+| `buildBatch` / `verifyInclusion` (Merkle) | SHA-256 binary Merkle tree with inclusion proofs (RFC 9162 leaf/internal prefix scheme, second-preimage safe) | Batch commitment to a transparency log; prove a single receipt belonged to the committed set |
 | `PostgresChainStateStore` | Postgres backend for chain state with CAS concurrency, row-level security pattern | SaaS multi-tenant deployments past single-process |
 | `MemoryChainStateStore` | In-process backend | Tests, serverless |
 | `KeyRegistry` | Key rotation, retirement, revocation, historical-time-window-aware trusted set | Long-lived issuers (key rotation every 90 days per NIST SP 800-57) |
@@ -565,7 +565,7 @@ Measured numbers from `npm run bench` (5000 iterations after warmup, Node 22, sa
 | `signReceipt` end-to-end | 1.64 ms | 2.13 ms | 2.47 ms |
 | `verifyReceipt` end-to-end | 1.91 ms | 2.13 ms | 2.26 ms |
 
-Note: Ed25519 numbers reflect pure-TypeScript `@noble/ed25519` (zero native dependencies, audited). When deployed against a native libsodium binding or HSM, signing drops to ~70 µs. The dominant cost in `signReceipt` is canonicalization + file I/O for chain state — production deployments swap the file backend for Postgres + HSM and stay well within an enterprise gateway's latency budget.
+Note: Ed25519 numbers reflect pure-TypeScript `@noble/ed25519` (zero native dependencies, audited). When deployed against a native libsodium binding or HSM, signing drops to ~70 µs. The dominant cost in `signReceipt` is canonicalization + file I/O for chain state, production deployments swap the file backend for Postgres + HSM and stay well within an enterprise gateway's latency budget.
 
 ---
 
@@ -581,16 +581,16 @@ AskLedger is not the only effort in cryptographic AI receipts. The following pro
 | [OpenTelemetry GenAI](https://opentelemetry.io/docs/specs/semconv/gen-ai/) | Runtime telemetry conventions |
 | AgentMint, OrgKernel, Pipelock, ArkForge, Garl Protocol, AEGIS, Nono | Independent receipts/audit SDKs (various states of completeness) |
 
-**How we differentiate.** This SDK focuses on the **runtime AI decision receipt** — the cryptographic envelope that binds a single AI event to a tenant, a policy, a model identity, and a hash-chained position. We compose with build-time attestation (Sigstore, in-toto, SLSA), with the OWASP AIBOM, and with OpenTelemetry GenAI semantic conventions. The commercial AskLedger platform layers a verifier model, a regulator portal, evidence packs, and BFSI-MENA-specific framework mappings on top — open-core, Datadog / HashiCorp / Sentry pattern.
+**How we differentiate.** This SDK focuses on the **runtime AI decision receipt**: the cryptographic envelope that binds a single AI event to a tenant, a policy, a model identity, and a hash-chained position. We compose with build-time attestation (Sigstore, in-toto, SLSA), with the OWASP AIBOM, and with OpenTelemetry GenAI semantic conventions. The commercial AskLedger platform layers a verifier model, a regulator portal, evidence packs, and BFSI-MENA-specific framework mappings on top, open-core, Datadog / HashiCorp / Sentry pattern.
 
 ---
 
 ## Get involved
 
-- **GitHub Discussions** — questions, design proposals, use cases
-- **Issues** — bugs, enhancements, integration requests
-- **Pull Requests** — see [CONTRIBUTING.md](CONTRIBUTING.md)
-- **Security disclosures** — see [SECURITY.md](SECURITY.md) (private channel)
+- **GitHub Discussions**: questions, design proposals, use cases
+- **Issues**: bugs, enhancements, integration requests
+- **Pull Requests**: see [CONTRIBUTING.md](CONTRIBUTING.md)
+- **Security disclosures**: see [SECURITY.md](SECURITY.md) (private channel)
 
 We are particularly interested in feedback from:
 - Bank CISOs and Chief Risk Officers preparing for CBUAE / SAMA / EU AI Act inspections
@@ -618,7 +618,7 @@ We are particularly interested in feedback from:
 | 3 Go tests | ✅ Passing |
 | Rust tests | ✅ Code shipped; cargo runs in CI |
 | Java tests | ✅ Code shipped; mvn runs in CI |
-| Cross-language conformance vectors | ✅ Shipped — TS ↔ Python ↔ Go pass byte-identical |
+| Cross-language conformance vectors | ✅ Shipped, TS ↔ Python ↔ Go pass byte-identical |
 | Fuzz harness (200 random mutations) | ✅ Shipped |
 | **Crypto hardening** | |
 | RFC 3161 timestamping client (FreeTSA + commercial TSA) | ✅ Shipped |
@@ -674,7 +674,7 @@ We are particularly interested in feedback from:
 | Quantum-resistant hybrid signatures (Ed25519 + Dilithium) | 🔴 v2.0 protocol revision |
 | Transparency log integration (Rekor) | 🟡 Merkle in place; log connector v0.4 |
 
-Rows marked 🔴 require external parties (audit firms, CPA firms). The code and the audit-ready artifacts are shipped — what remains is hiring the firms and running their engagements.
+Rows marked 🔴 require external parties (audit firms, CPA firms). The code and the audit-ready artifacts are shipped, what remains is hiring the firms and running their engagements.
 
 ---
 

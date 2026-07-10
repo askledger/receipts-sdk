@@ -4,7 +4,7 @@
  * Produces a deterministic byte representation of any JSON value, regardless
  * of key ordering, whitespace, or numeric formatting differences. This is
  * essential because a regulator running an independent verifier must compute
- * the same hash we did — without canonicalization, every implementation drifts.
+ * the same hash we did, without canonicalization, every implementation drifts.
  *
  * Reference: https://datatracker.ietf.org/doc/html/rfc8785
  */
@@ -32,7 +32,7 @@ export function canonicalize(value: unknown): string {
   }
   const result = canonicalizeImpl(value);
   if (result === undefined) {
-    throw new Error("Canonicalization returned undefined — value not JSON-serializable");
+    throw new Error("Canonicalization returned undefined, value not JSON-serializable");
   }
   return result;
 }

@@ -3,7 +3,7 @@
  *
  * Every adapter accepts an `AdapterContext` and is responsible for
  * building a RawEvent it hands to signReceipt. The adapter MUST NOT
- * raise from sign failures — receipts MUST NOT take down the AI call
+ * raise from sign failures, receipts MUST NOT take down the AI call
  * they instrument.
  */
 
@@ -36,7 +36,7 @@ export interface AdapterContext {
    */
   userIdResolver?: () => string | undefined;
   /**
-   * If true, do not embed the input/output text into the receipt — only
+   * If true, do not embed the input/output text into the receipt, only
    * embed their hashes. Default: true (privacy by default).
    */
   hashOnly?: boolean;

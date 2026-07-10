@@ -119,7 +119,7 @@ export interface IngestResult {
   scale: number; // multiply displayed $ / counts by this to undo downsampling (>= 1)
 }
 
-// Expand normalized workloads into per-request receipts (unsigned — imported
+// Expand normalized workloads into per-request receipts (unsigned, imported
 // from a bill, not signed at capture; signing is the Pro upgrade). Each receipt
 // carries the row's AVERAGE tokens so the over-tiering gate (avg output, avg
 // input) sees the true shape. Very large bills are uniformly downsampled to
@@ -183,6 +183,6 @@ function mkReceipt(w: Workload, inAvg: number, outAvg: number, i: number): Signe
         chain_height: 1,
       },
     },
-    signatures: [], // imported from a bill — unsigned. Signing at capture is Pro.
+    signatures: [], // imported from a bill, unsigned. Signing at capture is Pro.
   } as SignedReceipt;
 }

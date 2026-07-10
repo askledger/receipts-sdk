@@ -119,7 +119,7 @@ function tryWrapSdk(modName: string, apply: (mod: Record<string, unknown>) => vo
         console.warn(`[askledger] failed to instrument "${modName}":`, (e as Error).message);
       }
     })
-    .catch(() => { /* dep not installed — expected, no-op */ });
+    .catch(() => { /* dep not installed, expected, no-op */ });
 }
 
 function patchConstructor(
@@ -139,7 +139,7 @@ function patchConstructor(
 }
 
 async function emit(cfg: ResolvedConfig, receipt: SignedReceipt): Promise<void> {
-  if (!cfg.ingestUrl) return; // dev mode — receipts kept in-process via onReceipt log
+  if (!cfg.ingestUrl) return; // dev mode, receipts kept in-process via onReceipt log
   try {
     const res = await fetch(cfg.ingestUrl, {
       method: "POST",

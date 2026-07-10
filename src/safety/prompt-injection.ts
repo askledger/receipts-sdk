@@ -1,10 +1,10 @@
 /**
- * Prompt-injection detector — Plane 4 (Decision).
+ * Prompt-injection detector, Plane 4 (Decision).
  *
  * Inspired by Lakera Guard and Robust Intelligence's runtime firewall,
  * but implemented entirely with heuristics (regex + token-level
  * scoring) rather than a second LLM. LLM-based detectors are
- * themselves a privacy and shadow-AI risk — regex is deterministic,
+ * themselves a privacy and shadow-AI risk, regex is deterministic,
  * auditable, and adds zero latency.
  *
  * Detects:

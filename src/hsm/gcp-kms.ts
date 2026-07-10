@@ -96,7 +96,7 @@ export class GcpKmsSigningProvider implements SigningProvider {
     }
     return new FipsSigningProvider(this, {
       provider: "Google Cloud KMS (protectionLevel=HSM)",
-      cmvp_certificate: "FIPS 140-2 Level 3 — per Google Cloud public attestation",
+      cmvp_certificate: "FIPS 140-2 Level 3, per Google Cloud public attestation",
       attestation: true,
     });
   }

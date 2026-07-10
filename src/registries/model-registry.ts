@@ -1,5 +1,5 @@
 /**
- * Model Registry — ValidMind pattern.
+ * Model Registry, ValidMind pattern.
  *
  * Every AI model that runs in production is registered with version,
  * validation status, owner, and provenance. Receipts can carry a
@@ -17,7 +17,7 @@ export type ValidationStatus =
   | "approved"          // approved for production within scope
   | "approved_with_conditions" // approved but with caveats
   | "retired"           // no longer in use; receipts retained for audit
-  | "revoked";          // forbidden — known issue, do not run
+  | "revoked";          // forbidden, known issue, do not run
 
 export interface ModelRegistration {
   /** Stable id within tenant. */
@@ -36,7 +36,7 @@ export interface ModelRegistration {
   validation_status: ValidationStatus;
   /** Approved use-case ids this model serves. */
   approved_use_case_ids: string[];
-  /** Model owner — usually an MRM (Model Risk Management) lead. */
+  /** Model owner, usually an MRM (Model Risk Management) lead. */
   model_owner: string;
   /** Reference to the Sigstore Model Signing attestation, if any. */
   oms_attestation_url?: string;

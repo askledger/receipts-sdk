@@ -1,5 +1,5 @@
 /**
- * AskLedger — Receipts SDK
+ * AskLedger, Receipts SDK
  *
  * Cryptographic AI Decision Receipts for enterprise AI.
  *
@@ -52,7 +52,7 @@ export {
   type TimestampVerdict,
   type TimestampFormat,
 } from "./timestamp.js";
-// Layer 3 — Rule-Based Correctness / Assurance.
+// Layer 3, Rule-Based Correctness / Assurance.
 export {
   assuranceLevel,
   checkRules,
@@ -62,7 +62,7 @@ export {
   type RuleCheckResult,
   type RuleEvaluation,
 } from "./assurance.js";
-// Layer 2 — Execution Traceability: deterministic workflow reconstruction.
+// Layer 2, Execution Traceability: deterministic workflow reconstruction.
 export {
   reconstructWorkflow,
   verifyWorkflow,
@@ -70,7 +70,7 @@ export {
   type WorkflowGraph,
   type WorkflowVerifyResult,
 } from "./workflow-graph.js";
-// Layer 4 — Pre-Execution Guardian / Verdict (prevent, then prove).
+// Layer 4, Pre-Execution Guardian / Verdict (prevent, then prove).
 export {
   actionHash,
   signPreVerdict,
@@ -210,7 +210,7 @@ export {
 // receipts reduced to a single Merkle root with inclusion proofs and a
 // top-level `pack_hash`. The marketing site uses the word "bundle"; the SDK
 // internals use "pack". These aliases let callers use either name against the
-// identical implementation — no behavioral difference.
+// identical implementation, no behavioral difference.
 export {
   /** Alias of `buildEvidencePack`. A "bundle" and a "pack" are the same artifact. */
   buildEvidencePack as buildEvidenceBundle,
@@ -220,7 +220,7 @@ export {
   verifyAllReceiptsInPack as verifyAllReceiptsInBundle,
 } from "./evidence/index.js";
 
-// Content safety (Plane 4 · Pillar 6 — Shadow AI Discovery & Block)
+// Content safety (Plane 4 · Pillar 6, Shadow AI Discovery & Block)
 export {
   scanPii,
   detectShadowAi,
@@ -324,7 +324,7 @@ export {
 } from "./cost/dashboard.js";
 
 // Ingest an existing provider usage export (OpenAI/Anthropic) with no
-// instrumentation — the "read the bill you already have" front door.
+// instrumentation, the "read the bill you already have" front door.
 export {
   normalizeModel,
   parseUsageExport,
@@ -334,7 +334,7 @@ export {
   type IngestResult,
 } from "./cost/ingest.js";
 
-// Verified savings — sign a baseline, prove the realized saving, verify it
+// Verified savings, sign a baseline, prove the realized saving, verify it
 // independently. The paid differentiator, buildable standalone.
 export {
   buildBaseline,

@@ -1,5 +1,5 @@
 /**
- * FedRAMP / NIST SP 800-53 Rev. 5 — pre-built template for US federal
+ * FedRAMP / NIST SP 800-53 Rev. 5, pre-built template for US federal
  * AI deployments and contractors.
  *
  * The Office of Management and Budget M-24-10 memorandum (March 2024)
@@ -12,7 +12,7 @@ import type { PolicyTemplate } from "./types.js";
 
 export const FEDRAMP_NIST_AI: PolicyTemplate = {
   regulator: "NIST_RMF",
-  name: "FedRAMP + NIST SP 800-53 — Federal AI Controls",
+  name: "FedRAMP + NIST SP 800-53, Federal AI Controls",
   version: "Rev-5",
   published_at: "2020-09-23",
   summary:
@@ -66,7 +66,7 @@ export const FEDRAMP_NIST_AI: PolicyTemplate = {
       id: "AU-10",
       title: "Non-Repudiation",
       requirement:
-        "Protect against an individual falsely denying having performed an action — including invoking an AI inference.",
+        "Protect against an individual falsely denying having performed an action, including invoking an AI inference.",
       pillar: "accountability",
       satisfied_by_fields: ["signatures", "integrity.receipt_hash"],
       severity: "high",

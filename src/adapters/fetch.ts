@@ -15,7 +15,7 @@
  *
  * Designed to be drop-in: `const fetch = withReceipts(globalThis.fetch, ctx);`
  *
- * The interceptor is conservative — if a request does not match a known
+ * The interceptor is conservative, if a request does not match a known
  * AI endpoint, it is passed through unchanged with zero overhead.
  */
 
@@ -182,7 +182,7 @@ function tryExtractOutputText(parsed: unknown): string {
 export function withReceipts(opts: FetchAdapterOptions): FetchFn {
   const base = opts.baseFetch ?? globalThis.fetch;
   if (!base) {
-    throw new Error("No fetch available — pass baseFetch or run on Node >=18");
+    throw new Error("No fetch available, pass baseFetch or run on Node >=18");
   }
   const patterns = [
     ...DEFAULT_PATTERNS.filter((p) => !opts.disableVendors?.includes(p.vendor)),

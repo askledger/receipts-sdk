@@ -4,7 +4,7 @@
  * Single entry point for the SDK: given an AI event's input + output +
  * context, runs PII detection, deviation analysis, and shadow-AI
  * checks. Returns a structured safety verdict the adapter writes into
- * `payload.metadata.safety` on the receipt — and that the platform's
+ * `payload.metadata.safety` on the receipt, and that the platform's
  * Plane 4 (Decision) consumes to issue allow / block / flag verdicts.
  *
  * The whole pipeline is deterministic, in-process, < 5 ms for typical
@@ -40,7 +40,7 @@ export type SafetyVerdict = "allow" | "flag" | "block";
 
 export interface SafetyVerdictResult {
   verdict: SafetyVerdict;
-  /** 0..1 — cumulative risk score across PII + deviation + shadow. */
+  /** 0..1, cumulative risk score across PII + deviation + shadow. */
   risk_score: number;
   input_pii: PiiScanResult;
   output_pii: PiiScanResult;

@@ -1,5 +1,5 @@
 /**
- * Layer 2 — Execution Traceability: deterministic workflow reconstruction.
+ * Layer 2, Execution Traceability: deterministic workflow reconstruction.
  *
  * A multi-step run (an agent workflow, a pipeline) leaves one receipt per step,
  * each recording its parent step(s) in `provenance.parent_receipt_ids` and the

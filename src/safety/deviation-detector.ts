@@ -1,5 +1,5 @@
 /**
- * Classification-deviation detector — Plane 4 (Decision).
+ * Classification-deviation detector, Plane 4 (Decision).
  *
  * Catches the most common failure modes where a model's response
  * deviates from what the request justified:
@@ -14,7 +14,7 @@
  *   - Response token count is wildly disproportionate to the request
  *     (potential prompt expansion / hallucination)
  *
- * This module is deliberately lightweight — heuristic only. The
+ * This module is deliberately lightweight, heuristic only. The
  * platform layer can add LLM-based deviation grading later; the
  * heuristic catches the highest-frequency issues at zero latency cost.
  */
@@ -38,7 +38,7 @@ export interface DeviationCheckInput {
   input_token_count?: number;
   output_token_count?: number;
   ai_capability?: string;
-  /** Coarse content type the response looked like — set by the SDK adapter. */
+  /** Coarse content type the response looked like, set by the SDK adapter. */
   response_kind?: "code" | "prose" | "structured" | "binary" | "unknown";
 }
 
@@ -84,7 +84,7 @@ export function detectDeviation(input: DeviationCheckInput): DeviationResult {
     }
   }
 
-  // 2. PII leaked to a public-facing surface — ANY PII fires this rule
+  // 2. PII leaked to a public-facing surface, ANY PII fires this rule
   if (
     input.output_classification === "public" &&
     (input.output_pii?.count ?? 0) > 0
@@ -96,7 +96,7 @@ export function detectDeviation(input: DeviationCheckInput): DeviationResult {
     });
   }
 
-  // 3. Capability mismatch — asked for code, got prose, etc.
+  // 3. Capability mismatch, asked for code, got prose, etc.
   if (input.ai_capability === "code-completion" && input.response_kind === "prose") {
     findings.push({
       category: "capability_mismatch",
@@ -121,14 +121,14 @@ export function detectDeviation(input: DeviationCheckInput): DeviationResult {
     });
   }
 
-  // 5. Response classification lower than input — sensitive data has become looser
+  // 5. Response classification lower than input, sensitive data has become looser
   const rank = (c?: string) =>
     ({ public: 0, internal: 1, pii_redacted: 2, pii: 3, pci: 3, mnpi: 4 }[c ?? "internal"] ?? 1);
   if (rank(input.output_classification) < rank(input.input_classification)) {
     findings.push({
       category: "response_classification_lower_than_input",
       severity: "medium",
-      detail: `Input was classified '${input.input_classification}' but response is '${input.output_classification}' — sensitive data may have been declassified.`,
+      detail: `Input was classified '${input.input_classification}' but response is '${input.output_classification}', sensitive data may have been declassified.`,
     });
   }
 

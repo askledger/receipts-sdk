@@ -1,5 +1,5 @@
 /**
- * Cryptographic primitives — hashing and signing.
+ * Cryptographic primitives, hashing and signing.
  *
  * Algorithms:
  *   - SHA-256 (via @noble/hashes)
@@ -7,7 +7,7 @@
  *
  * In production, signing keys are HSM-backed (FIPS 140-3 Level 3). For local
  * development and the SDK reference implementation, keys live in JSON files
- * under .ledger/keys/ — never use these for real customer data.
+ * under .ledger/keys/, never use these for real customer data.
  */
 
 import * as ed from "@noble/ed25519";

@@ -3,7 +3,7 @@
  *
  * Delegates Ed25519 signing to Azure Key Vault. The Premium tier and
  * Managed HSM are FIPS 140-2 Level 3 validated. Standard tier is FIPS
- * 140-2 Level 1 — sufficient for many use cases but NOT for SR 26-2
+ * 140-2 Level 1, sufficient for many use cases but NOT for SR 26-2
  * / SAMA / CBUAE high-assurance scenarios.
  *
  * Production usage:
@@ -120,7 +120,7 @@ export class AzureKeyVaultSigningProvider implements SigningProvider {
     }
     return new FipsSigningProvider(this, {
       provider: "Azure Key Vault Managed HSM / Premium tier",
-      cmvp_certificate: "FIPS 140-2 Level 3 — per Microsoft public attestation",
+      cmvp_certificate: "FIPS 140-2 Level 3, per Microsoft public attestation",
       attestation: true,
     });
   }

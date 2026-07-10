@@ -1,7 +1,7 @@
 /**
  * Key rotation, revocation, and historical verification.
  *
- * In a long-lived deployment the issuer's signing key rotates — every
+ * In a long-lived deployment the issuer's signing key rotates, every
  * 90 days under most BFSI cryptographic-key-management standards
  * (NIST SP 800-57 Part 1 §6.5). Receipts signed with an old key MUST
  * still be verifiable forever; the verifier needs to know the key was

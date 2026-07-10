@@ -5,7 +5,7 @@
 // Annex IV technical files.
 //
 // The engine treats the receipt chain as the audit trail; workpapers
-// are derived views — every figure carries the receipt ids that
+// are derived views, every figure carries the receipt ids that
 // substantiate it. A regulator can spot-check any number by walking
 // from the workpaper to the underlying signed receipts.
 
@@ -41,7 +41,7 @@ export interface ModelEntry {
   model_id: string;
   invocations: number;
   // Distinct tenant_ids seen for this model. Receipts carry no end-user
-  // identity, so this is NOT a user count — reporting it as "unique_users"
+  // identity, so this is NOT a user count, reporting it as "unique_users"
   // would overstate a substantiated figure in a regulator workpaper.
   distinct_tenants: number;
   block_rate: number;
@@ -262,7 +262,7 @@ ${findings}
 
 function round(n: number): number { return Math.round(n * 10000) / 10000; }
 function sha256Hex(input: string | Uint8Array): string {
-  // intentionally avoid pulling crypto into the typing surface here —
+  // intentionally avoid pulling crypto into the typing surface here,
   // re-export uses the SDK's sha256String for consistency
   const { createHash } = require("node:crypto") as typeof import("node:crypto");
   return createHash("sha256").update(typeof input === "string" ? input : Buffer.from(input)).digest("hex");

@@ -1,11 +1,11 @@
 /**
- * PII detector — Plane 4 (Decision) Pillar 6 (Shadow AI Discovery & Block).
+ * PII detector, Plane 4 (Decision) Pillar 6 (Shadow AI Discovery & Block).
  *
  * Scans text for Personally Identifiable Information and BFSI-specific
  * sensitive patterns. Designed to run in <1 ms on a typical prompt so
  * it can sit inline in the receipt-signing path.
  *
- * The matcher is intentionally regex + Luhn — NOT an LLM. LLM-based
+ * The matcher is intentionally regex + Luhn, NOT an LLM. LLM-based
  * PII detectors are themselves a privacy and shadow-AI risk; our
  * detector runs locally, deterministically, and is fully auditable.
  *
@@ -32,7 +32,7 @@ export type PiiCategory =
 
 export interface PiiFinding {
   category: PiiCategory;
-  /** First 4 chars + "…" + last 2 chars — never the full match. */
+  /** First 4 chars + "…" + last 2 chars, never the full match. */
   redacted: string;
   /** Start index in the original text. */
   start: number;
@@ -172,7 +172,7 @@ function redact(s: string): string {
 }
 
 /**
- * Scan text for PII. Returns structured findings — never returns the
+ * Scan text for PII. Returns structured findings, never returns the
  * raw matched strings, only redacted previews.
  */
 export function scanPii(text: string): PiiScanResult {
@@ -204,7 +204,7 @@ export function scanPii(text: string): PiiScanResult {
     if (!last || f.start >= last.end) {
       kept.push(f);
     } else {
-      // overlap — keep higher confidence, then longer
+      // overlap, keep higher confidence, then longer
       const aLen = last.end - last.start;
       const bLen = f.end - f.start;
       if (

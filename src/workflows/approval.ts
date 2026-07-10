@@ -35,7 +35,7 @@ export interface ApprovalRequest {
   requestedAt: string;
   /** Free-form context the approvers see in the UI. */
   context: Record<string, unknown>;
-  /** Approvers — at least N of M must approve. */
+  /** Approvers, at least N of M must approve. */
   approvers: string[];
   threshold: number;
   expiresAt: string;

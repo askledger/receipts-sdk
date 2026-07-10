@@ -1,4 +1,4 @@
-// Two-stage planning cascade — preview with a cheap model, commit with
+// Two-stage planning cascade, preview with a cheap model, commit with
 // an expensive one. The pattern:
 //
 //   1. Caller submits a prompt.
@@ -61,7 +61,7 @@ export function chooseCascade(rule: CascadeRule): CascadeChoice {
   const planner = DEFAULT_PLANNERS[intent];
   const executor = DEFAULT_EXECUTORS[intent];
 
-  // Risk override — regulated decisions never run on the cheap planner.
+  // Risk override, regulated decisions never run on the cheap planner.
   if (rule.risk === "high") {
     return {
       planner: executor,
@@ -70,7 +70,7 @@ export function chooseCascade(rule: CascadeRule): CascadeChoice {
     };
   }
 
-  // Very small inputs don't benefit from preview — overhead exceeds savings.
+  // Very small inputs don't benefit from preview, overhead exceeds savings.
   if (rule.estimated_input_tokens < 200) {
     return {
       planner: executor,

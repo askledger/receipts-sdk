@@ -85,7 +85,7 @@ export interface PipelineResult {
 
 /**
  * Run the full pipeline for one event. Returns the final state and
- * every artifact produced along the way. Never throws — failures are
+ * every artifact produced along the way. Never throws, failures are
  * captured in the result.
  */
 export async function runPipeline(

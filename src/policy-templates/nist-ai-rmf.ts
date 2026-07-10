@@ -1,5 +1,5 @@
 /**
- * NIST AI Risk Management Framework (AI RMF 1.0) — pre-built template.
+ * NIST AI Risk Management Framework (AI RMF 1.0), pre-built template.
  *
  * Voluntary US framework with four functions: Govern, Map, Measure, Manage.
  * Adopted by many US federal contractors and increasingly cited by state

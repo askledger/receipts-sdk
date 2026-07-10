@@ -2,11 +2,11 @@
 //
 // Anyone can ask a plain-English question ("show me every blocked loan
 // decision on opus last week", "how much did gpt-5 cost by app?") and get an
-// answer that is ALWAYS grounded in real receipts — every result carries the
+// answer that is ALWAYS grounded in real receipts, every result carries the
 // receipt ids it came from, so the answer stays independently verifiable. The
 // parser here is deterministic and offline (free, no API key); an optional
 // LLM mode (see ./llm) handles free-form phrasing but still only produces a
-// StructuredQuery — it never invents data.
+// StructuredQuery, it never invents data.
 //
 // Honesty boundary: the NL layer decides WHICH receipts to show and how to
 // summarize them. It does not assert anything the receipts don't already say,
@@ -86,8 +86,8 @@ export interface QueryFilter {
   eventType?: string; // substring match on event_type
   decision?: DecisionVerdict;
   environment?: string;
-  since?: string; // ISO — capturedAt >= since
-  until?: string; // ISO — capturedAt <= until
+  since?: string; // ISO, capturedAt >= since
+  until?: string; // ISO, capturedAt <= until
   minCost?: number;
   maxCost?: number;
   minTokens?: number;

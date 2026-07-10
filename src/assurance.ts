@@ -1,5 +1,5 @@
 /**
- * Layer 3 — Rule-Based Correctness / Assurance.
+ * Layer 3, Rule-Based Correctness / Assurance.
  *
  * Two pieces:
  *  1. `assuranceLevel()` classifies a receipt L0 to L3 by what it actually
@@ -11,10 +11,10 @@
  *     dressed up as a mathematical proof.
  *
  * Assurance ladder:
- *   L0 Recorded         — a receipt exists (may be unsigned / imported).
- *   L1 Signed & chained — Ed25519 signature + hash-chain integrity (tamper-evident).
- *   L2 Governed & timed — L1 + the policy that applied is recorded + a timestamp.
- *   L3 Verified         — L2 + rules checked and passed, or an external proof bound.
+ *   L0 Recorded        , a receipt exists (may be unsigned / imported).
+ *   L1 Signed & chained, Ed25519 signature + hash-chain integrity (tamper-evident).
+ *   L2 Governed & timed, L1 + the policy that applied is recorded + a timestamp.
+ *   L3 Verified        , L2 + rules checked and passed, or an external proof bound.
  */
 
 import type { SignedReceipt, PolicyContext, VerificationBlock } from "./types.js";

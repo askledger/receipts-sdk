@@ -1,4 +1,4 @@
-// Interactive 60-second flow — first run of `pl quickstart` after
+// Interactive 60-second flow, first run of `pl quickstart` after
 // install.sh finishes. The goal is one outcome: by the end the user
 // has signed a real receipt, verified it, and has a public badge URL
 // they can paste somewhere.

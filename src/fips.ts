@@ -1,7 +1,7 @@
 /**
  * FIPS 140-3 mode helpers.
  *
- * IMPORTANT — read carefully:
+ * IMPORTANT, read carefully:
  *
  * The SDK code in this repository is NOT itself FIPS 140-3 validated.
  * NIST CMVP validation applies to *cryptographic providers*, not to
@@ -69,7 +69,7 @@ interface FipsAttestation {
   cmvp_certificate?: string;
   /**
    * Implementation MUST set this to true to opt-in. The SDK trusts the
-   * caller — if you wrap a non-FIPS provider and claim FIPS, that is on
+   * caller, if you wrap a non-FIPS provider and claim FIPS, that is on
    * you. Auditors will reject false attestations.
    */
   attestation: true;

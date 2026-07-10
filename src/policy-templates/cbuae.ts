@@ -1,5 +1,5 @@
 /**
- * CBUAE Responsible AI Framework — pre-built policy template.
+ * CBUAE Responsible AI Framework, pre-built policy template.
  *
  * Tracks the Central Bank of the UAE's "Principles for Responsible AI"
  * issued February 2026, applied to UAE-supervised financial entities.

@@ -1,5 +1,5 @@
 /**
- * Receipt Score — SSL-Labs-A+ for AI trust.
+ * Receipt Score, SSL-Labs-A+ for AI trust.
  */
 
 export {

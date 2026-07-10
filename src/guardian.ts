@@ -1,5 +1,5 @@
 /**
- * Layer 4 — Pre-Execution Guardian / Verdict.
+ * Layer 4, Pre-Execution Guardian / Verdict.
  *
  * Layers 1 to 3 PROVE what happened, how, and why, after the fact. This layer
  * PREVENTS: before an irreversible action runs, an independent reviewer issues a
@@ -31,7 +31,7 @@ export interface ProposedAction {
 
 export interface ReviewDecision {
   verdict: Verdict;
-  reviewer: string; // who/what reviewed — must be independent of action.actor
+  reviewer: string; // who/what reviewed, must be independent of action.actor
   reasons?: string[];
 }
 
@@ -40,7 +40,7 @@ export interface PreVerdict {
   kind: "askledger.preverdict";
   tenant_id: string;
   action_type: string;
-  action_hash: string; // sha256 of the canonical action — binds this verdict to THIS action
+  action_hash: string; // sha256 of the canonical action, binds this verdict to THIS action
   verdict: Verdict;
   reviewer: string;
   independent_of: string | null; // the actor the reviewer is independent of

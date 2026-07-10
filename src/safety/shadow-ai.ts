@@ -1,5 +1,5 @@
 /**
- * Shadow-AI detector — Pillar 6.
+ * Shadow-AI detector, Pillar 6.
  *
  * Identifies AI invocations that bypass the enterprise's approved
  * controls:
@@ -9,18 +9,18 @@
  *   - Unapproved endpoint (calling a public consumer endpoint)
  *
  * Findings are appended to the receipt's payload.metadata so the audit
- * trail captures every shadow-AI event — even if it was allowed by
+ * trail captures every shadow-AI event, even if it was allowed by
  * policy (e.g., during a controlled exception window).
  */
 
 export interface ShadowAiPolicy {
   /** Approved AI vendors for this tenant. */
   approved_vendors: string[];
-  /** Approved model identifiers — exact match. */
+  /** Approved model identifiers, exact match. */
   approved_models: string[];
   /** Approved source systems (the corporate gateway, the official IDE plugin, etc.). */
   approved_source_systems: string[];
-  /** Approved AI provider routes — e.g. "gateway:portkey", "direct:vpn-only". */
+  /** Approved AI provider routes, e.g. "gateway:portkey", "direct:vpn-only". */
   approved_providers?: string[];
   /** Domains the platform considers consumer-grade endpoints. */
   consumer_endpoints?: string[];
@@ -88,7 +88,7 @@ export function detectShadowAi(
         reasons.push("consumer_endpoint");
       }
     } catch {
-      /* malformed URL — ignore */
+      /* malformed URL, ignore */
     }
   }
   // Severity scoring: consumer endpoint is the most severe (PII leak vector),

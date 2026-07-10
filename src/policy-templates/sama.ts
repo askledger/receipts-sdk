@@ -1,5 +1,5 @@
 /**
- * SAMA (Saudi Central Bank) AI guidance — pre-built policy template.
+ * SAMA (Saudi Central Bank) AI guidance, pre-built policy template.
  *
  * Tracks SAMA's AI Adoption Framework guidance for Saudi-supervised
  * financial entities (banks, insurers, fintechs operating under SAMA

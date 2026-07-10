@@ -1,9 +1,9 @@
 /**
- * AskLedger — Receipts SDK
+ * AskLedger, Receipts SDK
  * Type definitions for the AI Decision Receipt envelope.
  *
  * This implements the receipt schema defined in the AskLedger
- * Technical Architecture v0.2 — Plane 5 (Records).
+ * Technical Architecture v0.2, Plane 5 (Records).
  *
  * Stable until the spec reaches v1.0 (target: Year 2, Linux Foundation AI).
  */
@@ -95,7 +95,7 @@ export interface IntegrityBlock {
 /**
  * A reference to an external evidence or attestation artifact associated with
  * a receipt (for example, a checker report or an out-of-band verification
- * artifact). The referenced artifact itself is NOT embedded — only its digest
+ * artifact). The referenced artifact itself is NOT embedded, only its digest
  * (and optional locator) is recorded, so the reference is bound into the
  * receipt's canonical bytes and covered by the signature without changing any
  * cryptographic behavior.
@@ -201,7 +201,7 @@ export interface Receipt {
   /**
    * OPTIONAL forward-compatibility map for experimental / not-yet-standardized
    * attributes (e.g. `data_provenance`, `compliance`), keyed by a namespaced
-   * name. Additive and signed like everything else — it is part of the canonical
+   * name. Additive and signed like everything else, it is part of the canonical
    * bytes, so anything placed here is covered by `integrity.receipt_hash` and the
    * signature. Promote a field to a first-class receipt field only once its shape
    * is proven in real use; until then it lives here without freezing the schema.

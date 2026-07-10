@@ -1,5 +1,5 @@
 /**
- * Public Transparency Log — Sigstore Rekor pattern for AI receipts.
+ * Public Transparency Log, Sigstore Rekor pattern for AI receipts.
  *
  * Operator deploys this as transparency.github.com/askledger/receipts-sdk. Anyone can
  * submit signed receipts (gated by submitter token in production), get
@@ -7,7 +7,7 @@
  * the log has not been rewritten.
  *
  * The transparency log is what makes AskLedger non-repudiable
- * even by us. We don't have to be trusted — we publish.
+ * even by us. We don't have to be trusted, we publish.
  */
 
 export {

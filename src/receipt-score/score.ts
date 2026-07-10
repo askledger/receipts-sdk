@@ -1,5 +1,5 @@
 /**
- * Receipt Score — public reputation signal for an AI deployment.
+ * Receipt Score, public reputation signal for an AI deployment.
  *
  * Inspired by SSL Labs (A+ TLS rating), Lighthouse (web performance),
  * and Cloudflare Radar. Banks, auditors, regulators, and customers
@@ -8,11 +8,11 @@
  * The score is composed of five sub-scores (0..100 each), then weighted
  * into a final 0..100 with a letter grade.
  *
- *   1. Coverage           — what % of AI traffic produces receipts
- *   2. Verification       — what % of receipts pass third-party verify
- *   3. Safety hygiene     — what fraction had findings + were handled
- *   4. Regulatory align.  — how many regulator templates the receipts cite
- *   5. Transparency log   — what % of batches reach the public log
+ *   1. Coverage          , what % of AI traffic produces receipts
+ *   2. Verification      , what % of receipts pass third-party verify
+ *   3. Safety hygiene    , what fraction had findings + were handled
+ *   4. Regulatory align. , how many regulator templates the receipts cite
+ *   5. Transparency log  , what % of batches reach the public log
  *
  * Recomputed daily. Embeddable as an SVG badge plus a JSON-LD blob.
  */

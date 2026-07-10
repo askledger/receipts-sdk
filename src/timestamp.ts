@@ -1,19 +1,19 @@
 /**
  * Time-stamping: attach a trusted time to a receipt, and verify that the token
- * BINDS to the receipt (the gap the audit found — tokens existed but nothing
+ * BINDS to the receipt (the gap the audit found, tokens existed but nothing
  * checked they committed to the receipt).
  *
- * A token commits to `canonicalSigningPayload(receipt)` — the exact bytes that
- * were signed — so a verifier can confirm "this receipt existed at time T".
+ * A token commits to `canonicalSigningPayload(receipt)`, the exact bytes that
+ * were signed, so a verifier can confirm "this receipt existed at time T".
  *
  * Two authorities implement the same tiny interface:
- *   - `TSAClient`     — real RFC 3161 over HTTP (FreeTSA / DigiCert / …).
- *   - `StubTSAClient` — offline, deterministic, for tests and local dev.
+ *   - `TSAClient`    , real RFC 3161 over HTTP (FreeTSA / DigiCert / …).
+ *   - `StubTSAClient`, offline, deterministic, for tests and local dev.
  *
  * Verification: for our local/stub tokens we fully check the imprint here. For
  * an RFC 3161 DER token the messageImprint AND the TSA's CMS signature must be
- * checked against the TSA's CA certificate using standard RFC 3161 tooling —
- * out of scope for the pure, dependency-free SDK — so those are reported as
+ * checked against the TSA's CA certificate using standard RFC 3161 tooling,
+ * out of scope for the pure, dependency-free SDK, so those are reported as
  * present-and-externally-verifiable rather than falsely asserted valid here.
  */
 
@@ -25,7 +25,7 @@ export interface TimestampClient {
   timestamp(payload: Uint8Array): Promise<TimestampToken>;
 }
 
-/** Hex SHA-256 of the receipt's signed canonical bytes — what a token commits to. */
+/** Hex SHA-256 of the receipt's signed canonical bytes, what a token commits to. */
 export function receiptTimestampImprint(signed: SignedReceipt): string {
   return sha256(canonicalSigningPayload(signed.receipt));
 }
@@ -68,12 +68,12 @@ export function verifyReceiptTimestamps(signed: SignedReceipt): TimestampVerdict
         note: matches ? "imprint binds to this receipt" : "imprint does NOT match this receipt",
       };
     }
-    // Base64 that isn't our JSON token — assume an RFC 3161 DER TimeStampResp.
+    // Base64 that isn't our JSON token, assume an RFC 3161 DER TimeStampResp.
     return {
       tsa: t.tsa,
       format: "rfc3161",
       imprintMatches: null,
-      note: "RFC 3161 token — verify the messageImprint and TSA signature against the TSA CA certificate",
+      note: "RFC 3161 token, verify the messageImprint and TSA signature against the TSA CA certificate",
     };
   });
 }

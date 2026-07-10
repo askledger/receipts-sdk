@@ -21,7 +21,7 @@ import type { SignedReceipt } from "../types.js";
 import type { KeyRecord } from "../key-management.js";
 
 export interface EvidencePackMeta {
-  /** Human-readable title — e.g. "AI Decision Evidence Pack · ACME Bank · Q3 2026". */
+  /** Human-readable title, e.g. "AI Decision Evidence Pack · ACME Bank · Q3 2026". */
   title: string;
   /** Tenant identifier. */
   tenantId: string;

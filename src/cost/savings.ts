@@ -1,13 +1,13 @@
-// Verified savings — the paid differentiator.
+// Verified savings, the paid differentiator.
 //
 // A dashboard can tell you your bill went down. It cannot prove WHY, and it
 // cannot hand a skeptic (a CFO, a client) a number they can check without
 // trusting the person who produced it. This module does that:
 //
-//   1. buildBaseline()  — sign a tamper-evident "before" snapshot of your spend.
-//   2. proveSavings()   — compare a later period to that baseline and sign a
+//   1. buildBaseline() , sign a tamper-evident "before" snapshot of your spend.
+//   2. proveSavings()  , compare a later period to that baseline and sign a
 //                         proof of the realized saving.
-//   3. verifySavingsProof() — anyone re-checks the signature AND recomputes the
+//   3. verifySavingsProof(), anyone re-checks the signature AND recomputes the
 //                         math from the numbers in the proof. No trust required.
 //
 // The headline saving is EFFICIENCY-normalized: it isolates the drop in blended
@@ -23,7 +23,7 @@ export interface PeriodSummary {
   to: string | null;
   requests: number;
   totalTokens: number;
-  pricedTokens: number; // priced-model tokens — the denominator for the blended rate
+  pricedTokens: number; // priced-model tokens, the denominator for the blended rate
   costUsd: number;
   costPer1kTokens: number; // blended rate = costUsd / (pricedTokens/1000)
   costPerRequest: number;

@@ -1,5 +1,5 @@
 /**
- * Transparency Log types — Certificate Transparency / Sigstore Rekor
+ * Transparency Log types, Certificate Transparency / Sigstore Rekor
  * pattern, adapted for AI Decision Receipts.
  *
  * A transparency log is an append-only, publicly auditable Merkle tree
