@@ -4,6 +4,17 @@ All notable changes to the AskLedger Receipts SDK will be documented in this fil
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (with the caveat that until v1.0, breaking changes may occur between minor versions).
 
+## [0.12.5] - 2026-07-11
+
+### Changed (packaging, no API or type changes)
+
+- Stopped shipping source maps (`*.js.map`, `*.d.ts.map`) in the published package. They mapped
+  the compiled JS to the TypeScript sources, which are not shipped, so they were dead weight for
+  consumers, and the test suite runs against `src/` (not `dist/`), so nothing used them. Disabled
+  `sourceMap` / `declarationMap` in `tsconfig.json`. This cuts the package from ~1.06 MB / 387
+  files to ~623 KB / 189 files (about 41% smaller, half the files), for faster installs. The
+  `.js` runtime and `.d.ts` types are unchanged.
+
 ## [0.12.4] - 2026-07-11
 
 ### Changed (docs + comments only, no API or behavior changes)
