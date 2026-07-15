@@ -14,7 +14,7 @@ Concrete usage patterns showing how to integrate the Receipts SDK into real syst
 | `05-express-middleware.ts` | Wrapping an Express endpoint to emit a receipt per request |
 | `06-healthcare-cds.ts` | A clinical decision support call, receipted |
 | `07-government-eligibility.ts` | An eligibility determination, receipted |
-| `08-four-layers-end-to-end.ts` | **All four layers in one run:** guardian (L4) blocks a bad wire, the run is hash-chained (L1) and traced as a DAG (L2), and the decision is rule-checked and graded (L3) |
+| `08-five-layers-end-to-end.ts` | **All five layers in one run:** the guardian (L1) blocks a bad wire, every step is hash-chained (L2) and traced as a DAG (L3), the decision is rule-checked and graded (L4), and it all rolls up into governance and verified ROI (L5) |
 | `09-prove-the-savings.ts` | **Prove the savings, don't claim them:** sign a baseline, prove an efficiency-normalized saving against it, verify independently, and watch a forged number get rejected |
 
 ## Running an example
@@ -24,11 +24,11 @@ npm install
 npx tsx examples/01-basic-sign-verify.ts
 ```
 
-The four-layer walkthrough has its own shortcut:
+The five-layer walkthrough has its own shortcut:
 
 ```bash
 npm install
-npm run demo:layers        # runs 08-four-layers-end-to-end.ts
+npm run demo:layers        # runs 08-five-layers-end-to-end.ts
 npm run demo:savings       # runs 09-prove-the-savings.ts
 ```
 
