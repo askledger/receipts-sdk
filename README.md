@@ -54,6 +54,22 @@ interest, and standards-body co-authorship.
 
 ---
 
+## The five layers
+
+AskLedger is a five-layer model. Layers 1 to 4 are the cryptographic proof engine; layer 5 is the governance and ROI program built on top. **Every layer below ships in this SDK and is exported from the public API.**
+
+| Layer | What it does | Public API in this SDK |
+|---|---|---|
+| **L1 · Prevent** | Pre-execution guardian: an independent verdict (`approve` / `concerns` / `reject`) before an irreversible action, signed under its own key and bound to the exact action, so "approve A, run B" fails. Supports N-of-M review. | `signPreVerdict`, `verifyPreVerdict`, `assertActionCleared`, `reviewNofM` |
+| **L2 · Prove** | Cryptographic evidence: a signed, hash-chained receipt per AI action (Ed25519, RFC 8785 canonical JSON, RFC 3161 timestamp), independently verifiable with only a public key. | `signReceipt`, `verifyReceipt`, `verifyChain` |
+| **L3 · Trace** | Execution traceability: reconstruct and verify a multi-step workflow from its receipts, and group many receipts into one Merkle evidence bundle. | `reconstructWorkflow`, `verifyWorkflow` |
+| **L4 · Assure** | Rule-based assurance: classify each receipt on the L0–L3 ladder (Declared / Signed / Attested / Anchored) and check governing rules, computed from the evidence, not asserted. | `assuranceLevel`, `checkRules` |
+| **L5 · Govern** | Governance & ROI: turn the evidence chain into verified savings against a signed baseline, plus compliance-ready reporting. | `buildBaseline`, `proveSavings`, `verifyBaseline` |
+
+Layers 1 to 4 are cryptographically verifiable and open source here; layer 5's hosted governance, regulator portal, and evidence packs are the commercial layer (open-core).
+
+---
+
 ## Install
 
 ```bash
@@ -444,7 +460,7 @@ We are not reinventing the cryptographic primitives. We are composing them into 
 
 ### Shipped
 - Five language implementations, one wire format: TypeScript on npm; Python, Go, Rust and Java from source, all cross-verified against shared conformance vectors
-- The four-layer proof engine, prevent-first: a pre-execution guardian (prevents the wrong action), cryptographic evidence (proves what happened), execution traceability (proves how), and rule-based assurance (proves why)
+- The full five-layer model (see [The five layers](#the-five-layers)), prevent-first: L1 a pre-execution guardian (prevents the wrong action), L2 cryptographic evidence (proves what), L3 execution traceability (proves how), L4 rule-based assurance (proves why), and L5 governance and verified ROI (proves the value). Layers 1 to 4 are the open cryptographic proof engine; all are exported from the SDK
 - RFC 3161 timestamping, Merkle commitments and a transparency log, and HSM/KMS signing (AWS KMS, Azure Key Vault, GCP KMS, PKCS#11)
 - Verified savings (sign a baseline, prove the realized saving, verify it) and zero-instrumentation spend scan
 - Browser playground and verifier, plus SLSA provenance and a CycloneDX SBOM on every release
