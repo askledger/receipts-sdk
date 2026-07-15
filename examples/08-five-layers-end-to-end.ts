@@ -1,19 +1,20 @@
 /**
- * Example 08 — The four layers, end to end (prevent, then prove)
+ * Example 08 — The five layers, end to end (prevent, then prove)
  *
- * One runnable script that walks a single real agent action through all four
- * technical layers of AskLedger, then shows where Layer 5 fits.
+ * One runnable script that walks a single real agent action through all five
+ * layers of AskLedger. Layers 1 to 4 are the cryptographic proof engine;
+ * layer 5 is the governance and ROI program built on top.
  *
  * Scenario: an accounts-payable agent runs a multi-step "vendor payment"
  * workflow whose final step is an irreversible $40,000 wire. We:
  *
- *   L4  stop the wire until an INDEPENDENT reviewer signs off   (prevent)
- *   L1  sign every step into a per-tenant hash chain            (record)
- *   L2  reconstruct + verify the whole run as a DAG             (trace)
- *   L3  check the decision against its policy, and grade it     (prove correct)
- *   L5  package all of the above into governance + verified ROI (the program)
+ *   L1  stop the wire until an INDEPENDENT reviewer signs off   (prevent)
+ *   L2  sign every step into a per-tenant hash chain            (prove)
+ *   L3  reconstruct + verify the whole run as a DAG             (trace)
+ *   L4  check the decision against its policy, and grade it     (assure)
+ *   L5  package all of the above into governance + verified ROI (govern)
  *
- * Run:  node --loader tsx examples/08-four-layers-end-to-end.ts
+ * Run:  node --loader tsx examples/08-five-layers-end-to-end.ts
  */
 
 import {
@@ -78,7 +79,7 @@ function main(): void {
   };
 
   // -------------------------------------------------------------------------
-  banner("L4", "Pre-execution guardian — stop the wrong action before it runs");
+  banner("LAYER 1 · PREVENT", "Pre-execution guardian — stop the wrong action before it runs");
   // -------------------------------------------------------------------------
   const wire: ProposedAction = {
     tenant_id: TENANT,
@@ -87,7 +88,7 @@ function main(): void {
     actor: "agent-ap",
   };
 
-  // 4a. Independence is enforced: the actor cannot sign its own clearance.
+  // 1a. Independence is enforced: the actor cannot sign its own clearance.
   let selfApprovalBlocked = false;
   try {
     signPreVerdict(wire, { verdict: "approve", reviewer: "agent-ap" }, { keypair: riskKp, reviewedAt: new Date().toISOString() });
@@ -96,7 +97,7 @@ function main(): void {
   }
   check(selfApprovalBlocked, "self-approval refused: reviewer must be independent of the actor");
 
-  // 4b. A reject is a hard veto: the action cannot run.
+  // 1b. A reject is a hard veto: the action cannot run.
   const rejected = signPreVerdict(wire, { verdict: "reject", reviewer: "risk-engine", reasons: ["vendor not on approved list"] }, { keypair: riskKp, reviewedAt: new Date().toISOString() });
   let rejectBlocked = false;
   try {
@@ -106,24 +107,24 @@ function main(): void {
   }
   check(rejectBlocked, "a reject verdict blocks execution");
 
-  // 4c. Two independent approvers clear the high-risk wire (N-of-M).
+  // 1c. Two independent approvers clear the high-risk wire (N-of-M).
   const approveRisk = signPreVerdict(wire, { verdict: "approve", reviewer: "risk-engine" }, { keypair: riskKp, reviewedAt: new Date().toISOString() });
   const approveCtrl = signPreVerdict(wire, { verdict: "approve", reviewer: "controller" }, { keypair: controllerKp, reviewedAt: new Date().toISOString() });
   const nofm = reviewNofM(wire, [approveRisk, approveCtrl], { publicKeys: verdictKeys, threshold: 2 });
   check(nofm.cleared, `N-of-M cleared with ${nofm.approvals} distinct approvers (threshold 2)`);
 
-  // 4d. The verdict binds to THIS exact action; "approve A, run B" fails.
+  // 1d. The verdict binds to THIS exact action; "approve A, run B" fails.
   const tampered: ProposedAction = { ...wire, payload: { ...(wire.payload as Record<string, unknown>), amount_usd: 400000 } };
   const bind = verifyPreVerdict(approveRisk, tampered, { publicKeys: verdictKeys });
   check(!bind.checks.binds_to_action, "verdict does NOT clear a modified action (approve A, run B is caught)");
 
-  // The clearance rides into the receipt as tamper-evident evidence (L4 -> L1).
+  // The clearance rides into the receipt as tamper-evident evidence (L1 -> L2).
   const verdictRef = preVerdictEvidenceRef(approveRisk);
 
   // -------------------------------------------------------------------------
-  banner("L1 + L2", "Record every step into a hash chain, trace the run as a DAG");
+  banner("LAYER 2 · PROVE  +  LAYER 3 · TRACE", "Record every step into a hash chain, trace the run as a DAG");
   // -------------------------------------------------------------------------
-  // Layer 3 policy + rule check, computed here so the decision receipt carries it.
+  // Layer 4 policy + rule check, computed here so the decision receipt carries it.
   const policy: PolicyContext = {
     applied_rules: [
       { rule_id: "amount_within_limit", mathematical_form: "amount_usd <= 50000" },
@@ -141,14 +142,14 @@ function main(): void {
   const chain: SignedReceipt[] = [r1, r2, r3, r4];
 
   const chainRes = verifyChain(chain, { publicKeys });
-  check(chainRes.valid && chainRes.completeFromGenesis, `L1 hash chain verified end to end (length ${chainRes.length}, complete from genesis)`);
+  check(chainRes.valid && chainRes.completeFromGenesis, `L2 hash chain verified end to end (length ${chainRes.length}, complete from genesis)`);
 
   const wf = verifyWorkflow(chain, { publicKeys, workflowId: WF });
-  check(wf.valid, `L2 workflow DAG verified (${wf.order.length} steps, complete and acyclic)`);
+  check(wf.valid, `L3 workflow DAG verified (${wf.order.length} steps, complete and acyclic)`);
   console.log(`     order: ${chain.map((r) => r.receipt.event.event_type).join("  ->  ")}`);
 
   // -------------------------------------------------------------------------
-  banner("L3", "Prove the decision was sound, and grade the evidence");
+  banner("LAYER 4 · ASSURE", "Prove the decision followed its rules, and grade the evidence");
   // -------------------------------------------------------------------------
   check(ruleResult.status === "verified", `rule check status = ${ruleResult.status}`);
   for (const e of ruleResult.evaluations) {
@@ -156,19 +157,19 @@ function main(): void {
   }
   const grade = assuranceLevel(r3);
   console.log(`  assurance level of the decision receipt: ${grade.level} (${grade.name})`);
-  console.log("     (software key + chain = L1 Signed; add HSM/KMS for L2 Attested, a timestamp for L3 Anchored)");
+  console.log("     (assurance ladder: software key + chain = L1 Signed; add HSM/KMS for L2 Attested, a timestamp for L3 Anchored)");
 
   // -------------------------------------------------------------------------
-  banner("L5", "Enablement & ROI — the program around the engine (no new API)");
+  banner("LAYER 5 · GOVERN", "Enablement & ROI — the program around the engine (no new API)");
   // -------------------------------------------------------------------------
   console.log("  Layers 1-4 above are cryptographically verifiable. Layer 5 packages them:");
   console.log("    - the signed savings baseline from the cost engine   ->  Verified ROI");
-  console.log("    - the Layer 3 rule packs shown above                 ->  Compliance");
+  console.log("    - the Layer 4 rule packs shown above                 ->  Compliance");
   console.log("    - the assurance ladder                               ->  Audit success");
   console.log("  Every number is proven against signed evidence, never claimed.");
 
   // -------------------------------------------------------------------------
-  banner("RESULT", ok ? "All four layers verified end to end" : "Something did not verify");
+  banner("RESULT", ok ? "All five layers demonstrated end to end" : "Something did not verify");
   // -------------------------------------------------------------------------
   process.exitCode = ok ? 0 : 1;
 }

@@ -41,7 +41,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "demo": "npm run build && node dist/cli.js sign examples/event.json && node dist/cli.js verify .ledger/last-receipt.json",
-    "demo:layers": "tsx examples/08-four-layers-end-to-end.ts",
+    "demo:layers": "tsx examples/08-five-layers-end-to-end.ts",
     "demo:savings": "tsx examples/09-prove-the-savings.ts",
     "keygen": "npm run build && node dist/cli.js keygen",
     "bench": "npm run build && node scripts/bench.mjs",
