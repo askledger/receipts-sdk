@@ -145,9 +145,27 @@ export function verifyPreVerdict(
     errors.push("pre-verdict does not bind to this action (action_hash mismatch)");
   }
 
+  // Expiry must be compared as INSTANTS, not strings. RFC 3339 permits UTC
+  // offsets and variable fractional precision, so a lexicographic compare
+  // accepts an expired verdict: "2026-07-20T02:00:00+09:00" (= 17:00Z) sorts
+  // after "2026-07-19T18:00:00.000Z" while actually being in the past. For a
+  // gate on an irreversible action this must fail closed, including when
+  // either timestamp is unparseable.
   const now = opts.now ?? new Date().toISOString();
-  const not_expired = pv.expires_at === null || now <= pv.expires_at;
-  if (!not_expired) errors.push(`pre-verdict expired at ${pv.expires_at}`);
+  let not_expired: boolean;
+  if (pv.expires_at === null) {
+    not_expired = true;
+  } else {
+    const nowMs = Date.parse(now);
+    const expMs = Date.parse(pv.expires_at);
+    not_expired = Number.isFinite(nowMs) && Number.isFinite(expMs) && nowMs <= expMs;
+    if (!Number.isFinite(nowMs) || !Number.isFinite(expMs)) {
+      errors.push("pre-verdict has an unparseable timestamp; treated as expired");
+    }
+  }
+  if (!not_expired && pv.expires_at !== null && Number.isFinite(Date.parse(pv.expires_at))) {
+    errors.push(`pre-verdict expired at ${pv.expires_at}`);
+  }
 
   const valid = hash_matches && signature_valid && binds_to_action && not_expired;
   return {
@@ -206,8 +224,14 @@ export interface MultiReviewResult {
 /**
  * N-of-M multi-reviewer gate for high-risk actions. Every verdict must bind to
  * the SAME action and verify (signature, hash, not expired). Clears only when at
- * least `threshold` DISTINCT reviewers approve AND no reviewer rejects (a reject
- * is a hard veto). The same reviewer cannot count twice toward the threshold.
+ * least `threshold` DISTINCT SIGNING KEYS approve AND nobody rejects (a reject
+ * is a hard veto).
+ *
+ * Approvals are counted by key id, not by the `reviewer` name. The name is
+ * free-form text inside the signed body with no binding to the key, so counting
+ * names would let one key holder clear an N-of-M gate alone by signing under
+ * several invented names. One key therefore counts once, however many verdicts
+ * it produces.
  */
 export function reviewNofM(
   action: ProposedAction,
@@ -215,8 +239,24 @@ export function reviewNofM(
   opts: { publicKeys: Record<string, string>; threshold: number; now?: string; allowConcerns?: boolean }
 ): MultiReviewResult {
   const errors: string[] = [];
-  const approvers = new Set<string>();
+  // Separation of duty is counted by SIGNING KEY, never by the `reviewer`
+  // string. `reviewer` is free-form text inside the signed body and is not
+  // bound to the key that signed it, so counting names let a single key holder
+  // sign N verdicts under N invented names and clear an N-of-M gate alone.
+  // The key id is the only cryptographic identity here.
+  const approversByKid = new Map<string, string>(); // kid -> reviewer name (for reporting)
   let rejects = 0;
+
+  if (!Number.isInteger(opts.threshold) || opts.threshold < 1) {
+    return {
+      cleared: false,
+      approvals: 0,
+      rejects: 0,
+      reviewers: [],
+      threshold: opts.threshold,
+      errors: [`threshold must be an integer >= 1, got ${opts.threshold}`],
+    };
+  }
 
   for (const v of verdicts) {
     const res = verifyPreVerdict(v, action, { publicKeys: opts.publicKeys, now: opts.now });
@@ -228,13 +268,33 @@ export function reviewNofM(
       rejects++;
       errors.push(`rejected by "${v.pre_verdict.reviewer}"`);
     } else if (res.verdict === "approve" || (res.verdict === "concerns" && opts.allowConcerns)) {
-      approvers.add(v.pre_verdict.reviewer);
+      const kid = v.signature.kid;
+      const seen = approversByKid.get(kid);
+      if (seen !== undefined) {
+        // Same key, counted once. Flag it when the names differ, that is the
+        // shape of an attempted separation-of-duty bypass, not an accident.
+        if (seen !== v.pre_verdict.reviewer) {
+          errors.push(
+            `key ${kid} signed approvals under multiple reviewer names ("${seen}", "${v.pre_verdict.reviewer}"); counted once`
+          );
+        }
+        continue;
+      }
+      approversByKid.set(kid, v.pre_verdict.reviewer);
     }
   }
 
-  const cleared = rejects === 0 && approvers.size >= opts.threshold;
+  const approvals = approversByKid.size;
+  const cleared = rejects === 0 && approvals >= opts.threshold;
   if (!cleared && rejects === 0) {
-    errors.push(`need ${opts.threshold} approvals, have ${approvers.size}`);
+    errors.push(`need ${opts.threshold} approvals from distinct keys, have ${approvals}`);
   }
-  return { cleared, approvals: approvers.size, rejects, reviewers: [...approvers].sort(), threshold: opts.threshold, errors };
+  return {
+    cleared,
+    approvals,
+    rejects,
+    reviewers: [...approversByKid.values()].sort(),
+    threshold: opts.threshold,
+    errors,
+  };
 }
