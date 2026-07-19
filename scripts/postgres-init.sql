@@ -44,6 +44,13 @@ CREATE INDEX IF NOT EXISTS idx_receipts_tenant_decision
 ALTER TABLE ledger_chain_state ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ledger_receipts ENABLE ROW LEVEL SECURITY;
 
+-- ENABLE alone does NOT apply to the table owner, and applications very
+-- commonly connect as the owner, which left these policies inert and tenant
+-- isolation resting entirely on the application's WHERE clauses. FORCE applies
+-- them to the owner too.
+ALTER TABLE ledger_chain_state FORCE ROW LEVEL SECURITY;
+ALTER TABLE ledger_receipts FORCE ROW LEVEL SECURITY;
+
 CREATE POLICY ledger_chain_state_tenant_isolation
   ON ledger_chain_state
   USING (tenant_id = current_setting('ledger.tenant_id', true));

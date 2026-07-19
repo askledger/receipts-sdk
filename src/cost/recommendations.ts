@@ -112,18 +112,29 @@ export function recommend(samples: ReceiptSample[], days = 30): Recommendation[]
       const alt = CHEAPER_ALT[currentKey];
       const altPrice = alt ? priceFor(alt.vendor, alt.model) : null;
       if (alt && altPrice) {
-        // Conservative estimate: 50% of calls accept the planner output.
+        // Estimate: 50% of calls accept the planner output.
+        //
+        // The planner runs on EVERY call, and the half that escalate pay for
+        // the planner AND the executor. The previous model was
+        // 0.5*altSpend + 0.5*currentSpend, which charged the planner only on
+        // the calls it satisfied and so omitted the cascade's overhead on
+        // every escalation, overstating the saving by half the planner spend
+        // while the comment described it as conservative.
         const altSpend = costUsd(altPrice, { input: a.input, output: a.output });
-        const expectedTotal = 0.5 * altSpend + 0.5 * currentSpend;
+        const expectedTotal = altSpend + 0.5 * currentSpend;
         const monthlySavings = (currentSpend - expectedTotal) * monthMultiplier;
-        recs.push({
-          kind: "enable_cascade",
-          use_case: a.use_case,
-          evidence: `${a.count} calls hit ${currentKey} with no preview stage.`,
-          expected_savings_usd_month: Number(monthlySavings.toFixed(2)),
-          confidence: 0.65,
-          action: { from: currentKey, to: `${alt.vendor}:${alt.model}`, param: { stage: "planner" } },
-        });
+        // A cascade whose planner overhead outweighs the escalation it avoids
+        // is not a saving, so do not recommend it.
+        if (monthlySavings > 0) {
+          recs.push({
+            kind: "enable_cascade",
+            use_case: a.use_case,
+            evidence: `${a.count} calls hit ${currentKey} with no preview stage.`,
+            expected_savings_usd_month: Number(monthlySavings.toFixed(2)),
+            confidence: 0.65,
+            action: { from: currentKey, to: `${alt.vendor}:${alt.model}`, param: { stage: "planner" } },
+          });
+        }
       }
     }
 

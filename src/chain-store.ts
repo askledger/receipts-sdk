@@ -140,8 +140,16 @@ export class MemoryChainStateStore implements ChainStateStore {
  *     ON ledger_chain_state
  *     USING (tenant_id = current_setting('ledger.tenant_id'));
  *
- * The caller MUST set the session variable `ledger.tenant_id` before
- * any query. The reference implementation here issues SET LOCAL for you.
+ * Every query MUST run with the session variable `ledger.tenant_id` set, or
+ * the policy above matches nothing. This store sets it per transaction via
+ * set_config(..., true), but ONLY when the pool exposes `connect()`: the
+ * variable and the query it guards have to share one connection, and
+ * `pool.query` may hand each statement a different one. Pass a real pg Pool.
+ *
+ * Note that ENABLE ROW LEVEL SECURITY does not apply to the table's OWNER.
+ * Deploy with ALTER TABLE ... FORCE ROW LEVEL SECURITY (as
+ * scripts/postgres-init.sql does) or connect as a non-owner role, otherwise
+ * the policies are inert and isolation rests entirely on the WHERE clauses.
  *
  * Concurrency model:
  *   - Single-statement UPSERT with CAS on chain_height.
@@ -152,13 +160,29 @@ export class MemoryChainStateStore implements ChainStateStore {
  *   - Pass a `pg` Pool instance into the constructor. We do not import
  *     pg directly to keep it an optional dependency.
  */
-export interface PgPool {
-  // Minimal subset of node-postgres Pool we use. Any client that
-  // matches this shape can be passed in.
+export interface PgQueryable {
   query: (
     sql: string,
     params?: unknown[]
   ) => Promise<{ rows: Record<string, unknown>[]; rowCount: number | null }>;
+}
+
+/** A checked-out connection. `release()` returns it to the pool. */
+export interface PgClient extends PgQueryable {
+  release: () => void;
+}
+
+export interface PgPool extends PgQueryable {
+  // Minimal subset of node-postgres Pool we use. Any client that
+  // matches this shape can be passed in.
+  /**
+   * Check out a single connection. REQUIRED for row-level security: the
+   * tenant context is a session variable, so it and the query it guards must
+   * run on the SAME connection. Calling `pool.query` alone can hand each
+   * statement a different connection, which is why the tenant context cannot
+   * be set without this. Optional only for backward compatibility.
+   */
+  connect?: () => Promise<PgClient>;
 }
 
 export class PostgresChainStateStore implements ChainStateStore {
@@ -167,12 +191,49 @@ export class PostgresChainStateStore implements ChainStateStore {
     private readonly tableName: string = "ledger_chain_state"
   ) {}
 
+  /**
+   * Run `fn` with `ledger.tenant_id` set, so the RLS policies in
+   * scripts/postgres-init.sql actually match. This module's own documentation
+   * claimed "the reference implementation here issues SET LOCAL for you" while
+   * no code ever did, so every RLS policy evaluated `tenant_id = NULL`. That
+   * fails closed rather than open, but it meant isolation rested entirely on
+   * the WHERE clauses, and if the app connects as the table owner (the common
+   * case) RLS is bypassed altogether unless the table is FORCEd.
+   *
+   * set_config(..., true) is transaction-local, so the value is discarded at
+   * COMMIT and cannot leak to the next borrower of a pooled connection.
+   */
+  private async withTenant<T>(
+    tenantId: string,
+    fn: (q: PgQueryable) => Promise<T>
+  ): Promise<T> {
+    if (!this.pool.connect) return fn(this.pool);
+    const client = await this.pool.connect();
+    try {
+      await client.query("BEGIN");
+      await client.query("SELECT set_config('ledger.tenant_id', $1, true)", [tenantId]);
+      const out = await fn(client);
+      await client.query("COMMIT");
+      return out;
+    } catch (err) {
+      // Surface the original failure, not a rollback error on top of it.
+      try {
+        await client.query("ROLLBACK");
+      } catch {
+        /* ignore */
+      }
+      throw err;
+    } finally {
+      client.release();
+    }
+  }
+
   async load(tenantId: string): Promise<ChainState> {
     const sql = `SELECT tenant_id, chain_height, previous_receipt_hash,
                         last_receipt_id, updated_at
                  FROM ${this.tableName}
                  WHERE tenant_id = $1`;
-    const r = await this.pool.query(sql, [tenantId]);
+    const r = await this.withTenant(tenantId, (q) => q.query(sql, [tenantId]));
     if (r.rowCount === 0) {
       return {
         tenant_id: tenantId,
@@ -203,10 +264,10 @@ export class PostgresChainStateStore implements ChainStateStore {
     const newHeight = previousState.chain_height + 1;
     // INSERT for genesis, UPDATE for advances. The CAS predicate is the
     // expected chain_height; if another writer advanced first, rowCount=0.
-    let r;
+    const r = await this.withTenant(previousState.tenant_id, async (q) => {
     if (previousState.chain_height === 0) {
       // Initial insert: ON CONFLICT means somebody else genesis'd first.
-      r = await this.pool.query(
+      return q.query(
         `INSERT INTO ${this.tableName}
            (tenant_id, chain_height, previous_receipt_hash, last_receipt_id, updated_at)
          VALUES ($1, $2, $3, $4, now())
@@ -215,7 +276,7 @@ export class PostgresChainStateStore implements ChainStateStore {
         [previousState.tenant_id, newHeight, newReceiptHash, newReceiptId]
       );
     } else {
-      r = await this.pool.query(
+      return q.query(
         `UPDATE ${this.tableName}
             SET chain_height = $2,
                 previous_receipt_hash = $3,
@@ -233,6 +294,7 @@ export class PostgresChainStateStore implements ChainStateStore {
         ]
       );
     }
+    });
     if ((r.rowCount ?? 0) === 0) {
       // CAS lost. Re-read to expose the observed height.
       const observed = await this.load(previousState.tenant_id);

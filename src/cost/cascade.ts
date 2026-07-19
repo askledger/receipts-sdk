@@ -17,7 +17,7 @@
 // Internal studies suggest 60-80% cost reduction on multi-turn workflows
 // where a cheap-model preview lets the user refine before committing.
 
-import { priceFor, type Usage } from "./pricing.js";
+import { priceFor, costUsd, type Usage } from "./pricing.js";
 
 export type CascadeStage = "planner" | "executor";
 
@@ -102,24 +102,38 @@ export interface CascadeRun {
 
 /** Cost summary for a completed (or in-flight) cascade run. */
 export function runCost(run: CascadeRun): { planner_usd: number; executor_usd: number; total_usd: number; baseline_usd: number; savings_usd: number; savings_pct: number } {
+  // Use the shared pricing function rather than re-deriving the arithmetic.
+  // The hand-rolled version here counted only input and output, silently
+  // dropping cache_read and cache_write, which pricing.ts has always priced.
+  // On a cache-heavy Anthropic workload those are a real line item, so the
+  // figures fed to the savings ledger and the Finance dashboard were not what
+  // the customer actually paid. For a product whose claim is "prove the
+  // savings", a cost that omits a billed component cannot be defended.
   const plannerPrice = priceFor(run.planner_outcome.vendor, run.planner_outcome.model);
-  const plannerUsd = plannerPrice ? plannerPrice.input_per_1k * run.planner_outcome.usage.input / 1000
-                                  + plannerPrice.output_per_1k * run.planner_outcome.usage.output / 1000 : 0;
+  const plannerUsd = plannerPrice ? costUsd(plannerPrice, run.planner_outcome.usage) : 0;
   let executorUsd = 0;
   if (run.executor_outcome) {
-    const ep = priceFor(run.executor_outcome.vendor, run.executor_outcome.model);
-    if (ep) executorUsd = ep.input_per_1k * run.executor_outcome.usage.input / 1000
-                         + ep.output_per_1k * run.executor_outcome.usage.output / 1000;
+    const p = priceFor(run.executor_outcome.vendor, run.executor_outcome.model);
+    if (p) executorUsd = costUsd(p, run.executor_outcome.usage);
   }
   // Baseline = what it would have cost to run executor for BOTH stages
   // (i.e. without the cheap planner).
   const ep = priceFor(run.choice.executor.vendor, run.choice.executor.model);
-  const baselineUsd = ep
-    ? (run.planner_outcome.usage.input + (run.executor_outcome?.usage.input ?? 0)) * ep.input_per_1k / 1000
-    + (run.planner_outcome.usage.output + (run.executor_outcome?.usage.output ?? 0)) * ep.output_per_1k / 1000
-    : 0;
+  const combined: Usage = {
+    input: run.planner_outcome.usage.input + (run.executor_outcome?.usage.input ?? 0),
+    output: run.planner_outcome.usage.output + (run.executor_outcome?.usage.output ?? 0),
+    cache_read:
+      (run.planner_outcome.usage.cache_read ?? 0) + (run.executor_outcome?.usage.cache_read ?? 0),
+    cache_write:
+      (run.planner_outcome.usage.cache_write ?? 0) + (run.executor_outcome?.usage.cache_write ?? 0),
+  };
+  const baselineUsd = ep ? costUsd(ep, combined) : 0;
   const total = plannerUsd + executorUsd;
-  const savings = Math.max(0, baselineUsd - total);
+  // NOT floored at zero. A cascade whose planner overhead exceeded what the
+  // executor alone would have cost is a real loss, and clamping it to 0 made
+  // every rollup a sum of wins with the losses deleted: a systematic upward
+  // bias in the exact number this product exists to substantiate.
+  const savings = baselineUsd - total;
   const savings_pct = baselineUsd === 0 ? 0 : savings / baselineUsd;
   return { planner_usd: plannerUsd, executor_usd: executorUsd, total_usd: total, baseline_usd: baselineUsd, savings_usd: savings, savings_pct };
 }

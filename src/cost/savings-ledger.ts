@@ -74,7 +74,19 @@ export async function rollup(store: SavingsStore, since: number): Promise<Saving
     out.total_spent_usd += e.total_usd;
     out.total_baseline_usd += e.baseline_usd;
     out.total_savings_usd += e.savings_usd;
-    const b = (out.by_intent[e.intent] ??= { count: 0, savings_usd: 0 });
+    // `intent` is caller-supplied. On a normal object literal, an intent of
+    // "__proto__" resolves to Object.prototype, so `??=` skips assignment and
+    // the subsequent `b.count++` mutates the prototype while the intent
+    // silently vanishes from the rollup. Use a null-prototype bucket map.
+    if (!Object.prototype.hasOwnProperty.call(out.by_intent, e.intent)) {
+      Object.defineProperty(out.by_intent, e.intent, {
+        value: { count: 0, savings_usd: 0 },
+        enumerable: true,
+        writable: true,
+        configurable: true,
+      });
+    }
+    const b = out.by_intent[e.intent];
     b.count++;
     b.savings_usd += e.savings_usd;
   }

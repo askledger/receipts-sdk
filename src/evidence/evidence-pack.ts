@@ -15,6 +15,7 @@
  */
 
 import { buildBatch, type MerkleBatch } from "../merkle.js";
+import { canonicalizeBytes } from "../canonicalize.js";
 import { canonicalSigningPayload } from "../receipt.js";
 import { sha256 as sha256Fn } from "@noble/hashes/sha2";
 import type { SignedReceipt } from "../types.js";
@@ -94,13 +95,14 @@ function sha256Hex(b: Uint8Array): string {
 }
 
 function canonicalBytes(v: unknown): Uint8Array {
-  // Use the package's canonicalize via dynamic import to avoid cycles
-  // (evidence-pack is leaf vs receipt.ts).
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const json = JSON.stringify(v);
-  // The pack itself is content-addressed by sha256 over its canonical
-  // bytes computed by RFC 8785 (same as receipts).
-  return new TextEncoder().encode(json);
+  // Must be RFC 8785 (JCS), which is what the comment, the pack's own
+  // VERIFY_INSTRUCTIONS and the receipts themselves all specify. This used to
+  // be a plain JSON.stringify, so pack_hash was key-order dependent: it only
+  // reproduced because verifyPackIntegrity rebuilt the object in the same
+  // literal order. Any third party following the shipped instructions, or any
+  // pack that round-tripped through a system that reorders keys, computed a
+  // different hash and was told the pack was tampered with.
+  return canonicalizeBytes(v);
 }
 
 /**
@@ -177,10 +179,17 @@ export function verifyAllReceiptsInPack(pack: EvidencePack): SignedReceipt[] {
     let idx = proof.leaf_index;
     let levelSize = proof.tree_size;
     let pathPos = 0;
+    // A malformed pack must be REPORTED as failed, not throw. This loop
+    // previously dropped the three guards merkle.ts has, so a truncated
+    // audit_path reached Buffer.from(undefined, "hex") and crashed the
+    // verifier, and a path with extra trailing nodes was accepted.
+    let malformed = false;
     while (levelSize > 1) {
       const isLastOdd = idx === levelSize - 1 && levelSize % 2 === 1;
       if (!isLastOdd) {
+        if (pathPos >= proof.audit_path.length) { malformed = true; break; }
         const sibling = Buffer.from(proof.audit_path[pathPos++], "hex");
+        if (sibling.length !== 32) { malformed = true; break; }
         h = sha256Fn(
           new Uint8Array(
             idx % 2 === 0
@@ -191,6 +200,12 @@ export function verifyAllReceiptsInPack(pack: EvidencePack): SignedReceipt[] {
       }
       idx = Math.floor(idx / 2);
       levelSize = Math.ceil(levelSize / 2);
+    }
+    // Every supplied node must have been consumed, otherwise the proof carries
+    // unverified padding.
+    if (malformed || pathPos !== proof.audit_path.length) {
+      failed.push(r);
+      continue;
     }
     if (Buffer.from(h).toString("hex") !== pack.merkle.root.toLowerCase()) {
       failed.push(r);

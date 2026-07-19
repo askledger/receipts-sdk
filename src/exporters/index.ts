@@ -78,30 +78,38 @@ export async function exportReceipts(
   const sleep = opts.sleep ?? defaultSleep;
 
   const events = receipts.map((r) => toExportEvent(r, opts));
-  const totals = new Map<string, SinkResult>();
+  // Keyed by POSITION, not by sink.name. `name` is a class-level constant
+  // ("webhook", "syslog"), so fanning out to two WebhookSinks with different
+  // URLs, the whole point of fan-out, merged both into a single result: the
+  // delivered counts were summed across distinct destinations and a failure to
+  // one endpoint could not be attributed to it.
+  const totals: (SinkResult | undefined)[] = new Array(opts.sinks.length);
   let batches = 0;
 
   for (let i = 0; i < events.length; i += batchSize) {
     const batch = events.slice(i, i + batchSize);
     batches++;
-    const results = await Promise.all(
+    const batchResults = await Promise.all(
       opts.sinks.map((s) => sendWithRetry(s, batch, retries, delayMs, sleep))
     );
-    for (const r of results) {
-      const prev = totals.get(r.sink);
+    batchResults.forEach((r, idx) => {
+      const prev = totals[idx];
       if (!prev) {
-        totals.set(r.sink, { ...r });
+        totals[idx] = { ...r };
       } else {
         prev.delivered += r.delivered;
         prev.ok = prev.ok && r.ok;
         if (!r.ok && r.error && !prev.error) prev.error = r.error;
       }
-    }
+    });
   }
 
-  const results = [...totals.values()];
+  const results = totals.filter((r): r is SinkResult => r !== undefined);
   return {
-    ok: results.length > 0 && results.every((r) => r.ok),
+    // Exporting zero receipts is a successful no-op, not a failure. Reporting
+    // ok:false made a caller draining an empty queue look like a broken export
+    // pipeline. Configuring no sinks while having events to send IS a failure.
+    ok: results.every((r) => r.ok) && (events.length === 0 || opts.sinks.length > 0),
     events: events.length,
     batches,
     results,

@@ -139,7 +139,25 @@ export function computeScore(
  * Render the Receipt Score as an embeddable SVG badge. Companies place
  * this in their AI product pages, annual reports, RFP responses.
  */
-export function renderBadgeSvg(score: ReceiptScore, tenantName: string): string {
+/**
+ * Escape text before it enters SVG markup.
+ *
+ * `tenantName` lands in both an attribute value and element content. Unescaped,
+ * a crafted name can close the attribute and paint its own `<text>` over the
+ * grade, so an F-rated tenant renders an A+ badge that this SDK itself
+ * produced, or inject a `<script>` wherever the badge is inlined.
+ */
+function xmlEscape(v: unknown): string {
+  return String(v)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+export function renderBadgeSvg(score: ReceiptScore, tenantNameRaw: string): string {
+  const tenantName = xmlEscape(tenantNameRaw);
   const gradeColor: Record<Grade, string> = {
     "A+": "#1b7f55",
     A: "#1b7f55",
