@@ -90,9 +90,18 @@ export class KeyRegistry {
     const out: Record<string, string> = {};
     for (const r of this.records.values()) {
       if (r.status === "revoked") continue;
-      if (at && r.status === "retired" && r.retired_at) {
-        const retiredAt = new Date(r.retired_at).getTime();
-        if (at.getTime() > retiredAt) continue;
+      if (r.status === "retired") {
+        // Retired keys must fail CLOSED. Previously the retirement window was
+        // only applied when the caller remembered to pass `at`, so the common
+        // call, trustedKeys() with no argument, silently trusted retired keys,
+        // contradicting retire()'s own contract. With no `at` we cannot know
+        // whether the receipt predates retirement, so we exclude.
+        if (!at) continue;
+        const retiredAt = Date.parse(r.retired_at ?? "");
+        // An unparseable or missing retirement date is also excluded rather
+        // than trusted (NaN comparisons are always false, which used to keep
+        // the key trusted).
+        if (!Number.isFinite(retiredAt) || at.getTime() > retiredAt) continue;
       }
       out[r.kid] = r.public_key;
     }

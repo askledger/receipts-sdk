@@ -196,11 +196,16 @@ export function verifySavingsProof(
   const signature_valid = checkSig(unsigned, signature, opts.publicKeys);
   const baseline_hash_matches = p.baseline.hash === sha256String(canonicalize(p.baseline.period));
   const recomputed = computeSavings(p.baseline.period, p.current);
+  // Every field a reader acts on must be recomputed, including the headline
+  // percentage. Omitting it let a signed proof state "95% saved" while the
+  // recomputation said 5% and still verify, and the percentage is the number a
+  // CFO or auditor actually reads.
   const savings_math_matches =
     recomputed.normalizedSavingsUsd === p.savings.normalizedSavingsUsd &&
     recomputed.absoluteSpendDeltaUsd === p.savings.absoluteSpendDeltaUsd &&
     recomputed.baselineRatePer1k === p.savings.baselineRatePer1k &&
-    recomputed.currentRatePer1k === p.savings.currentRatePer1k;
+    recomputed.currentRatePer1k === p.savings.currentRatePer1k &&
+    recomputed.normalizedSavingsPct === p.savings.normalizedSavingsPct;
   return {
     valid: signature_valid && baseline_hash_matches && savings_math_matches,
     checks: { signature_valid, baseline_hash_matches, savings_math_matches },

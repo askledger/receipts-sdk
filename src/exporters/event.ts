@@ -183,7 +183,11 @@ export function formatSyslog5424(
   const pri = facility * 8 + severity;
   const host = (opts.hostname ?? "askledger").replace(/\s/g, "_");
   const app = (opts.appName ?? "receipts").replace(/\s/g, "_");
-  const ts = new Date(ev.issued_at).toISOString();
+  // An unparseable issued_at must not throw: SyslogSink.format() is called
+  // outside the try in sinks.ts, so a RangeError here would escape as an
+  // exception instead of the reported SinkResult this module promises.
+  const parsed = Date.parse(ev.issued_at);
+  const ts = Number.isFinite(parsed) ? new Date(parsed).toISOString() : new Date(0).toISOString();
 
   const sdEscape = (v: string): string => oneLine(v).replace(/([\]"\\])/g, "\\$1");
   const sdParams: Array<[string, string | undefined]> = [

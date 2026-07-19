@@ -218,15 +218,35 @@ function deriveFindings(inv: ModelEntry[], rs: ReceiptSummary[]): Workpaper["sec
   return out;
 }
 
+/**
+ * Neutralise anything that could break out of a markdown table cell.
+ *
+ * `model_id` and `use_case_id` come from receipt content, which is not
+ * constrained by `validate.ts`. An unescaped `|` forges extra inventory
+ * columns, and a newline forges whole rows or an entire `## Findings` section
+ * in a document handed to a regulator. The signed attestation covers the JSON,
+ * not this rendering, so the tampering would not be detectable downstream.
+ */
+function mdCell(v: unknown): string {
+  return String(v)
+    .replace(/[\r\n]+/g, " ")
+    .replace(/\|/g, "\\|")
+    .replace(/`/g, "\\`")
+    .trim();
+}
+
 export function renderWorkpaperMarkdown(w: Workpaper): string {
   const inv = w.sections.model_inventory.map((m) =>
-    `| ${m.model_id} | ${m.invocations} | ${(m.block_rate*100).toFixed(2)}% | ${(m.flag_rate*100).toFixed(2)}% | ${(m.error_rate*100).toFixed(2)}% | ${m.use_cases.join(", ")} |`,
+    `| ${mdCell(m.model_id)} | ${m.invocations} | ${(m.block_rate*100).toFixed(2)}% | ${(m.flag_rate*100).toFixed(2)}% | ${(m.error_rate*100).toFixed(2)}% | ${m.use_cases.map(mdCell).join(", ")} |`,
   ).join("\n");
 
   const findings = w.sections.findings.length === 0
     ? "_No findings in period._"
     : w.sections.findings.map((f) =>
-        `### [${f.severity.toUpperCase()}] ${f.title}\n${f.detail}\n\nEvidence: ${f.evidence_receipt_ids.map((id) => `\`${id}\``).join(", ")}`,
+        // Titles can embed receipt-derived identifiers, so a newline here would
+        // forge additional headings (e.g. a fake "## Findings, none" section)
+        // in a regulator-facing document.
+        `### [${mdCell(f.severity).toUpperCase()}] ${mdCell(f.title)}\n${String(f.detail).replace(/\r/g, "")}\n\nEvidence: ${f.evidence_receipt_ids.map((id) => `\`${mdCell(id)}\``).join(", ")}`,
       ).join("\n\n");
 
   return `# ${w.regulator.replace(/_/g, " ")} · Validation Workpaper
