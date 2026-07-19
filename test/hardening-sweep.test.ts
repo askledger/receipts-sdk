@@ -18,6 +18,9 @@ import { buildWorkpaper, renderWorkpaperMarkdown, type ReceiptSummary } from "..
 import { computeScore, renderBadgeSvg } from "../src/receipt-score/score.js";
 import { KeyRegistry } from "../src/key-management.js";
 import { formatSyslog5424, toExportEvent } from "../src/exporters/event.js";
+import { exportReceipts } from "../src/exporters/index.js";
+import { WebhookSink } from "../src/exporters/sinks.js";
+import { loadChainState, saveChainState } from "../src/chain.js";
 import {
   signReceipt,
   buildEvidencePack,
@@ -245,6 +248,81 @@ describe("malformed input is reported, not thrown", () => {
     // Trailing padding nodes must be rejected too, not silently ignored.
     const padded = { ...pack, merkle: { ...pack.merkle, proofs: { ...pack.merkle.proofs, [victim]: { ...proof, audit_path: [...proof.audit_path, "00".repeat(32)] } } } };
     expect(verifyAllReceiptsInPack(padded).length).toBeGreaterThan(0);
+  });
+});
+
+describe("fan-out reports each destination separately", () => {
+  it("two sinks with the same class name do not collapse into one result", async () => {
+    const kp = generateKeyPair();
+    const receipts = [1, 2].map((i) => signReceipt({ event: evt("t-fanout", i), keypair: kp }));
+
+    // The whole point of fan-out: the same sink type pointed at two endpoints.
+    const okUrl = "https://siem.example/ok";
+    const okSink = new WebhookSink({
+      url: okUrl,
+      fetchImpl: async () => new Response("", { status: 200 }),
+    });
+    const badSink = new WebhookSink({
+      url: "https://partner.example/down",
+      fetchImpl: async () => new Response("boom", { status: 500 }),
+    });
+
+    const report = await exportReceipts(receipts, {
+      sinks: [okSink, badSink],
+      retries: 0,
+      sleep: async () => {},
+    });
+
+    // Two entries, not one merged "webhook" entry whose delivered count is the
+    // sum across distinct destinations.
+    expect(report.results).toHaveLength(2);
+    expect(report.results[0].ok).toBe(true);
+    expect(report.results[0].delivered).toBe(2);
+    expect(report.results[1].ok).toBe(false);
+    expect(report.ok).toBe(false);
+  });
+
+  it("exporting zero receipts is a successful no-op", async () => {
+    const report = await exportReceipts([], {
+      sinks: [new WebhookSink({ url: "https://siem.example/ok", fetchImpl: async () => new Response("", { status: 200 }) })],
+      sleep: async () => {},
+    });
+    // Previously ok:false, so a caller draining an empty queue looked like a
+    // broken export pipeline.
+    expect(report.ok).toBe(true);
+    expect(report.events).toBe(0);
+  });
+
+  it("having events but no sinks configured is still a failure", async () => {
+    const kp = generateKeyPair();
+    const report = await exportReceipts([signReceipt({ event: evt("t-nosink", 1), keypair: kp })], {
+      sinks: [],
+      sleep: async () => {},
+    });
+    expect(report.ok).toBe(false);
+  });
+});
+
+describe("tenant chain state files do not collide", () => {
+  it("two tenants that sanitize to the same name keep separate chains", () => {
+    // "acme.corp" and "acme/corp" both sanitized to "acme_corp", so all three
+    // shared one state file: one tenant's receipts landed in another's chain,
+    // and whoever wrote last silently reset the others.
+    const suffix = Math.random().toString(36).slice(2);
+    const names = [`acme.corp-${suffix}`, `acme_corp-${suffix}`, `acme/corp-${suffix}`];
+    names.forEach((tenant_id, i) => {
+      saveChainState({
+        tenant_id,
+        chain_height: (i + 1) * 10,
+        previous_receipt_hash: String(i + 1).repeat(64),
+        updated_at: NOW,
+      });
+    });
+    names.forEach((tenant_id, i) => {
+      const st = loadChainState(tenant_id);
+      expect(st.tenant_id).toBe(tenant_id);
+      expect(st.chain_height).toBe((i + 1) * 10);
+    });
   });
 });
 
