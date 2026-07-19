@@ -372,3 +372,29 @@ export {
   type Severity,
 } from "./query/alerts.js";
 export { parseQueryLLM, type LLMQueryOptions, type CompleteFn } from "./query/llm.js";
+
+// Evidence export: push signed receipts into the SIEM / log platform an
+// enterprise already runs (Splunk, QRadar, Sentinel, Elastic), so evidence
+// lands in their existing workflow and stays independently verifiable.
+// Always operator-configured; the SDK has no endpoint of its own.
+export {
+  exportReceipts,
+  toExportEvent,
+  formatCEF,
+  formatSyslog5424,
+  SplunkHecSink,
+  WebhookSink,
+  FileSink,
+  SyslogSink,
+  type ExportEvent,
+  type ToExportEventOptions,
+  type ExportOptions,
+  type ExportReport,
+  type ExportSink,
+  type SinkResult,
+  type FetchLike,
+  type SplunkHecConfig,
+  type WebhookConfig,
+  type FileSinkConfig,
+  type SyslogConfig,
+} from "./exporters/index.js";
