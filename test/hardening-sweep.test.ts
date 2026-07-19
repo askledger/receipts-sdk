@@ -148,6 +148,35 @@ describe("caller-controlled text cannot escape a rendered artifact", () => {
     expect(md).not.toContain("| evil:model |");
     expect(md).not.toMatch(/\n\| evil/);
   });
+
+  it("a backslash before a pipe cannot re-open a workpaper table cell", () => {
+    // Escaping `|` without first escaping `\` leaves `a\|b` as `a\\|b`, which
+    // markdown reads as a literal backslash plus a LIVE delimiter. Caught by
+    // CodeQL (js/incomplete-sanitization) against the first version of mdCell.
+    const receipts: ReceiptSummary[] = [
+      {
+        receipt_id: "r1",
+        issued_at: "2026-06-01T00:00:00.000Z",
+        tenant_id: "t1",
+        model_id: "openai:gpt-5\\|999|100%|CLEAN",
+        use_case_id: "uc1",
+        event_type: "gateway.request",
+        applied_policies: [],
+      },
+    ];
+    const md = renderWorkpaperMarkdown(
+      buildWorkpaper({
+        tenant_id: "t1",
+        regulator: "SR_11_7",
+        period_start: "2026-06-01",
+        period_end: "2026-06-30",
+        receipts,
+      })
+    );
+    // No `\\` immediately followed by a live delimiter anywhere in the render.
+    expect(md).not.toMatch(/[^\\]\\\\\|/);
+    expect(md).toContain("\\\\\\|999");
+  });
 });
 
 describe("caller-controlled keys cannot reach the prototype", () => {

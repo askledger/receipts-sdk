@@ -229,6 +229,11 @@ function deriveFindings(inv: ModelEntry[], rs: ReceiptSummary[]): Workpaper["sec
  */
 function mdCell(v: unknown): string {
   return String(v)
+    // Backslash MUST be escaped first. Escaping `|` into `\|` without it means
+    // an input of `a\|b` becomes `a\\|b`, which markdown renders as a literal
+    // backslash followed by an UNESCAPED delimiter, so the column forgery this
+    // function exists to stop still succeeds.
+    .replace(/\\/g, "\\\\")
     .replace(/[\r\n]+/g, " ")
     .replace(/\|/g, "\\|")
     .replace(/`/g, "\\`")

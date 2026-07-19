@@ -114,7 +114,16 @@ const CHECKS: Record<string, Checker> = {
   "F.5": () => fileContains("console/src/lib/api.ts", /SCHEMA_INVALID|safeParse/),
 
   // G. Supply chain
-  "G.1": () => dirHas(".", (n) => n.toLowerCase().includes("sbom") || n.toLowerCase().includes("cyclonedx")) ,
+  // Checks the SBOM is actually PRODUCED, not that one happens to be lying
+  // around. The old check scanned the repo root for a filename containing
+  // "sbom", which only passed in CI because security-scan.yml redirects the
+  // generator into ./sbom.cyclonedx.json on the line before it runs this
+  // verifier. On a clean clone it failed, so the README's "66/66" badge was
+  // true only inside a CI job. The generator and its release wiring are the
+  // durable facts.
+  "G.1": () =>
+    fileExists("scripts/generate-sbom.mjs") &&
+    fileContains(".github/workflows/release.yml", "sbom.cyclonedx.json"),
   "G.2": () => fileContains("docs/security/HARDENING_CHECKLIST.md", "cosign"),
   "G.3": () => fileExists("package-lock.json"),
   "G.4": () => fileContains("docs/security/HARDENING_CHECKLIST.md", "postinstall"),
