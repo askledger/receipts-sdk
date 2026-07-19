@@ -15,7 +15,8 @@ import { summarizeReceipts } from "../src/cost/dashboard.js";
 import { buildBaseline, proveSavings, verifySavingsProof } from "../src/cost/savings.js";
 import { InMemorySavings, rollup } from "../src/cost/savings-ledger.js";
 import { runCost, type CascadeRun } from "../src/cost/cascade.js";
-import type { Usage } from "../src/cost/pricing.js";
+import { costUsd, priceFor, type Usage } from "../src/cost/pricing.js";
+import { recommend } from "../src/cost/recommendations.js";
 import { buildWorkpaper, renderWorkpaperMarkdown, type ReceiptSummary } from "../src/mrm/index.js";
 import { computeScore, renderBadgeSvg } from "../src/receipt-score/score.js";
 import { KeyRegistry } from "../src/key-management.js";
@@ -382,6 +383,34 @@ describe("cascade cost is what the customer actually paid", () => {
     // and dropped the failures: a systematic upward bias.
     expect(r.savings_usd).toBeLessThan(0);
     expect(r.savings_pct).toBeLessThan(0);
+  });
+});
+
+describe("cascade recommendations charge the planner on every call", () => {
+  it("the projected saving accounts for planner overhead on escalations", () => {
+    const samples = Array.from({ length: 60 }, () => ({
+      use_case: "contract-review",
+      vendor: "anthropic",
+      model: "claude-opus-4-6",
+      input_tokens: 4000,
+      output_tokens: 1500,
+    }));
+    const rec = recommend(samples, 30).find((r) => r.kind === "enable_cascade");
+    expect(rec).toBeDefined();
+
+    // Opus 4.6 executor, Sonnet 4.6 planner (CHEAPER_ALT), 60 calls at
+    // 4000/1500 tokens, days=30 so the month multiplier is 1.
+    const usage = { input: 4000 * 60, output: 1500 * 60 };
+    const current = costUsd(priceFor("anthropic", "claude-opus-4-6")!, usage);
+    const alt = costUsd(priceFor("anthropic", "claude-sonnet-4-6")!, usage);
+    // The planner runs on EVERY call; only the executor half is avoided.
+    const honest = current - (alt + 0.5 * current);
+    // The old model was 0.5*alt + 0.5*current, which skipped the planner cost
+    // on every escalating call and inflated the projection.
+    const inflated = current - (0.5 * alt + 0.5 * current);
+
+    expect(rec!.expected_savings_usd_month).toBeCloseTo(Number(honest.toFixed(2)), 2);
+    expect(rec!.expected_savings_usd_month).toBeLessThan(inflated);
   });
 });
 
