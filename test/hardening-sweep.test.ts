@@ -21,6 +21,7 @@ import { formatSyslog5424, toExportEvent } from "../src/exporters/event.js";
 import { exportReceipts } from "../src/exporters/index.js";
 import { WebhookSink } from "../src/exporters/sinks.js";
 import { loadChainState, saveChainState } from "../src/chain.js";
+import { PostgresChainStateStore } from "../src/chain-store.js";
 import {
   signReceipt,
   buildEvidencePack,
@@ -323,6 +324,74 @@ describe("tenant chain state files do not collide", () => {
       expect(st.tenant_id).toBe(tenant_id);
       expect(st.chain_height).toBe((i + 1) * 10);
     });
+  });
+});
+
+describe("postgres row-level security gets a tenant context", () => {
+  // A pool whose connect() hands out ONE client and records every statement,
+  // so we can assert the tenant context and the guarded query share it.
+  function poolWithConnect() {
+    const stmts: Array<{ sql: string; params?: unknown[] }> = [];
+    let released = 0;
+    const client = {
+      query: async (sql: string, params?: unknown[]) => {
+        stmts.push({ sql: sql.trim(), params });
+        return { rows: [], rowCount: 0 };
+      },
+      release: () => {
+        released++;
+      },
+    };
+    return {
+      stmts,
+      releases: () => released,
+      pool: {
+        query: async () => ({ rows: [], rowCount: 0 }),
+        connect: async () => client,
+      },
+    };
+  }
+
+  it("sets ledger.tenant_id in the same transaction as the read", async () => {
+    const { pool, stmts, releases } = poolWithConnect();
+    await new PostgresChainStateStore(pool).load("acme-bank");
+
+    // The module documented "the reference implementation here issues SET LOCAL
+    // for you" while no code ever did, so every RLS policy compared against
+    // NULL and matched nothing.
+    expect(stmts[0].sql).toBe("BEGIN");
+    expect(stmts[1].sql).toContain("set_config('ledger.tenant_id', $1, true)");
+    expect(stmts[1].params).toEqual(["acme-bank"]);
+    // The guarded SELECT must come after the context, on this same client.
+    expect(stmts[2].sql).toContain("FROM ledger_chain_state");
+    expect(stmts[3].sql).toBe("COMMIT");
+    expect(releases()).toBe(1);
+  });
+
+  it("advance() also runs under a tenant context, and releases on failure", async () => {
+    const { pool, stmts, releases } = poolWithConnect();
+    const store = new PostgresChainStateStore(pool);
+    // rowCount 0 => CAS lost => ConcurrentChainWriteError after a re-read.
+    await expect(
+      store.advance(
+        { tenant_id: "acme-bank", chain_height: 4, previous_receipt_hash: "aa", updated_at: NOW },
+        "bb",
+        "r-9"
+      )
+    ).rejects.toThrow();
+    expect(stmts.filter((s) => s.sql.includes("set_config")).length).toBeGreaterThanOrEqual(1);
+    expect(stmts.some((s) => s.sql.startsWith("UPDATE"))).toBe(true);
+    // Connections must go back to the pool on every path.
+    expect(releases()).toBe(2); // the failed advance, then the re-read
+  });
+
+  it("still works with a bare pool that cannot check out a connection", async () => {
+    // Backward compatibility: no connect() means no tenant context is possible,
+    // and the store must not crash trying.
+    const st = await new PostgresChainStateStore({
+      query: async () => ({ rows: [], rowCount: 0 }),
+    }).load("acme-bank");
+    expect(st.chain_height).toBe(0);
   });
 });
 
