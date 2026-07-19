@@ -14,6 +14,8 @@ import { receiptsFromWorkloads } from "../src/cost/ingest.js";
 import { summarizeReceipts } from "../src/cost/dashboard.js";
 import { buildBaseline, proveSavings, verifySavingsProof } from "../src/cost/savings.js";
 import { InMemorySavings, rollup } from "../src/cost/savings-ledger.js";
+import { runCost, type CascadeRun } from "../src/cost/cascade.js";
+import type { Usage } from "../src/cost/pricing.js";
 import { buildWorkpaper, renderWorkpaperMarkdown, type ReceiptSummary } from "../src/mrm/index.js";
 import { computeScore, renderBadgeSvg } from "../src/receipt-score/score.js";
 import { KeyRegistry } from "../src/key-management.js";
@@ -324,6 +326,62 @@ describe("tenant chain state files do not collide", () => {
       expect(st.tenant_id).toBe(tenant_id);
       expect(st.chain_height).toBe((i + 1) * 10);
     });
+  });
+});
+
+describe("cascade cost is what the customer actually paid", () => {
+  const run = (opts: {
+    planner: { vendor: string; model: string };
+    executor: { vendor: string; model: string };
+    plannerUsage: Usage;
+    executorUsage: Usage;
+  }): CascadeRun => ({
+    rule: { estimated_input_tokens: 5000, intent: "analyze" },
+    choice: { planner: opts.planner, executor: opts.executor, reason: "test" },
+    planner_outcome: { ...opts.planner, usage: opts.plannerUsage },
+    executor_outcome: { ...opts.executor, usage: opts.executorUsage },
+  });
+
+  it("prompt-cache tokens are billed, not silently dropped", () => {
+    const planner = { vendor: "anthropic", model: "claude-haiku-4-5" };
+    const executor = { vendor: "anthropic", model: "claude-sonnet-4-6" };
+    const noCache = runCost(
+      run({
+        planner,
+        executor,
+        plannerUsage: { input: 10_000, output: 1_000 },
+        executorUsage: { input: 10_000, output: 2_000 },
+      })
+    );
+    const withCache = runCost(
+      run({
+        planner,
+        executor,
+        plannerUsage: { input: 10_000, output: 1_000, cache_read: 50_000, cache_write: 20_000 },
+        executorUsage: { input: 10_000, output: 2_000, cache_read: 50_000 },
+      })
+    );
+    // Cache tokens cost money. runCost hand-rolled input+output only, so these
+    // two runs reported identical spend despite 170k extra billed tokens.
+    expect(withCache.total_usd).toBeGreaterThan(noCache.total_usd);
+    expect(withCache.baseline_usd).toBeGreaterThan(noCache.baseline_usd);
+  });
+
+  it("a cascade that cost more than the baseline reports a loss, not zero", () => {
+    // Planner more expensive than the executor: the cascade backfired.
+    const r = runCost(
+      run({
+        planner: { vendor: "anthropic", model: "claude-opus-4-6" },
+        executor: { vendor: "anthropic", model: "claude-haiku-4-5" },
+        plannerUsage: { input: 100_000, output: 20_000 },
+        executorUsage: { input: 1_000, output: 200 },
+      })
+    );
+    expect(r.total_usd).toBeGreaterThan(r.baseline_usd);
+    // Math.max(0, ...) used to delete losses, so every rollup summed the wins
+    // and dropped the failures: a systematic upward bias.
+    expect(r.savings_usd).toBeLessThan(0);
+    expect(r.savings_pct).toBeLessThan(0);
   });
 });
 
