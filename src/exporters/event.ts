@@ -106,17 +106,28 @@ export function toExportEvent(
  * Wire formats
  * ----------------------------------------------------------------------- */
 
+/**
+ * Collapse anything that could terminate a log record.
+ *
+ * A newline (or other control character) in an attacker-influenced field such
+ * as `event_type` or `tenant_id` would otherwise let a forged CEF/syslog record
+ * be injected into the customer's SIEM. For an evidence product, forging
+ * records in the system of record is the exact threat we exist to prevent, so
+ * every field is flattened to a single line before it reaches a wire format.
+ */
+function oneLine(v: unknown): string {
+  // eslint-disable-next-line no-control-regex
+  return String(v).replace(/[\r\n\u0000-\u001F\u007F]+/g, " ").trim();
+}
+
 /** Escape a value for a CEF extension field (ArcSight/QRadar ingestion). */
 function cefEscape(v: unknown): string {
-  return String(v)
-    .replace(/\\/g, "\\\\")
-    .replace(/=/g, "\\=")
-    .replace(/\r?\n/g, " ");
+  return oneLine(v).replace(/\\/g, "\\\\").replace(/=/g, "\\=");
 }
 
 /** Escape the CEF header fields, where the separator is `|`. */
 function cefHeaderEscape(v: string): string {
-  return v.replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
+  return oneLine(v).replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
 }
 
 /**
@@ -174,7 +185,7 @@ export function formatSyslog5424(
   const app = (opts.appName ?? "receipts").replace(/\s/g, "_");
   const ts = new Date(ev.issued_at).toISOString();
 
-  const sdEscape = (v: string): string => v.replace(/([\]"\\])/g, "\\$1");
+  const sdEscape = (v: string): string => oneLine(v).replace(/([\]"\\])/g, "\\$1");
   const sdParams: Array<[string, string | undefined]> = [
     ["receiptId", ev.receipt_id],
     ["tenantId", ev.tenant_id],
@@ -189,6 +200,11 @@ export function formatSyslog5424(
     .map(([k, v]) => `${k}="${sdEscape(String(v))}"`)
     .join(" ");
 
-  const msg = `AI receipt ${ev.event_type} tenant=${ev.tenant_id} decision=${ev.decision ?? "n/a"}`;
-  return `<${pri}>1 ${ts} ${host} ${app} - ${ev.event_id} [askledger@0 ${sd}] ${msg}`;
+  // Every interpolated field is flattened: a newline anywhere here would let a
+  // caller forge an extra syslog record in the customer's SIEM.
+  const msgId = oneLine(ev.event_id).replace(/\s/g, "_") || "-";
+  const msg = oneLine(
+    `AI receipt ${ev.event_type} tenant=${ev.tenant_id} decision=${ev.decision ?? "n/a"}`
+  );
+  return `<${pri}>1 ${ts} ${host} ${app} - ${msgId} [askledger@0 ${sd}] ${msg}`;
 }
