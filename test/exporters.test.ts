@@ -242,3 +242,45 @@ describe("exportReceipts", () => {
     expect(badResult?.error).toContain("network down");
   });
 });
+
+describe("log-injection hardening", () => {
+  // A newline in an attacker-influenced field must never be able to forge an
+  // extra record in the customer's SIEM. For an evidence product, forging the
+  // system of record is the threat we exist to prevent.
+  const hostile = (over: Partial<ExportEvent>): ExportEvent => ({
+    ...toExportEvent(receipt()),
+    ...over,
+  });
+
+  it("CEF cannot be split by a newline in the event type", () => {
+    const line = formatCEF(hostile({
+      event_type: "loan.decision\nCEF:0|Evil|Forged|1.0|100|FORGED ADMIN LOGIN|10|",
+    }));
+    expect(line.split("\n")).toHaveLength(1);
+    expect(line.split("\r")).toHaveLength(1);
+  });
+
+  it("CEF cannot be split via an extension field", () => {
+    const line = formatCEF(hostile({ tenant_id: "acme\nCEF:0|Evil|X|1|1|forged|10|" }));
+    expect(line.split("\n")).toHaveLength(1);
+  });
+
+  it("syslog cannot be split by a newline in tenant, event id or type", () => {
+    for (const ev of [
+      hostile({ tenant_id: "acme\n<13>1 forged record" }),
+      hostile({ event_id: "e1\n<13>1 forged record" }),
+      hostile({ event_type: "x\n<13>1 forged record" }),
+    ]) {
+      const line = formatSyslog5424(ev);
+      expect(line.split("\n")).toHaveLength(1);
+      expect(line.split("\r")).toHaveLength(1);
+    }
+  });
+
+  it("strips other control characters but preserves ordinary punctuation", () => {
+    const line = formatCEF(hostile({ event_type: "loan\u0000decision", decision: "require-approval" }));
+    expect(line).not.toContain("\u0000");
+    // hyphens and dots in legitimate values must survive sanitisation
+    expect(line).toContain("outcome=require-approval");
+  });
+});
