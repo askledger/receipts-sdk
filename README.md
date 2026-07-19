@@ -538,6 +538,36 @@ Errors from the wrapped client always propagate, receipts never take down the AI
 
 ---
 
+## Evidence export · SIEM connectors
+
+Your SIEM stores logs your own systems wrote, mutable and self-attested. Receipts make what lands there **provable**. Push signed receipts into the platform your analysts and auditors already use; they remain independently verifiable after they arrive.
+
+Ships with sinks for **Splunk HEC**, **syslog/CEF** (QRadar, ArcSight), a **generic webhook** (Microsoft Sentinel, Elastic, Chronicle, in-house pipelines), and a **JSONL file / object-storage drop** (the universal fallback every SIEM can ingest).
+
+```ts
+import {
+  exportReceipts, SplunkHecSink, SyslogSink, WebhookSink, FileSink,
+} from "@askledger/receipts-sdk";
+
+const report = await exportReceipts(receipts, {
+  sinks: [
+    new SplunkHecSink({ url: "https://splunk.internal:8088", token: process.env.HEC_TOKEN!, index: "ai_evidence" }),
+    new SyslogSink({ host: "qradar.internal", format: "cef" }),   // CEF for QRadar / ArcSight
+    new WebhookSink({ url: "https://sentinel.internal/ingest" }),
+    new FileSink({ path: "/var/log/askledger/receipts.jsonl" }),
+  ],
+  includeAssurance: true,  // attach the L0–L3 grade
+  includeReceipt: true,    // embed the signed receipt so the SIEM record stays verifiable
+  batchSize: 200,
+});
+
+report.results; // per-sink delivery outcome; one failing sink never blocks the others
+```
+
+**Privacy by default:** the raw event payload (business data) is **excluded** unless you set `includePayload`. **Operator-configured only:** there is no default endpoint and the SDK never transmits anything you have not configured.
+
+---
+
 ## Multi-language
 
 | SDK | Language | Status | Conformance |
