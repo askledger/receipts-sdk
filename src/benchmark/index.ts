@@ -22,10 +22,14 @@ export interface VendorScore {
   model: string;
   invocations: number;
   hallucination_proxy: number;         // 0..1; lower better
-  cost_per_outcome_usd: number;         // total cost / successful outcomes
+  /** total cost / successful outcomes; null when the model is not in the pricing table */
+  cost_per_outcome_usd: number | null;
+  /** false => no list price is known for this model, so cost is UNKNOWN, not zero */
+  cost_known: boolean;
   compliance_posture: number;           // 0..1; higher better
   supply_chain_risk: number;            // 0..1; lower better
-  composite: number;                    // 0..100; lower is better
+  /** 0..100; lower is better. null when cost is unknown, since a quarter of the score is missing. */
+  composite: number | null;
 }
 
 export interface BenchmarkReport {
@@ -34,20 +38,49 @@ export interface BenchmarkReport {
   methodology_url: string;
   sample_size: number;
   by_vendor: VendorScore[];
-  rankings: { hallucination: string[]; cost_per_outcome: string[]; compliance_posture: string[]; supply_chain: string[] };
+  rankings: {
+    hallucination: string[];
+    /** priced models only, cheapest first */
+    cost_per_outcome: string[];
+    compliance_posture: string[];
+    supply_chain: string[];
+    /** models with no list price: cost and composite are UNKNOWN, so they are ranked on neither */
+    cost_unknown: string[];
+  };
 }
 
 export function score(samples: VendorSample[]): BenchmarkReport {
   const totalInvocations = samples.reduce((n, s) => n + s.invocations, 0);
 
-  const by_vendor = samples.map((s) => {
+  const by_vendor: VendorScore[] = samples.map((s) => {
     const successful = Math.max(1, s.invocations - s.errors - s.blocked);
     const price = priceFor(s.vendor, s.model);
-    const usd = price ? costUsd(price, { input: s.input_tokens, output: s.output_tokens }) : 0;
     const hallucination_proxy = s.invocations === 0 ? 0 : round((s.flagged + s.errors) / s.invocations);
-    const cost_per_outcome = round(usd / successful);
     const compliance_posture = s.invocations === 0 ? 0 : round(s.reviewed / s.invocations);
     const supply_chain_risk = round(Math.min(1, s.high_severity_findings / 10));
+
+    // A model absent from the pricing table has an UNKNOWN cost, not a zero
+    // one. Scoring it at $0 made it the cheapest thing on a public ranking
+    // page: an unlisted "acme:giant-1" scored $0.00000 cost/outcome and a
+    // composite of 0.4 against gpt-5's 20.4, and ranked FIRST on cost. Cost and
+    // composite are therefore reported as null and the model is listed under
+    // rankings.cost_unknown instead of competing on a number nobody has.
+    if (!price) {
+      return {
+        vendor: s.vendor,
+        model: s.model,
+        invocations: s.invocations,
+        hallucination_proxy,
+        cost_per_outcome_usd: null,
+        cost_known: false,
+        compliance_posture,
+        supply_chain_risk,
+        composite: null,
+      };
+    }
+
+    const usd = costUsd(price, { input: s.input_tokens, output: s.output_tokens });
+    const cost_per_outcome = round(usd / successful);
     const composite = round(
       hallucination_proxy * 40 +
       Math.min(1, cost_per_outcome * 1000) * 20 +
@@ -60,6 +93,7 @@ export function score(samples: VendorSample[]): BenchmarkReport {
       invocations: s.invocations,
       hallucination_proxy,
       cost_per_outcome_usd: cost_per_outcome,
+      cost_known: true,
       compliance_posture,
       supply_chain_risk,
       composite,
@@ -67,6 +101,7 @@ export function score(samples: VendorSample[]): BenchmarkReport {
   });
 
   const key = (v: VendorScore) => `${v.vendor}:${v.model}`;
+  const priced = by_vendor.filter((v) => v.cost_known);
   return {
     schema_version: "1.0",
     generated_at: new Date().toISOString(),
@@ -75,27 +110,42 @@ export function score(samples: VendorSample[]): BenchmarkReport {
     by_vendor,
     rankings: {
       hallucination:    [...by_vendor].sort((a, b) => a.hallucination_proxy - b.hallucination_proxy).map(key),
-      cost_per_outcome: [...by_vendor].sort((a, b) => a.cost_per_outcome_usd - b.cost_per_outcome_usd).map(key),
+      cost_per_outcome: priced
+        .slice()
+        .sort((a, b) => (a.cost_per_outcome_usd as number) - (b.cost_per_outcome_usd as number))
+        .map(key),
       compliance_posture: [...by_vendor].sort((a, b) => b.compliance_posture - a.compliance_posture).map(key),
       supply_chain:     [...by_vendor].sort((a, b) => a.supply_chain_risk - b.supply_chain_risk).map(key),
+      cost_unknown:     by_vendor.filter((v) => !v.cost_known).map(key),
     },
   };
 }
 
 export function renderHTML(b: BenchmarkReport): string {
+  // Unknown-cost models sort LAST and render "unknown" in both cost columns.
+  // Sorting them by a composite of 0 put a model nobody has priced at the top
+  // of a public ranking table.
   const rows = b.by_vendor
     .slice()
-    .sort((a, b) => a.composite - b.composite)
+    .sort((a, b) => {
+      if (a.composite === null) return b.composite === null ? 0 : 1;
+      if (b.composite === null) return -1;
+      return a.composite - b.composite;
+    })
     .map((v) => `<tr>
       <td>${escape(v.vendor)}</td><td>${escape(v.model)}</td>
       <td class="r">${v.invocations.toLocaleString()}</td>
       <td class="r">${(v.hallucination_proxy * 100).toFixed(2)}%</td>
-      <td class="r">$${v.cost_per_outcome_usd.toFixed(5)}</td>
+      <td class="r">${v.cost_known ? `$${(v.cost_per_outcome_usd as number).toFixed(5)}` : `<span class="unk">unknown</span>`}</td>
       <td class="r">${(v.compliance_posture * 100).toFixed(1)}%</td>
       <td class="r">${(v.supply_chain_risk * 100).toFixed(1)}%</td>
-      <td class="r"><strong>${v.composite}</strong></td>
+      <td class="r"><strong>${v.composite === null ? `<span class="unk">unknown</span>` : v.composite}</strong></td>
     </tr>`)
     .join("");
+
+  const unknownNote = b.rankings.cost_unknown.length
+    ? `<p class="lede">${b.rankings.cost_unknown.length} model(s) have no published list price in the pricing table (${b.rankings.cost_unknown.map(escape).join(", ")}). Their cost per outcome is <strong>unknown</strong>, not zero, so they are excluded from the cost ranking and from the composite score.</p>`
+    : "";
 
   return `<!doctype html><html lang="en"><head><meta charset="utf-8">
 <title>AskLedger · Quarterly AI Vendor Benchmark</title>
@@ -109,9 +159,11 @@ export function renderHTML(b: BenchmarkReport): string {
   .r{text-align:right;font-variant-numeric:tabular-nums}
   footer{margin-top:40px;color:#64748b;font-size:12px}
   code{background:#f1f5f9;padding:1px 6px;border-radius:4px}
+  .unk{color:#92400e;background:#fef3c7;padding:1px 6px;border-radius:4px;font-weight:600;font-size:12px}
 </style></head><body>
 <h1>AskLedger · Quarterly AI Vendor Benchmark</h1>
 <p class="lede">Composite scoring derived from ${b.sample_size.toLocaleString()} anonymised receipts. Methodology: <a href="${b.methodology_url}">methodology.md</a>.</p>
+${unknownNote}
 <table><thead><tr>
   <th>Vendor</th><th>Model</th><th class="r">Invocations</th>
   <th class="r">Hallucination proxy</th><th class="r">Cost/outcome</th>

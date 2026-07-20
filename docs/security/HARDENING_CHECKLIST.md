@@ -7,6 +7,38 @@ This checklist is enforced by CI: a release branch is rejected if any item
 in the `mandatory` section is unchecked. The list lives in code and is
 verified by `tools/verify-hardening.ts` against the deployed manifest.
 
+## What the hardening count does and does not mean
+
+Read this before citing the number anywhere.
+
+K.3 is currently **unchecked**: the Q2 failover drill record states
+`Mode: dry-run (no traffic shifted)`, which does not satisfy a control that
+requires a canary traffic shift. It is listed as open rather than counted.
+
+`tools/verify-hardening.ts` checks that each control is **documented and that
+the code implementing it is present**. It does not exercise the control. Of the
+checks:
+
+| What the check does | Count |
+|---|---|
+| Greps this checklist, or another doc, for a string | 31 |
+| Lists a directory for a filename pattern | 9 |
+| Confirms a file exists | 7 |
+| Greps a **source** file for a substring | 18 |
+| Unconditionally returns pass | 1 |
+| **Executes the control and asserts the outcome** | **0** |
+
+So a full pass means "every control is written down and the code it names is
+in the repo". It is a documentation-completeness gate, not evidence that any control
+works. Several checks are self-referential: the checklist asserts a control and
+the verifier confirms the assertion is present in the checklist.
+
+The real behavioural assurance in this repo lives in the test suite (for
+example `test/canonicalize-property.test.ts`, `test/chain-tamper.test.ts`,
+`test/hardening-sweep.test.ts` and `test/sweep2-regressions.test.ts`), not in
+this checklist. Closing that gap, by making each control executable, is open
+work and is the honest prerequisite for treating this list as assurance.
+
 ---
 
 ## A · Identity + access (mandatory)
@@ -188,7 +220,7 @@ Quarterly adversarial review. Tester runs each scenario; results filed at
 
 - [x] **K.1** Quarterly restore drill. See runbook §6.4.
 - [x] **K.2** RPO documented per service. See runbook §1.
-- [x] **K.3** Region failover runbook tested annually with traffic-shift
+- [ ] **K.3** Region failover runbook tested annually with traffic-shift
       below 5% as a canary.
 - [x] **K.4** Customer-facing region routing is DNS-based; no in-app
       hard-coding of region URLs.

@@ -12,6 +12,7 @@
  */
 
 import { sha256 as sha256Fn } from "@noble/hashes/sha2";
+import { canonicalizeBytes } from "../canonicalize.js";
 import type { Regulator } from "../policy-templates/types.js";
 
 export type UseCaseRiskTier =
@@ -69,9 +70,13 @@ export class UseCaseRegistry {
    * regenerated on read.
    */
   static entryHash(entry: UseCase): string {
-    return Buffer.from(
-      sha256Fn(new TextEncoder().encode(JSON.stringify(entry)))
-    ).toString("hex");
+    // RFC 8785, not JSON.stringify. Key order is not a property of the data, so
+    // a plain stringify made this hash depend on how the object happened to be
+    // built. `previous_version_hash` chains audit history on this value, so an
+    // entry that round-tripped through anything that reorders keys (jsonb, a
+    // JSON API, a re-parsed export) silently broke its own history chain, and
+    // the break was indistinguishable from tampering.
+    return Buffer.from(sha256Fn(canonicalizeBytes(entry))).toString("hex");
   }
 
   /** Register or update a use case. Returns the new entry hash. */

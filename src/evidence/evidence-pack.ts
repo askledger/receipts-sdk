@@ -16,6 +16,7 @@
 
 import { buildBatch, type MerkleBatch } from "../merkle.js";
 import { canonicalizeBytes } from "../canonicalize.js";
+import { verifyReceipt } from "../verify.js";
 import { canonicalSigningPayload } from "../receipt.js";
 import { sha256 as sha256Fn } from "@noble/hashes/sha2";
 import type { SignedReceipt } from "../types.js";
@@ -56,11 +57,24 @@ export interface EvidencePack {
 const VERIFY_INSTRUCTIONS = `
 HOW TO VERIFY THIS EVIDENCE PACK
 
+READ THIS FIRST. THE KEYS IN THIS FILE PROVE NOTHING.
+
+  \`trusted_keys\` travels INSIDE this pack. Anyone who can write this file can
+  put their own key there, re-sign every receipt with it, rebuild the Merkle
+  root and recompute \`pack_hash\`, and the result is internally consistent.
+  Every integrity mechanism in this document is computed over data supplied by
+  whoever produced the document.
+
+  So \`trusted_keys\` is a HINT about which key ids to go and look up. It is
+  NOT a trust root. You MUST obtain the signer's public key for each \`kid\`
+  from somewhere else: the issuer's published key, your own key registry, a
+  certificate, or a channel independent of this file. If you cannot, you have
+  not verified this pack, whatever the tooling prints.
+
 Prerequisites:
   - The AskLedger Receipts verifier (any language SDK passing the
     cross-language conformance vectors at test/conformance/).
-  - The list of trusted public keys (included in this pack under
-    \`trusted_keys\`).
+  - The signer's public key for each \`kid\`, obtained OUT OF BAND (see above).
 
 Steps:
   1. For each receipt in \`receipts\`:
@@ -70,8 +84,9 @@ Steps:
         - Compute SHA-256 hex of the canonical bytes.
         - Compare to the original \`integrity.receipt_hash\`. MUST match.
      b. Verify the Ed25519 signature in \`signatures[0].sig\` against the
-        canonical receipt body and the public key in \`trusted_keys\` whose
-        \`kid\` matches \`signatures[0].kid\`. MUST verify.
+        canonical receipt body and the OUT-OF-BAND public key whose \`kid\`
+        matches \`signatures[0].kid\`. MUST verify. Do NOT use the key material
+        carried in \`trusted_keys\` for this step.
      c. For receipts i and i-1 in the same tenant, verify that
         \`receipts[i].integrity.previous_receipt_hash\` equals
         \`receipts[i-1].integrity.receipt_hash\`.
@@ -157,6 +172,82 @@ export function verifyPackIntegrity(pack: EvidencePack): boolean {
     verification_instructions: pack.verification_instructions,
   };
   return sha256Hex(canonicalBytes(stripped)) === pack.integrity.pack_hash;
+}
+
+export interface PackVerification {
+  valid: boolean;
+  checks: {
+    pack_hash_matches: boolean;
+    all_receipts_included: boolean;
+    all_signatures_valid: boolean;
+  };
+  failed_inclusion: string[];
+  failed_signature: string[];
+  errors: string[];
+}
+
+/**
+ * Verify a pack against keys the CALLER supplies out of band.
+ *
+ * This exists because a pack cannot certify itself. `trusted_keys` travels
+ * inside the pack, so all three of its integrity mechanisms are computed over
+ * attacker-controlled input: pack_hash is recomputed by the forger,
+ * merkle.root is built from the forger's receipts, and trusted_keys is the
+ * forger's own key. A pack with every decision rewritten (block -> allow,
+ * $900,000 -> $2,000) passed pack integrity, Merkle inclusion and per-receipt
+ * signature verification, because it was internally consistent under the key
+ * it shipped.
+ *
+ * `publicKeys` MUST come from somewhere other than the pack: your key
+ * registry, the issuer's published key, a certificate. The `trusted_keys`
+ * field is only a hint about WHICH kids to go and resolve.
+ */
+export function verifyEvidencePack(
+  pack: EvidencePack,
+  opts: { publicKeys: Record<string, string> }
+): PackVerification {
+  const errors: string[] = [];
+
+  if (!opts.publicKeys || Object.keys(opts.publicKeys).length === 0) {
+    // Fail closed. "No keys supplied" must never read as "nothing was wrong".
+    return {
+      valid: false,
+      checks: { pack_hash_matches: false, all_receipts_included: false, all_signatures_valid: false },
+      failed_inclusion: [],
+      failed_signature: [],
+      errors: ["no external public keys supplied; a pack cannot authenticate itself"],
+    };
+  }
+
+  const pack_hash_matches = verifyPackIntegrity(pack);
+  if (!pack_hash_matches) errors.push("pack_hash does not match the pack contents");
+
+  const failed_inclusion = verifyAllReceiptsInPack(pack).map((r) => r.receipt.receipt_id);
+  if (failed_inclusion.length > 0) {
+    errors.push(`${failed_inclusion.length} receipt(s) are not included under the Merkle root`);
+  }
+
+  const failed_signature: string[] = [];
+  for (const r of pack.receipts) {
+    if (!verifyReceipt(r, { publicKeys: opts.publicKeys }).valid) {
+      failed_signature.push(r.receipt.receipt_id);
+    }
+  }
+  if (failed_signature.length > 0) {
+    errors.push(
+      `${failed_signature.length} receipt(s) failed signature verification against the supplied keys`
+    );
+  }
+
+  const all_receipts_included = failed_inclusion.length === 0;
+  const all_signatures_valid = failed_signature.length === 0;
+  return {
+    valid: pack_hash_matches && all_receipts_included && all_signatures_valid,
+    checks: { pack_hash_matches, all_receipts_included, all_signatures_valid },
+    failed_inclusion,
+    failed_signature,
+    errors,
+  };
 }
 
 /**

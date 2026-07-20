@@ -16,9 +16,9 @@ Strict mode, no `any`, no implicit `any`, no unused imports.
 ## Gate 2 · All tests pass
 
 ```
-npm test                                # 194 tests across 20 files
-npm --prefix python test               # 12 tests
-go test ./go-sdk/... -race             # 3 tests, race detector on
+npm test                                          # TypeScript suite
+PYTHONPATH=python-sdk/src python3 -m pytest python-sdk/tests -q   # 48 tests
+go test ./go-sdk/... -race                        # 3 tests, race detector on
 ```
 
 Required: 100% pass rate. Flaky tests are quarantined within 24 h and
@@ -36,15 +36,22 @@ If this test red, no release.
 
 ## Gate 4 · Cross-language conformance
 
-Conformance vectors live at `conformance/vectors/`. Each SDK must produce
-identical signatures for identical inputs.
+Shared vectors live at `test/conformance/` (`canonicalize.json`, 43 vectors;
+`sha256.json`, 4). Every SDK must reproduce them byte for byte.
+
+SCOPE, stated plainly: what is cross-verified today is RFC 8785
+canonicalization and SHA-256, NOT signed receipts. `SIGNED_VECTORS` and
+`CHAINED_VECTORS` in `conformance/src/vectors.ts` are still empty, so each
+non-TS SDK's signing test is a self-consistent round-trip against its own
+verifier. Freezing receipt vectors from the reference implementation is the
+open work that would make CL2/CL3 meaningful.
 
 ```
-npm run conformance:test                # TS
-python -m pytest python/tests/test_conformance.py
-go test ./go-sdk/conformance/...
-cargo test --manifest-path rust-sdk/Cargo.toml conformance
-mvn -f java-sdk/pom.xml -Dtest=ConformanceTest test
+npx vitest run test/conformance.test.ts           # TS
+PYTHONPATH=python-sdk/src python3 -m pytest python-sdk/tests -q
+go test ./go-sdk/...
+cargo test --manifest-path rust-sdk/Cargo.toml
+mvn -f java-sdk/pom.xml test
 ```
 
 ## Gate 5 · Linting + style

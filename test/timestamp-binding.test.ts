@@ -24,7 +24,14 @@ const evt = (): RawEvent => ({
 });
 
 describe("timestamp binding", () => {
-  it("attaches a token that binds to the receipt and verifies", async () => {
+  // UPDATED for the sweep-3 timestamp fix. This test used to assert
+  // `timestamp_imprint_matches === true` for a stub (local, UNSIGNED) token,
+  // which encoded the defect: `timestamps[]` sits outside the signed receipt
+  // bytes and the imprint is publicly computable, so a passing check here was
+  // a verifier endorsement of an attacker-choosable time. verifyReceipt now
+  // only ever reports that check as false (a genuine tamper signal) and states
+  // separately, via timestamp_time_attested, that no time was attested.
+  it("attaches a token whose imprint binds, but does NOT attest the time", async () => {
     const store = new MemoryChainStateStore();
     const signed = await signReceiptWithStore({ event: evt(), keypair: kp }, store);
     const stamped = await timestampReceipt(signed, new StubTSAClient("test-tsa"));
@@ -33,9 +40,11 @@ describe("timestamp binding", () => {
     expect(verdicts).toHaveLength(1);
     expect(verdicts[0].format).toBe("local");
     expect(verdicts[0].imprintMatches).toBe(true);
+    expect(verdicts[0].authenticated).toBe(false);
 
     const v = verifyReceipt(stamped, { publicKeys: keys });
-    expect(v.checks.timestamp_imprint_matches).toBe(true);
+    expect(v.checks.timestamp_imprint_matches).toBeUndefined();
+    expect(v.checks.timestamp_time_attested).toBe(false);
     expect(v.valid).toBe(true);
   });
 

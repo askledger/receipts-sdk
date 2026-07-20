@@ -7,9 +7,9 @@ Open-source, vendor-neutral cryptographic trust substrate for enterprise AI. Eve
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org)
 [![Spec](https://img.shields.io/badge/PL--RFC-001…010-blueviolet)](spec/README.md)
-[![Conformance](https://img.shields.io/badge/conformance-CL1%2FCL2%2FCL3-blue)](conformance/README.md)
-[![Tests](https://img.shields.io/badge/tests-494%20passing-brightgreen)](#testing)
-[![Hardening](https://img.shields.io/badge/hardening-66%2F66%20PASS-brightgreen)](docs/security/HARDENING_CHECKLIST.md)
+[![Conformance](https://img.shields.io/badge/conformance-CL1%20(canonicalization)-blue)](conformance/README.md)
+[![Tests](https://img.shields.io/badge/tests-569%20passing-brightgreen)](#testing)
+[![Hardening](https://img.shields.io/badge/hardening-65%2F66%20documented%20(K.3%20open)-yellowgreen)](docs/security/HARDENING_CHECKLIST.md)
 
 ---
 
@@ -37,9 +37,10 @@ savings **signed and verifiable**: that is the paid tier.
 ## Project status
 
 **v0.12 · live on npm.** The cryptographic core is hardened and
-independently verifiable, cross-language conformance tests enforce
-byte-identical receipts across the TypeScript, Python, Go, Rust, and
-Java SDKs, and a machine-checked hardening checklist runs in CI. SDK,
+independently verifiable, shared conformance vectors enforce
+byte-identical RFC 8785 canonicalization and SHA-256 across the
+TypeScript, Python, Go, Rust and Java SDKs, and a documented hardening
+checklist is checked in CI. SDK,
 integrations, browser extension, console, public verifier, specification,
 and conformance program are publicly available. A third-party
 penetration test and SOC 2 Type II report are scoped for Q4 2026 - Q1
@@ -572,7 +573,7 @@ report.results; // per-sink delivery outcome; one failing sink never blocks the 
 
 | SDK | Language | Status | Conformance |
 |---|---|---|---|
-| `@askledger/receipts-sdk` | TypeScript / Node 18+ / browsers | live on npm · 498 tests (494 pass, 4 HSM-live skipped) | Reference |
+| `@askledger/receipts-sdk` | TypeScript / Node 18+ / browsers | live on npm · 573 tests (569 pass, 4 HSM-live skipped) | Reference |
 | `askledger-receipts` (Python, import `askledger.receipts`) | Python 3.10+ | From source (not yet on PyPI) · cross-verified against TS vectors | Cross-verified |
 | `github.com/askledger/receipts-sdk/go-sdk` | Go 1.22+ | `go get` (git-based) · cross-verified against TS vectors | Cross-verified |
 | `askledger-receipts` (Rust crate) | Rust 1.75+ | From source (git dep, not yet on crates.io) · cross-verified against TS vectors | Cross-verified |
@@ -659,12 +660,12 @@ We are particularly interested in feedback from:
 | Receipts Protocol Spec v0.1 | ✅ Shipped, IETF-style |
 | Input validation + structured errors | ✅ Shipped |
 | **Tests** | |
-| 494 TypeScript tests | ✅ Passing (4 HSM-live skipped without hardware) |
+| 569 TypeScript tests | ✅ Passing (4 HSM-live skipped without hardware) |
 | 48 Python tests | ✅ Passing (conformance vectors, parametrized) |
 | 3 Go conformance tests | ✅ Passing |
 | Rust tests | ✅ Code shipped; cargo runs in CI |
 | Java tests | ✅ Code shipped; mvn runs in CI |
-| Cross-language conformance vectors | ✅ Shipped, TS ↔ Python ↔ Go pass byte-identical |
+| Cross-language conformance vectors | ✅ Canonicalization (43) + SHA-256 (4). Signed-receipt and chained vectors are NOT yet frozen, so CL2/CL3 are unearned |
 | Fuzz harness (200 random mutations) | ✅ Shipped |
 | **Crypto hardening** | |
 | RFC 3161 timestamping client (FreeTSA + commercial TSA) | ✅ Shipped |

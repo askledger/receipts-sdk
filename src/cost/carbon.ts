@@ -29,6 +29,15 @@ export interface CarbonReceipt {
   source: string;
 }
 
+// Unrounded per-event figures. `carbonOf` rounds for display; anything that
+// AGGREGATES must use these, never the rounded receipt.
+function rawCarbon(vendor: string, model: string, tokens: number): { wh: number; g: number } | null {
+  const p = ENERGY[`${vendor}:${model}`];
+  if (!p) return null;
+  const wh = (tokens / 1000) * p.wh_per_1k_tokens;
+  return { wh, g: (wh / 1000) * p.grid_g_per_kwh };
+}
+
 export function carbonOf(vendor: string, model: string, tokens: number): CarbonReceipt | null {
   const p = ENERGY[`${vendor}:${model}`];
   if (!p) return null;
@@ -48,18 +57,33 @@ export interface CarbonRollup {
   by_vendor: Record<string, { wh: number; g: number }>;
 }
 
+// Sum the RAW per-event figures and round once at the end.
+//
+// Rounding each event to 4dp before adding is one-directional whenever the
+// per-event value is small relative to 1e-4, and it compounds: 1,000,000
+// single-token events on gpt-5 reported total_g_co2e = 300 against a true 256,
+// an inflation of 17.2%. A sustainability figure that only ever moves upward
+// with the event count is not a measurement.
 export function rollupCarbon(events: Array<{ vendor: string; model: string; tokens: number }>): CarbonRollup {
-  const out: CarbonRollup = { total_wh: 0, total_g_co2e: 0, by_vendor: {} };
+  let totalWh = 0;
+  let totalG = 0;
+  const raw: Record<string, { wh: number; g: number }> = {};
   for (const e of events) {
-    const c = carbonOf(e.vendor, e.model, e.tokens);
+    const c = rawCarbon(e.vendor, e.model, e.tokens);
     if (!c) continue;
-    out.total_wh += c.wh;
-    out.total_g_co2e += c.g_co2e;
-    const b = (out.by_vendor[e.vendor] ??= { wh: 0, g: 0 });
+    totalWh += c.wh;
+    totalG += c.g;
+    const b = (raw[e.vendor] ??= { wh: 0, g: 0 });
     b.wh += c.wh;
-    b.g += c.g_co2e;
+    b.g += c.g;
   }
-  out.total_wh = Number(out.total_wh.toFixed(4));
-  out.total_g_co2e = Number(out.total_g_co2e.toFixed(4));
-  return out;
+  const by_vendor: CarbonRollup["by_vendor"] = {};
+  for (const [vendor, b] of Object.entries(raw)) {
+    by_vendor[vendor] = { wh: Number(b.wh.toFixed(4)), g: Number(b.g.toFixed(4)) };
+  }
+  return {
+    total_wh: Number(totalWh.toFixed(4)),
+    total_g_co2e: Number(totalG.toFixed(4)),
+    by_vendor,
+  };
 }

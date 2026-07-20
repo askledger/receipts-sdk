@@ -138,16 +138,35 @@ export function recommend(samples: ReceiptSample[], days = 30): Recommendation[]
       }
     }
 
-    // (3) Dedup cache hit-rate is low → recommend enabling.
+    // (3) Dedup cache hit-rate is low → recommend measuring it.
+    //
+    // This used to assert a dollar saving of a hardcoded 15% of spend (the
+    // local variable was literally named `optimistic`) with zero evidence of
+    // prompt repetition. The engine only ever sees vendor, model, use case and
+    // token counts, never prompt hashes, so it cannot know the achievable hit
+    // rate: for a workload of all-unique prompts the true saving is $0 and the
+    // recommendation still printed a confident monthly figure next to
+    // recommendations whose numbers ARE exact counterfactuals.
+    //
+    // The observation (the cache is effectively unused) is real and worth
+    // surfacing, so keep the recommendation but report no dollar amount. The
+    // saving is whatever the measured repeat rate turns out to be, and the
+    // formula is given so the customer can fill it in from a real measurement.
     if (a.count >= 100 && a.cache_hits / a.count < 0.05) {
-      const optimistic = 0.15 * currentSpend * monthMultiplier;
+      const observedHitRate = a.cache_hits / a.count;
+      const monthlySpend = currentSpend * monthMultiplier;
       recs.push({
         kind: "enable_dedup_cache",
         use_case: a.use_case,
-        evidence: `Only ${a.cache_hits}/${a.count} calls hit the dedup cache.`,
-        expected_savings_usd_month: Number(optimistic.toFixed(2)),
+        evidence:
+          `Only ${a.cache_hits}/${a.count} calls (${(observedHitRate * 100).toFixed(1)}%) hit the dedup cache. ` +
+          `Savings depend entirely on how often prompts actually repeat, which these receipts do not record ` +
+          `(no prompt hashes), so no dollar figure is claimed. At ${monthlySpend.toFixed(2)} USD/month on ` +
+          `${currentKey}, each 1 percentage point of real cache hit rate is worth about ` +
+          `${(monthlySpend / 100).toFixed(2)} USD/month. Measure the repeat rate first.`,
+        expected_savings_usd_month: 0,
         confidence: 0.50,
-        action: { from: currentKey, param: { ttl_min: 60 } },
+        action: { from: currentKey, param: { ttl_min: 60, measure_repeat_rate_first: true } },
       });
     }
   }
