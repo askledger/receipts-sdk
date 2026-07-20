@@ -252,9 +252,9 @@ export function parseQuery(nl: string, now: Date = new Date()): StructuredQuery 
       const n = Number(hit[1].replace(/,/g, ""));
       return Number.isFinite(n) ? n : undefined;
     };
-    const min = amountAt(/(?:over|above|more than|greater than|>=?)\s*\$?\s*([\d,.]+)/);
+    const min = amountAt(/(?:over|above|more than|greater than|>=?)[\s$]*([\d,.]+)/);
     if (min !== undefined) filter.minCost = min;
-    const max = amountAt(/(?:under|below|less than|cheaper than|<=?)\s*\$?\s*([\d,.]+)/);
+    const max = amountAt(/(?:under|below|less than|cheaper than|<=?)[\s$]*([\d,.]+)/);
     if (max !== undefined) filter.maxCost = max;
   }
   if ((m = q.match(/(?:over|more than|>=?)\s*([\d,]+)\s*tokens/)))

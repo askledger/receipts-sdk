@@ -33,9 +33,27 @@ function isVersionTail(s: string): boolean {
 // the collapse was for "dated snapshots and versioned names" only; this makes
 // the behavior match the claim. An unrecognized variant now falls through to
 // vendor "unknown", where it is reported as unpriced rather than mispriced.
-function tierMatch(s: string, base: RegExp): boolean {
-  const m = s.match(base);
-  return m ? isVersionTail(s.slice(m.index! + m[0].length)) : false;
+function tierMatch(s: string, base: string): boolean {
+  // indexOf, not a regex. Passing a RegExp here meant patterns like
+  // /gemini[\w.-]*flash/ (an ambiguous quantifier followed by a literal that
+  // overlaps its own character class) were run against attacker-influenced
+  // model ids from a billing export, which CodeQL flagged as polynomial ReDoS.
+  // Every base we match on is a plain literal, so a substring search is both
+  // linear and exactly what was meant.
+  const i = s.indexOf(base);
+  return i === -1 ? false : isVersionTail(s.slice(i + base.length));
+}
+
+/**
+ * Google puts the tier word AFTER the version ("gemini-2.5-flash"), so the
+ * tier is not a version tail. Match the family and the tier separately, still
+ * without a regex.
+ */
+function geminiTier(s: string, tier: string): boolean {
+  const i = s.indexOf("gemini");
+  if (i === -1) return false;
+  const j = s.indexOf(tier, i + "gemini".length);
+  return j === -1 ? false : isVersionTail(s.slice(j + tier.length));
 }
 
 // Map a provider's model / snapshot id onto a "vendor:model" the pricing table
@@ -44,19 +62,19 @@ function tierMatch(s: string, base: RegExp): boolean {
 // Order matters: the most specific patterns (…-mini) are tested first.
 export function normalizeModel(raw: string): { vendor: string; model: string } {
   const s = String(raw ?? "").toLowerCase();
-  if (tierMatch(s, /gpt-5-nano/)) return { vendor: "openai", model: "gpt-5-nano" };
-  if (tierMatch(s, /gpt-5-mini/)) return { vendor: "openai", model: "gpt-5-mini" };
-  if (tierMatch(s, /gpt-5/)) return { vendor: "openai", model: "gpt-5" };
-  if (tierMatch(s, /gpt-4o-mini/)) return { vendor: "openai", model: "gpt-4o-mini" };
-  if (tierMatch(s, /gpt-4o/)) return { vendor: "openai", model: "gpt-4o" };
-  if (tierMatch(s, /opus/)) return { vendor: "anthropic", model: "claude-opus-4-6" };
-  if (tierMatch(s, /sonnet/)) return { vendor: "anthropic", model: "claude-sonnet-4-6" };
-  if (tierMatch(s, /haiku/)) return { vendor: "anthropic", model: "claude-haiku-4-5" };
+  if (tierMatch(s, "gpt-5-nano")) return { vendor: "openai", model: "gpt-5-nano" };
+  if (tierMatch(s, "gpt-5-mini")) return { vendor: "openai", model: "gpt-5-mini" };
+  if (tierMatch(s, "gpt-5")) return { vendor: "openai", model: "gpt-5" };
+  if (tierMatch(s, "gpt-4o-mini")) return { vendor: "openai", model: "gpt-4o-mini" };
+  if (tierMatch(s, "gpt-4o")) return { vendor: "openai", model: "gpt-4o" };
+  if (tierMatch(s, "opus")) return { vendor: "anthropic", model: "claude-opus-4-6" };
+  if (tierMatch(s, "sonnet")) return { vendor: "anthropic", model: "claude-sonnet-4-6" };
+  if (tierMatch(s, "haiku")) return { vendor: "anthropic", model: "claude-haiku-4-5" };
   // Google's tier word trails the version ("gemini-2.5-flash"), so the tier
   // word itself is part of the match rather than tail noise.
-  if (tierMatch(s, /gemini[\w.-]*flash/)) return { vendor: "google", model: "gemini-2-5-flash" };
-  if (tierMatch(s, /gemini[\w.-]*pro/)) return { vendor: "google", model: "gemini-2-5-pro" };
-  if (tierMatch(s, /gemini/)) return { vendor: "google", model: "gemini-2-5-pro" };
+  if (geminiTier(s, "flash")) return { vendor: "google", model: "gemini-2-5-flash" };
+  if (geminiTier(s, "pro")) return { vendor: "google", model: "gemini-2-5-pro" };
+  if (tierMatch(s, "gemini")) return { vendor: "google", model: "gemini-2-5-pro" };
   return { vendor: "unknown", model: s.replace(/[^a-z0-9._-]/g, "") || "unknown" };
 }
 
