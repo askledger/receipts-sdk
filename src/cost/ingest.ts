@@ -9,7 +9,19 @@ import type { SignedReceipt } from "../types.js";
 // Only a DATED or VERSIONED tail may follow a recognized tier name. Digits,
 // dots, dashes and underscores are version noise; letters are a different
 // product.
-const VERSION_TAIL = /^[\d._-]*$/;
+// Plain character scan, not a regex. Model ids come from a customer's billing
+// export, so they are attacker-influenced input, and CodeQL flagged the regex
+// form as polynomial ReDoS (js/polynomial-redos). A scan is O(n) with no
+// backtracking and is easier to read besides.
+function isVersionTail(s: string): boolean {
+  for (let i = 0; i < s.length; i++) {
+    const c = s.charCodeAt(i);
+    const isDigit = c >= 48 && c <= 57;
+    const isSep = c === 46 /* . */ || c === 95 /* _ */ || c === 45 /* - */;
+    if (!isDigit && !isSep) return false;
+  }
+  return true;
+}
 
 // True when `s` contains `base` AND everything after it is version noise.
 //
@@ -23,7 +35,7 @@ const VERSION_TAIL = /^[\d._-]*$/;
 // vendor "unknown", where it is reported as unpriced rather than mispriced.
 function tierMatch(s: string, base: RegExp): boolean {
   const m = s.match(base);
-  return m ? VERSION_TAIL.test(s.slice(m.index! + m[0].length)) : false;
+  return m ? isVersionTail(s.slice(m.index! + m[0].length)) : false;
 }
 
 // Map a provider's model / snapshot id onto a "vendor:model" the pricing table

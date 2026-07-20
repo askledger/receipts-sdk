@@ -8,7 +8,7 @@ Open-source, vendor-neutral cryptographic trust substrate for enterprise AI. Eve
 [![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org)
 [![Spec](https://img.shields.io/badge/PL--RFC-001…010-blueviolet)](spec/README.md)
 [![Conformance](https://img.shields.io/badge/conformance-CL1%20(canonicalization)-blue)](conformance/README.md)
-[![Tests](https://img.shields.io/badge/tests-569%20passing-brightgreen)](#testing)
+[![Tests](https://img.shields.io/badge/tests-571%20passing-brightgreen)](#testing)
 [![Hardening](https://img.shields.io/badge/hardening-65%2F66%20documented%20(K.3%20open)-yellowgreen)](docs/security/HARDENING_CHECKLIST.md)
 
 ---
@@ -573,7 +573,7 @@ report.results; // per-sink delivery outcome; one failing sink never blocks the 
 
 | SDK | Language | Status | Conformance |
 |---|---|---|---|
-| `@askledger/receipts-sdk` | TypeScript / Node 18+ / browsers | live on npm · 573 tests (569 pass, 4 HSM-live skipped) | Reference |
+| `@askledger/receipts-sdk` | TypeScript / Node 18+ / browsers | live on npm · 575 tests (571 pass, 4 HSM-live skipped) | Reference |
 | `askledger-receipts` (Python, import `askledger.receipts`) | Python 3.10+ | From source (not yet on PyPI) · cross-verified against TS vectors | Cross-verified |
 | `github.com/askledger/receipts-sdk/go-sdk` | Go 1.22+ | `go get` (git-based) · cross-verified against TS vectors | Cross-verified |
 | `askledger-receipts` (Rust crate) | Rust 1.75+ | From source (git dep, not yet on crates.io) · cross-verified against TS vectors | Cross-verified |
@@ -660,7 +660,7 @@ We are particularly interested in feedback from:
 | Receipts Protocol Spec v0.1 | ✅ Shipped, IETF-style |
 | Input validation + structured errors | ✅ Shipped |
 | **Tests** | |
-| 569 TypeScript tests | ✅ Passing (4 HSM-live skipped without hardware) |
+| 571 TypeScript tests | ✅ Passing (4 HSM-live skipped without hardware) |
 | 48 Python tests | ✅ Passing (conformance vectors, parametrized) |
 | 3 Go conformance tests | ✅ Passing |
 | Rust tests | ✅ Code shipped; cargo runs in CI |

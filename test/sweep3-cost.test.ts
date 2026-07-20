@@ -452,3 +452,27 @@ describe("recommendations: enable_dedup_cache claims no dollar figure", () => {
     expect(rec.action.param).toMatchObject({ measure_repeat_rate_first: true });
   });
 });
+
+describe("query and model parsing are linear in input length", () => {
+  it("a long adversarial query does not trigger catastrophic backtracking", () => {
+    // `([\d,.]+)(?![\d,.]*\s*tokens?\b)` overlapped the captured class with
+    // the lookahead class, which CodeQL flagged as js/polynomial-redos. Queries
+    // are user-supplied, so a long run of digits and commas was a cheap DoS.
+    // Backtracking would take minutes here; the bound is deliberately generous
+    // so the test measures the complexity class, not the machine.
+    const q = "how much did we spend over " + "1,".repeat(20_000) + "x";
+    const t0 = Date.now();
+    const parsed = parseQuery(q);
+    expect(Date.now() - t0).toBeLessThan(2000);
+    expect(parsed).toBeTruthy();
+  });
+
+  it("a long adversarial model id does not trigger catastrophic backtracking", () => {
+    const raw = "gpt-5" + "-".repeat(20_000) + "x";
+    const t0 = Date.now();
+    const r = normalizeModel(raw);
+    expect(Date.now() - t0).toBeLessThan(2000);
+    // Letters after the version noise mean it is NOT the base tier.
+    expect(r.vendor).toBe("unknown");
+  });
+});

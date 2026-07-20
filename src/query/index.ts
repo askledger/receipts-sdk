@@ -238,10 +238,24 @@ export function parseQuery(nl: string, now: Date = new Date()): StructuredQuery 
   // mixed questions like "how much did we spend on receipts over 5000 tokens".
   let m: RegExpMatchArray | null;
   if (costWords) {
-    if ((m = q.match(/(?:over|above|more than|greater than|>=?)\s*\$?\s*([\d,.]+)(?![\d,.]*\s*tokens?\b)/)))
-      filter.minCost = Number(m[1].replace(/,/g, ""));
-    if ((m = q.match(/(?:under|below|less than|cheaper than|<=?)\s*\$?\s*([\d,.]+)(?![\d,.]*\s*tokens?\b)/)))
-      filter.maxCost = Number(m[1].replace(/,/g, ""));
+    // The "is this about tokens" guard is a plain check on the text AFTER the
+    // number, not a lookahead. `([\d,.]+)(?![\d,.]*\s*tokens?\b)` overlaps the
+    // captured class with the lookahead class, which CodeQL flags as polynomial
+    // ReDoS (js/polynomial-redos): a long run of digits and commas from a
+    // user-supplied query string forces quadratic backtracking. Queries are
+    // attacker-controlled, so this has to be linear.
+    const amountAt = (re: RegExp): number | undefined => {
+      const hit = q.match(re);
+      if (!hit || hit.index === undefined) return undefined;
+      const rest = q.slice(hit.index + hit[0].length, hit.index + hit[0].length + 24);
+      if (/^\s*tokens?\b/.test(rest)) return undefined; // "over 5000 tokens" is not a price
+      const n = Number(hit[1].replace(/,/g, ""));
+      return Number.isFinite(n) ? n : undefined;
+    };
+    const min = amountAt(/(?:over|above|more than|greater than|>=?)\s*\$?\s*([\d,.]+)/);
+    if (min !== undefined) filter.minCost = min;
+    const max = amountAt(/(?:under|below|less than|cheaper than|<=?)\s*\$?\s*([\d,.]+)/);
+    if (max !== undefined) filter.maxCost = max;
   }
   if ((m = q.match(/(?:over|more than|>=?)\s*([\d,]+)\s*tokens/)))
     filter.minTokens = Number(m[1].replace(/,/g, ""));
