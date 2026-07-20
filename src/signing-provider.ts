@@ -68,7 +68,26 @@ export class SoftwareSigningProvider implements SigningProvider {
     public readonly kid: string,
     private readonly privateKey: Uint8Array,
     private readonly _publicKey: Uint8Array
-  ) {}
+  ) {
+    // `private` is a TypeScript-only marker: at runtime these are ordinary
+    // enumerable own properties, so JSON.stringify(provider), a structured
+    // logger, an APM breadcrumb or an error-context dump all serialize the
+    // raw Ed25519 signing key. Anyone holding it can forge every receipt this
+    // issuer ever produced. Make the field non-enumerable so it cannot be
+    // reached by serialization or console inspection by accident.
+    Object.defineProperty(this, "privateKey", { enumerable: false });
+    Object.defineProperty(this, "_publicKey", { enumerable: false });
+  }
+
+  /** Never serialize key material, whatever the caller passes us to. */
+  toJSON(): Record<string, unknown> {
+    return { kid: this.kid, algorithm: this.algorithm, curve: this.curve, privateKey: "[redacted]" };
+  }
+
+  /** Keep the key out of console.log / util.inspect output too. */
+  [Symbol.for("nodejs.util.inspect.custom")](): string {
+    return `SoftwareSigningProvider { kid: ${JSON.stringify(this.kid)}, privateKey: [redacted] }`;
+  }
 
   /**
    * Generate a fresh keypair backed by software. The private key

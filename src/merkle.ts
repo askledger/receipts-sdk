@@ -144,6 +144,20 @@ export function verifyInclusion(
   proof: InclusionProof,
   trustedRootHex: string
 ): boolean {
+  // leaf_index MUST be inside the tree. Without this, `idx` is only ever
+  // consulted as `idx % 2`, so on power-of-two trees leaf_index + k*tree_size
+  // and negative aliases all reconstruct the same root and verify. The proof
+  // would then attest a position the receipt does not occupy.
+  if (
+    !Number.isInteger(proof.leaf_index) ||
+    !Number.isInteger(proof.tree_size) ||
+    proof.tree_size < 1 ||
+    proof.leaf_index < 0 ||
+    proof.leaf_index >= proof.tree_size
+  ) {
+    return false;
+  }
+
   let h = hashLeaf(canonicalSigningPayload(receipt.receipt));
   let idx = proof.leaf_index;
   let levelSize = proof.tree_size;

@@ -55,12 +55,23 @@ export interface SignedPreVerdict {
   signature: { alg: "EdDSA"; kid: string; sig: string };
 }
 
-/** Canonical SHA-256 hash of the exact action being judged. */
+/**
+ * Canonical SHA-256 hash of the exact action being judged.
+ *
+ * `actor` MUST be part of the hash. It used to be excluded, which made the
+ * separation-of-duty check trivially bypassable: the independence test in
+ * signPreVerdict only fires when `action.actor` is set, so a proposer simply
+ * called signPreVerdict with the actor field omitted, self-approved, and the
+ * resulting verdict still bound byte-for-byte to the real action because the
+ * hash could not tell the two apart. Binding the actor means a verdict issued
+ * for an actor-less action no longer clears an action performed BY someone.
+ */
 export function actionHash(action: ProposedAction): string {
   return sha256(
     canonicalizeBytes({
       tenant_id: action.tenant_id,
       action_type: action.action_type,
+      actor: action.actor ?? null,
       payload: action.payload,
     })
   );
@@ -107,6 +118,8 @@ export interface PreVerdictVerification {
     hash_matches: boolean;
     binds_to_action: boolean; // the verdict's action_hash matches the action supplied
     not_expired: boolean;
+    /** The reviewer is not the actor performing the action. */
+    reviewer_independent: boolean;
   };
   errors: string[];
 }
@@ -167,11 +180,25 @@ export function verifyPreVerdict(
     errors.push(`pre-verdict expired at ${pv.expires_at}`);
   }
 
-  const valid = hash_matches && signature_valid && binds_to_action && not_expired;
+  // Independence is re-checked HERE, not only at signing time. signPreVerdict
+  // is under the proposer's control, so a check that exists only there is a
+  // suggestion, not a control. The gate is the place it has to hold.
+  const reviewer_independent = !(
+    (action.actor && pv.reviewer === action.actor) ||
+    (pv.independent_of && pv.reviewer === pv.independent_of)
+  );
+  if (!reviewer_independent) {
+    errors.push(
+      `reviewer "${pv.reviewer}" is the actor performing the action; a pre-execution verdict must be independent`
+    );
+  }
+
+  const valid =
+    hash_matches && signature_valid && binds_to_action && not_expired && reviewer_independent;
   return {
     valid,
     verdict: valid ? pv.verdict : null,
-    checks: { signature_valid, hash_matches, binds_to_action, not_expired },
+    checks: { signature_valid, hash_matches, binds_to_action, not_expired, reviewer_independent },
     errors,
   };
 }

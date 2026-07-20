@@ -252,6 +252,22 @@ export class TransparencyLog {
     const leaf = hexToBytes(leafHashHex);
     if (leaf.length !== 32) return false;
 
+    // log_index MUST be inside the tree. proveInclusion() checks this but the
+    // VERIFIER did not, and climb() only compares `target - start < k`, so every
+    // out-of-range index collapses onto the last leaf's path (or the first, when
+    // negative) and verifies against the genuine root. log_index is the log's
+    // ordering claim, the only positional binding the proof carries, so a
+    // genuine proof could be re-presented as any entry number.
+    if (
+      !Number.isInteger(proof.log_index) ||
+      !Number.isInteger(proof.tree_size) ||
+      proof.tree_size < 1 ||
+      proof.log_index < 0 ||
+      proof.log_index >= proof.tree_size
+    ) {
+      return false;
+    }
+
     function climb(
       start: number,
       end: number,
