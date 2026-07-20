@@ -51,6 +51,18 @@ function fileExists(rel: string): CheckResult {
   return fs.existsSync(p) ? { ok: true } : { ok: false, note: `missing file: ${rel}` };
 }
 
+/**
+ * Combine two checks. Do NOT use `&&` on CheckResults: they are objects, and a
+ * non-empty object is always truthy, so `a && b` silently discards `a` and
+ * returns `b`. G.1 was written that way and its fileExists half never ran, the
+ * exact "check that cannot fail" class of bug this tool exists to catch.
+ */
+function both(a: CheckResult, b: CheckResult): CheckResult {
+  if (!a.ok) return a;
+  if (!b.ok) return b;
+  return { ok: true, note: [a.note, b.note].filter(Boolean).join("; ") || undefined };
+}
+
 function dirHas(rel: string, predicate: (name: string) => boolean): CheckResult {
   const p = path.join(REPO, rel);
   if (!fs.existsSync(p)) return { ok: false, note: `missing dir: ${rel}` };
@@ -122,8 +134,10 @@ const CHECKS: Record<string, Checker> = {
   // true only inside a CI job. The generator and its release wiring are the
   // durable facts.
   "G.1": () =>
-    fileExists("scripts/generate-sbom.mjs") &&
-    fileContains(".github/workflows/release.yml", "sbom.cyclonedx.json"),
+    both(
+      fileExists("scripts/generate-sbom.mjs"),
+      fileContains(".github/workflows/release.yml", "sbom.cyclonedx.json")
+    ),
   "G.2": () => fileContains("docs/security/HARDENING_CHECKLIST.md", "cosign"),
   "G.3": () => fileExists("package-lock.json"),
   "G.4": () => fileContains("docs/security/HARDENING_CHECKLIST.md", "postinstall"),

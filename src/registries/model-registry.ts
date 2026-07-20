@@ -10,6 +10,7 @@
  */
 
 import { sha256 as sha256Fn } from "@noble/hashes/sha2";
+import { canonicalizeBytes } from "../canonicalize.js";
 
 export type ValidationStatus =
   | "development"       // not approved for any use
@@ -53,10 +54,22 @@ export interface ModelRegistration {
 export class ModelRegistry {
   private readonly entries = new Map<string, ModelRegistration>();
 
+  /**
+   * RFC 8785 (JCS), not JSON.stringify.
+   *
+   * `previous_version_hash` chains registrations into an audit history, so this
+   * value has to be reproducible by anyone holding the entry. JSON.stringify
+   * preserves insertion order, which meant an entry that round-tripped through
+   * any store that reorders keys (Postgres jsonb, most JSON APIs, a re-parsed
+   * export) hashed differently from the same entry in memory, and the chain
+   * failed to verify against its own recorded predecessor. An auditor could not
+   * distinguish that from tampering.
+   *
+   * This intentionally changes previously computed entry hashes; the old ones
+   * were only ever valid inside one process's key ordering.
+   */
   static entryHash(entry: ModelRegistration): string {
-    return Buffer.from(
-      sha256Fn(new TextEncoder().encode(JSON.stringify(entry)))
-    ).toString("hex");
+    return Buffer.from(sha256Fn(canonicalizeBytes(entry))).toString("hex");
   }
 
   register(

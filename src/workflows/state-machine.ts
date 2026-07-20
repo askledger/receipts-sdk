@@ -42,6 +42,19 @@ export class StateMachine<S extends string, C = unknown> {
   private _state: S;
   private readonly history: StateChangeRecord<S>[] = [];
   private readonly transitions: Map<string, Transition<S>> = new Map();
+  /**
+   * Tail of the serialization queue. `transition` is async and awaits caller
+   * code (guard, action) in the middle of a read-modify-write on `_state`, so
+   * without this every concurrent call read the SAME starting state, both
+   * passed validation, and BOTH ran: `pending -> approved` and
+   * `pending -> rejected` on one approval workflow executed their actions and
+   * the audit history recorded `approved -> rejected`, a transition that does
+   * not exist in the table at all. Chaining each transition onto the previous
+   * one makes the validate/guard/act/commit sequence a genuine critical
+   * section, so the second caller re-validates against the committed state and
+   * is correctly rejected as an invalid transition.
+   */
+  private queue: Promise<unknown> = Promise.resolve();
 
   constructor(initial: S, transitions: Transition<S>[]) {
     this._state = initial;
@@ -61,6 +74,20 @@ export class StateMachine<S extends string, C = unknown> {
   async transition(
     to: S,
     opts: { actor?: string; metadata?: Record<string, unknown>; context?: C } = {}
+  ): Promise<S> {
+    // Serialize: run only after every previously-queued transition has settled.
+    // `.then(() => ...)` on a queue tail that never rejects (see below) keeps a
+    // failed transition from poisoning subsequent ones.
+    const run = this.queue.then(() => this.applyTransition(to, opts));
+    // The queue tail must not reject, or an unhandled rejection escapes and
+    // later transitions inherit the failure. Callers still get `run`.
+    this.queue = run.catch(() => undefined);
+    return run;
+  }
+
+  private async applyTransition(
+    to: S,
+    opts: { actor?: string; metadata?: Record<string, unknown>; context?: C }
   ): Promise<S> {
     const key = `${this._state}=>${to}`;
     const t = this.transitions.get(key);

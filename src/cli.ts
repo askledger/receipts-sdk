@@ -382,6 +382,11 @@ program
     const pack = buildEvidencePack(
       meta,
       receipts,
+      // These entries carry the signing kids so a verifier knows WHICH keys to
+      // go and fetch. `public_key` is deliberately left empty: a key that
+      // travels inside the bundle cannot vouch for the bundle, so shipping the
+      // material here would only invite someone to trust it. The verifier must
+      // resolve each kid against its own records, out of band.
       kids.map((kid) => ({
         kid,
         public_key: "",
@@ -456,7 +461,33 @@ program
         console.log(`   ${paint(inclOk ? c.green : c.red, inclOk ? "✓" : "✕")} inclusion proof     ${paint(c.gray, "(spot-check: first receipt ∈ root)")}`);
       }
     } else {
-      console.log(`   ${paint(c.gray, "·")} signatures          ${paint(c.gray, "skipped (pass --key <keypair.json> to check)")}`);
+      // FAIL CLOSED. This used to print "skipped" and then "✓ BUNDLE VALID"
+      // with exit 0, so the documented inspector command certified a bundle
+      // whose signatures were never checked even once. A pack carrying an
+      // attacker's own key, with every decision rewritten, passed exactly this
+      // path. An evidence tool must never report VALID for evidence it did not
+      // authenticate.
+      allOk = false;
+      console.log(`   ${paint(c.red, "✕")} signatures          ${paint(c.red, "NOT CHECKED")}`);
+      console.log(
+        `       ${paint(c.gray, "pass --key <keypair.json> with the signer's public key, obtained")}`
+      );
+      console.log(
+        `       ${paint(c.gray, "out of band. The key inside the bundle cannot vouch for the bundle.")}`
+      );
+    }
+
+    // The pack ships `trusted_keys` INSIDE itself, so those keys prove nothing
+    // on their own: a forger includes their own. Say so wherever a reader might
+    // mistake pack-internal keys for a trust root.
+    if (Array.isArray(pack.trusted_keys) && pack.trusted_keys.length > 0) {
+      console.log("");
+      console.log(
+        paint(c.gray, "   Note: trusted_keys travels inside this bundle and is NOT a trust root.")
+      );
+      console.log(
+        paint(c.gray, "   Confirm the kid and public key against your own records before relying on it.")
+      );
     }
 
     console.log("");

@@ -34,6 +34,15 @@ export type PipelineState =
   | "timestamped"
   | "persisting"
   | "persisted"
+  /**
+   * No store was configured, so nothing was written anywhere. Distinct from
+   * `persisted` on purpose: the trace previously ran `sm.transition("persisted")`
+   * unconditionally, so an audit trace asserted the receipt had been persisted
+   * when in fact it existed only in memory. The timestamping and notifying
+   * steps already had explicit skip paths; this one silently claimed work it
+   * had not done.
+   */
+  | "persist_skipped"
   | "notifying"
   | "done"
   | "failed";
@@ -52,7 +61,10 @@ const TRANSITIONS: Transition<PipelineState>[] = [
   { from: "timestamping", to: "failed" },
   { from: "timestamped", to: "persisting" },
   { from: "persisting", to: "persisted" },
+  { from: "persisting", to: "persist_skipped" }, // no store configured
   { from: "persisting", to: "failed" },
+  { from: "persist_skipped", to: "notifying" },
+  { from: "persist_skipped", to: "done" }, // notify-skip path
   { from: "persisted", to: "notifying" },
   { from: "persisted", to: "done" }, // notify-skip path
   { from: "notifying", to: "done" },
@@ -152,11 +164,15 @@ export async function runPipeline(
       await sm.transition("persisting");
     }
 
-    // 4. Persist
+    // 4. Persist. Only claim `persisted` when a store actually wrote the
+    //    receipt; otherwise say so explicitly rather than asserting durability
+    //    that does not exist.
     if (opts.store) {
       await opts.store(receipt);
+      await sm.transition("persisted");
+    } else {
+      await sm.transition("persist_skipped");
     }
-    await sm.transition("persisted");
 
     // 5. Notify
     if (opts.notify) {

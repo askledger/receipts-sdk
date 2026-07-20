@@ -69,28 +69,62 @@ describe("Layer 3 — assurance ladder (Declared/Signed/Attested/Anchored)", () 
     expect(a.name).toBe("Declared");
   });
 
-  it("L1 Signed for a plain signed receipt", async () => {
-    const a = assuranceLevel(await sign());
+  const pub = { [kp.kid]: kp.public_key };
+
+  it("L1 Signed for a plain signed receipt whose signature verifies", async () => {
+    const a = assuranceLevel(await sign(), { publicKeys: pub });
     expect(a.level).toBe("L1");
     expect(a.name).toBe("Signed");
   });
 
+  it("stays L0 when no keys are supplied, because nothing was actually checked", async () => {
+    // The ladder used to grant L1 for `signatures.length > 0`, i.e. for the
+    // PRESENCE of a signature rather than a valid one.
+    const a = assuranceLevel(await sign());
+    expect(a.level).toBe("L0");
+    expect(a.reasons.join(" ")).toMatch(/signatures were NOT checked/);
+  });
+
+  it("a forged signature over a tampered body is L0, not L1", async () => {
+    const good = await sign();
+    const forged = {
+      ...good,
+      receipt: { ...good.receipt, event: { ...good.receipt.event, event_type: "loan.approved" } },
+    };
+    expect(assuranceLevel(forged, { publicKeys: pub }).level).toBe("L0");
+  });
+
   it("L2 Attested when the signing key is declared HSM/KMS-backed", async () => {
-    const a = assuranceLevel(await sign(), { attestedKids: [kp.kid] });
+    const a = assuranceLevel(await sign(), { attestedKids: [kp.kid], publicKeys: pub });
     expect(a.level).toBe("L2");
     expect(a.name).toBe("Attested");
   });
 
-  it("L3 Anchored when attested AND externally timestamped", async () => {
+  it("L3 Anchored only when the anchor was independently verified", async () => {
     const stamped = await timestampReceipt(await sign(), new StubTSAClient("tsa"));
-    const a = assuranceLevel(stamped, { attestedKids: [kp.kid] });
+    const a = assuranceLevel(stamped, { attestedKids: [kp.kid], publicKeys: pub, verifiedAnchor: true });
     expect(a.level).toBe("L3");
     expect(a.name).toBe("Anchored");
     expect(a.criteria).toMatchObject({ signed: true, attested: true, anchored: true });
   });
 
+  it("an attached but unverified timestamp does NOT reach L3", async () => {
+    // `timestamps` sits OUTSIDE the signed bytes, so anyone can append one to an
+    // untouched receipt with no key access. Presence alone used to promote L2 to L3.
+    const stamped = await timestampReceipt(await sign(), new StubTSAClient("tsa"));
+    const a = assuranceLevel(stamped, { attestedKids: [kp.kid], publicKeys: pub });
+    expect(a.level).toBe("L2");
+    expect(a.reasons.join(" ")).toMatch(/not independently verified/);
+  });
+
+  it("a self-minted anchor bolted onto a receipt cannot lift it past L2", async () => {
+    const good = await sign();
+    const bolted = { ...good, timestamps: [{ tsa: "DigiCert TSA", timestamp_token: "Zm9yZ2Vk" }] };
+    expect(assuranceLevel(bolted, { attestedKids: [kp.kid], publicKeys: pub }).level).toBe("L2");
+  });
+
   it("anchored but not attested stays L1 (the ladder is cumulative)", async () => {
     const stamped = await timestampReceipt(await sign(), new StubTSAClient("tsa"));
-    expect(assuranceLevel(stamped).level).toBe("L1");
+    expect(assuranceLevel(stamped, { publicKeys: pub, verifiedAnchor: true }).level).toBe("L1");
   });
 });

@@ -19,6 +19,7 @@ import {
 } from "./deviation-detector.js";
 import {
   detectShadowAi,
+  SHADOW_METADATA_UNVERIFIABLE_REASONS,
   type ShadowAiPolicy,
   type ShadowAiCheckInput,
   type ShadowAiResult,
@@ -60,6 +61,17 @@ export interface SafetyPolicy {
   block_on_consumer_endpoint?: boolean;
   /** If true, any high-confidence PII to a "public" surface auto-blocks. Default true. */
   block_on_pii_to_public?: boolean;
+  /**
+   * If true (default), an invocation whose shadow-AI metadata is missing,
+   * blank, or unparseable is BLOCKED rather than allowed.
+   *
+   * This is the fail-closed switch. Without it the guardrail could be defeated
+   * by omission: the same payload carrying an IBAN, a PAN and an SSN returned
+   * `block` when the caller declared vendor/model/source honestly and `allow`
+   * when it simply left those fields out. Set to false only for a deliberate,
+   * time-boxed exception where unattributed traffic is expected.
+   */
+  block_on_missing_shadow_metadata?: boolean;
 }
 
 export function evaluateContentSafety(
@@ -98,11 +110,20 @@ export function evaluateContentSafety(
 
   const blockOnConsumer = policy.block_on_consumer_endpoint ?? true;
   const blockOnPiiPublic = policy.block_on_pii_to_public ?? true;
+  const blockOnMissingMeta = policy.block_on_missing_shadow_metadata ?? true;
   const blockTh = policy.block_threshold ?? 0.7;
   const flagTh = policy.flag_threshold ?? 0.3;
 
+  const metadataUnverifiable = shadowAi.reasons.some((r) =>
+    SHADOW_METADATA_UNVERIFIABLE_REASONS.includes(r)
+  );
+
   let verdict: SafetyVerdict = "allow";
   if (blockOnConsumer && shadowAi.reasons.includes("consumer_endpoint")) verdict = "block";
+  // Fail closed on unattributable traffic: an invocation we cannot attribute to
+  // a vendor/model/source, or whose endpoint we cannot parse, must never be the
+  // cheapest way past this control. Omission was previously a total bypass.
+  else if (blockOnMissingMeta && metadataUnverifiable) verdict = "block";
   else if (
     blockOnPiiPublic &&
     deviation.findings.some((f) => f.category === "pii_leaked_to_public_surface")
@@ -110,6 +131,10 @@ export function evaluateContentSafety(
     verdict = "block";
   else if (risk >= blockTh) verdict = "block";
   else if (risk >= flagTh) verdict = "flag";
+
+  // Even with the fail-closed block disabled by policy, unattributable metadata
+  // is never silently "allow": it is at minimum surfaced for review.
+  if (verdict === "allow" && metadataUnverifiable) verdict = "flag";
 
   return {
     verdict,

@@ -199,6 +199,7 @@ export {
 export {
   buildEvidencePack,
   verifyPackIntegrity,
+  verifyEvidencePack,
   verifyAllReceiptsInPack,
   type EvidencePack,
   type EvidencePackMeta,

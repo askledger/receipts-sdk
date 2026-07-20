@@ -102,7 +102,30 @@ export class Pkcs11SigningProvider implements SigningProvider {
   private constructor(
     private readonly opts: Pkcs11SigningProviderOptions,
     public readonly kid: string
-  ) {}
+  ) {
+    // `opts` holds `tokenPin`, the HSM user PIN, and `private` is erased at
+    // runtime. Serializing this provider (structured logger, APM breadcrumb,
+    // error context, debug endpoint) would emit the PIN in clear text, and the
+    // documented construction path reads it from process.env.HSM_PIN. The PIN
+    // is the secret the entire FIPS story rests on, so it must never be
+    // reachable by accidental serialization.
+    Object.defineProperty(this, "opts", { enumerable: false });
+  }
+
+  /** Never serialize the HSM PIN or session handles. */
+  toJSON(): Record<string, unknown> {
+    return {
+      kid: this.kid,
+      slotIndex: this.opts.slotIndex,
+      keyLabel: this.opts.keyLabel,
+      tokenPin: "[redacted]",
+    };
+  }
+
+  /** Keep the PIN out of console.log / util.inspect output too. */
+  [Symbol.for("nodejs.util.inspect.custom")](): string {
+    return `Pkcs11SigningProvider { kid: ${JSON.stringify(this.kid)}, tokenPin: [redacted] }`;
+  }
 
   static async fromKeyLabel(opts: Pkcs11SigningProviderOptions): Promise<Pkcs11SigningProvider> {
     const inst = new Pkcs11SigningProvider(opts, opts.kid);

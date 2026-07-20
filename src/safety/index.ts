@@ -18,6 +18,7 @@ export {
 
 export {
   detectShadowAi,
+  SHADOW_METADATA_UNVERIFIABLE_REASONS,
   type ShadowAiPolicy,
   type ShadowAiCheckInput,
   type ShadowAiResult,

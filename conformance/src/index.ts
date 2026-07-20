@@ -71,9 +71,16 @@ export async function runAll(adapter: Adapter): Promise<{ cl1: RunResult; cl2: R
   const cl1 = await runCL1(adapter);
   const cl2 = await runCL2(adapter);
   const cl3 = await runCL3(adapter);
+  // A level requires vectors that actually RAN. `failed === 0` is trivially
+  // true for an empty suite, and SIGNED_VECTORS/CHAINED_VECTORS are both
+  // currently empty, so this used to award CL3 to an adapter that cannot sign
+  // at all: 0 of 0 passed at both levels. A badge that cannot be failed is not
+  // evidence of conformance, it is decoration.
+  const cleared = (r: RunResult) => r.total > 0 && r.failed === 0;
+
   let badge: "CL3" | "CL2" | "CL1" | "NONE" = "NONE";
-  if (cl1.failed === 0) badge = "CL1";
-  if (cl1.failed === 0 && cl2.failed === 0) badge = "CL2";
-  if (cl1.failed === 0 && cl2.failed === 0 && cl3.failed === 0) badge = "CL3";
+  if (cleared(cl1)) badge = "CL1";
+  if (cleared(cl1) && cleared(cl2)) badge = "CL2";
+  if (cleared(cl1) && cleared(cl2) && cleared(cl3)) badge = "CL3";
   return { cl1, cl2, cl3, badge };
 }

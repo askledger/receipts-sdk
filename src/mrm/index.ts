@@ -10,6 +10,11 @@
 // from the workpaper to the underlying signed receipts.
 
 import { canonicalize } from "../canonicalize.js";
+// Static ESM import. This was a bare require("node:crypto") inside the
+// function, which throws "require is not defined in ES module scope" for every
+// consumer of the published package ("type": "module"), making the whole MRM
+// module unreachable. It passed CI only because vitest/tsx transpile it away.
+import { createHash } from "node:crypto";
 
 export type Regulator = "SR_11_7" | "OSFI_E_23" | "PRA_SS1_23" | "EU_AI_ACT_ANNEX_IV";
 
@@ -186,10 +191,27 @@ function buildMonitoring(rs: ReceiptSummary[]): Workpaper["sections"]["ongoing_m
 function buildValidationActivities(reg: Regulator, rs: ReceiptSummary[]): Workpaper["sections"]["validation_activities"] {
   const reviewed = rs.filter((r) => r.reviewer && r.reviewer !== "pending");
   const guardrailBlocked = rs.filter((r) => r.outcome === "guardrail_block");
+  const uncited = rs.filter((r) => (r.applied_policies?.length ?? 0) === 0);
   return [
     { activity: "Human-in-the-loop review of high-risk decisions", evidence_receipt_ids: reviewed.slice(0, 10).map((r) => r.receipt_id), finding: `${reviewed.length} reviewed receipts in period.` },
     { activity: "Guardrail effectiveness sampling",                evidence_receipt_ids: guardrailBlocked.slice(0, 10).map((r) => r.receipt_id), finding: `${guardrailBlocked.length} guardrail-blocked invocations recorded.` },
-    { activity: `${reg.replace(/_/g, " ")} citation completeness`, evidence_receipt_ids: rs.slice(0, 5).map((r) => r.receipt_id), finding: "All in-scope receipts carry policy_bundle_hash + applied_policies." },
+    // DERIVED, never asserted. This finding used to be the string literal
+    // "All in-scope receipts carry policy_bundle_hash + applied_policies",
+    // emitted unconditionally with the first five receipt ids attached as
+    // "evidence". A workpaper could therefore report coverage_pct: 0 in the
+    // monitoring section and certify 100% citation completeness in the same
+    // signed document. The evidence ids now point at the receipts that
+    // actually fail, which is what a validator needs to follow up.
+    {
+      activity: `${reg.replace(/_/g, " ")} citation completeness`,
+      evidence_receipt_ids: (uncited.length > 0 ? uncited : rs).slice(0, 5).map((r) => r.receipt_id),
+      finding:
+        rs.length === 0
+          ? "No in-scope receipts in period."
+          : uncited.length === 0
+            ? `All ${rs.length} in-scope receipts carry applied_policies.`
+            : `${uncited.length} of ${rs.length} in-scope receipts carry NO applied_policies (${round((rs.length - uncited.length) / rs.length) * 100}% cited).`,
+    },
   ];
 }
 
@@ -289,6 +311,5 @@ function round(n: number): number { return Math.round(n * 10000) / 10000; }
 function sha256Hex(input: string | Uint8Array): string {
   // intentionally avoid pulling crypto into the typing surface here,
   // re-export uses the SDK's sha256String for consistency
-  const { createHash } = require("node:crypto") as typeof import("node:crypto");
   return createHash("sha256").update(typeof input === "string" ? input : Buffer.from(input)).digest("hex");
 }

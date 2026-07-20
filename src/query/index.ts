@@ -129,6 +129,12 @@ export interface QueryResult {
   aggregate?: { metric: Metric; value: number };
   citations: string[]; // receipt ids backing the answer (capped)
   answer: string; // one-paragraph plain answer
+  /** matched receipts whose model has no local list price, so they contributed $0 to any cost figure */
+  unpricedMatched: number;
+  /** models seen on those receipts, sorted, for the caveat text */
+  unpricedModels: string[];
+  /** non-null whenever a cost figure above is incomplete; already appended to `answer` */
+  costCaveat: string | null;
 }
 
 // ---------- deterministic parser ----------
@@ -177,7 +183,11 @@ export function parseQuery(nl: string, now: Date = new Date()): StructuredQuery 
   // intent + metric
   let intent: Intent = "list";
   let metric: Metric = "count";
-  const costWords = /\b(cost|costs|spend|spent|spending|\$|dollar|bill|priced)\b/.test(q);
+  // A literal "$12.34" is a cost signal, but `\b\$\b` never fires: "$" is not a
+  // word character, so the leading \b demanded a word char immediately before
+  // it. Detect the currency symbol separately.
+  const moneySymbol = /\$\s*[\d.]/.test(q);
+  const costWords = moneySymbol || /\b(cost|costs|spend|spent|spending|dollar|dollars|bill|priced)\b/.test(q);
   const tokenWords = /\btokens?\b/.test(q);
   if (costWords) metric = "cost";
   else if (tokenWords) metric = "tokens";
@@ -220,12 +230,33 @@ export function parseQuery(nl: string, now: Date = new Date()): StructuredQuery 
   else if (/\bstaging\b/.test(q)) filter.environment = "staging";
   else if (/\bdevelopment\b|\bdev\b/.test(q)) filter.environment = "development";
 
-  // cost thresholds
+  // Cost thresholds. Only applied when the question is actually about money.
+  // The "over N" pattern used to fire on token questions too: "how many
+  // receipts used more than 5000 tokens" produced {minCost: 5000, minTokens:
+  // 5000} and answered "0 receipt(s) match" when 20 did, because no single
+  // receipt costs $5,000. The negative lookahead is the second guard, for
+  // mixed questions like "how much did we spend on receipts over 5000 tokens".
   let m: RegExpMatchArray | null;
-  if ((m = q.match(/(?:over|above|more than|greater than|>=?)\s*\$?\s*([\d,.]+)/)))
-    filter.minCost = Number(m[1].replace(/,/g, ""));
-  if ((m = q.match(/(?:under|below|less than|cheaper than|<=?)\s*\$?\s*([\d,.]+)/)))
-    filter.maxCost = Number(m[1].replace(/,/g, ""));
+  if (costWords) {
+    // The "is this about tokens" guard is a plain check on the text AFTER the
+    // number, not a lookahead. `([\d,.]+)(?![\d,.]*\s*tokens?\b)` overlaps the
+    // captured class with the lookahead class, which CodeQL flags as polynomial
+    // ReDoS (js/polynomial-redos): a long run of digits and commas from a
+    // user-supplied query string forces quadratic backtracking. Queries are
+    // attacker-controlled, so this has to be linear.
+    const amountAt = (re: RegExp): number | undefined => {
+      const hit = q.match(re);
+      if (!hit || hit.index === undefined) return undefined;
+      const rest = q.slice(hit.index + hit[0].length, hit.index + hit[0].length + 24);
+      if (/^\s*tokens?\b/.test(rest)) return undefined; // "over 5000 tokens" is not a price
+      const n = Number(hit[1].replace(/,/g, ""));
+      return Number.isFinite(n) ? n : undefined;
+    };
+    const min = amountAt(/(?:over|above|more than|greater than|>=?)[\s$]*([\d,.]+)/);
+    if (min !== undefined) filter.minCost = min;
+    const max = amountAt(/(?:under|below|less than|cheaper than|<=?)[\s$]*([\d,.]+)/);
+    if (max !== undefined) filter.maxCost = max;
+  }
   if ((m = q.match(/(?:over|more than|>=?)\s*([\d,]+)\s*tokens/)))
     filter.minTokens = Number(m[1].replace(/,/g, ""));
 
@@ -312,10 +343,36 @@ function describeFilter(f: QueryFilter): string {
   return parts.length ? parts.join(", ") : "all receipts";
 }
 
+/**
+ * Build the caveat that must ride along with any dollar figure when some of the
+ * matched receipts ran on a model with no local list price.
+ *
+ * `flattenReceipt` scores those at costUsd 0 (it has nothing better to use), so
+ * a cost answer silently omits them. With 10 gpt-5 and 10 unpriced o3-pro
+ * receipts of identical usage, "how much did we spend in total" answered
+ * "$20.00" , understating by half the fleet, with nothing on screen to say so.
+ * `ReceiptRow.priced` already recorded the fact; it was just never surfaced.
+ */
+function buildCostCaveat(unpricedCount: number, models: string[], total: number): string | null {
+  if (unpricedCount === 0) return null;
+  const list = models.slice(0, 5).join(", ") + (models.length > 5 ? `, +${models.length - 5} more` : "");
+  return `Cost is INCOMPLETE: ${unpricedCount.toLocaleString()} of ${total.toLocaleString()} matching receipt(s) ran on a model with no entry in the local pricing table (${list}) and were counted at $0. The real spend is higher by an unknown amount.`;
+}
+
 /** Execute a StructuredQuery over receipts. Always returns cited receipt ids. */
 export function runQuery(receipts: SignedReceipt[], q: StructuredQuery): QueryResult {
   const rows = receipts.map(flattenReceipt);
   const hits = rows.filter((r) => matches(r, q.filter));
+
+  // Only receipts that name a model can be priced at all; a receipt with no
+  // model is not an AI call and is not a pricing gap.
+  const unpricedHits = hits.filter((r) => r.model !== null && !r.priced);
+  const unpricedModels = Array.from(
+    new Set(unpricedHits.map((r) => `${r.vendor ?? "unknown"}:${r.model}`))
+  ).sort();
+  const costCaveat = buildCostCaveat(unpricedHits.length, unpricedModels, hits.length);
+  // Attach the caveat only where a dollar figure is actually being reported.
+  const caveatApplies = q.metric === "cost" && costCaveat !== null;
 
   const metricOf = (r: ReceiptRow) => (q.metric === "cost" ? r.costUsd : q.metric === "tokens" ? r.totalTokens : 1);
   const fmtMetric = (v: number) => (q.metric === "cost" ? usd(v) : q.metric === "tokens" ? v.toLocaleString() : String(v));
@@ -341,12 +398,14 @@ export function runQuery(receipts: SignedReceipt[], q: StructuredQuery): QueryRe
     answer = groups.length
       ? `${hits.length} matching receipt(s), grouped by ${q.groupBy}. Top: ${top.key} at ${fmtMetric(top.value)}.`
       : `No receipts matched (${describeFilter(q.filter)}).`;
+    if (caveatApplies) answer += ` ${costCaveat}`;
   } else if (q.intent === "aggregate" || q.intent === "count") {
     const value = q.intent === "count" ? hits.length : hits.reduce((s, r) => s + metricOf(r), 0);
     aggregate = { metric: q.intent === "count" ? "count" : q.metric, value };
     answer = q.intent === "count"
       ? `${hits.length} receipt(s) match ${describeFilter(q.filter)}.`
       : `${fmtMetric(value)} across ${hits.length} matching receipt(s) (${describeFilter(q.filter)}).`;
+    if (q.intent === "aggregate" && caveatApplies) answer += ` ${costCaveat}`;
   } else {
     const sorted = [...hits].sort((a, b) => b.costUsd - a.costUsd || (a.capturedAt < b.capturedAt ? 1 : -1));
     answer = hits.length
@@ -355,6 +414,7 @@ export function runQuery(receipts: SignedReceipt[], q: StructuredQuery): QueryRe
     return {
       query: q, interpretation, matched: sorted.slice(0, q.limit), matchedCount: hits.length,
       scanned: rows.length, citations: sorted.slice(0, q.limit).map((r) => r.id), answer,
+      unpricedMatched: unpricedHits.length, unpricedModels, costCaveat,
     };
   }
 
@@ -362,6 +422,7 @@ export function runQuery(receipts: SignedReceipt[], q: StructuredQuery): QueryRe
     query: q, interpretation, matched: hits.slice(0, q.limit), matchedCount: hits.length,
     scanned: rows.length, groups, aggregate,
     citations: hits.slice(0, Math.min(q.limit, 25)).map((r) => r.id), answer,
+    unpricedMatched: unpricedHits.length, unpricedModels, costCaveat,
   };
 }
 

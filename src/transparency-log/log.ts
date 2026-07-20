@@ -13,6 +13,8 @@
  */
 
 import { sha256 as sha256Fn } from "@noble/hashes/sha2";
+import { canonicalizeBytes } from "../canonicalize.js";
+import { verify as verifySig } from "../crypto.js";
 import type {
   LogEntry,
   SignedTreeHead,
@@ -20,6 +22,21 @@ import type {
   ConsistencyProof,
 } from "./types.js";
 import type { SigningProvider } from "../signing-provider.js";
+
+/**
+ * The exact bytes an STH signature covers. Shared by the producer and the
+ * verifier so they can never drift, and RFC 8785 so an independent
+ * implementation reproduces them.
+ */
+function sthSigningBytes(fields: {
+  tree_size: number;
+  root_hash: string;
+  timestamp: string;
+  log_id: string;
+}): Uint8Array {
+  return canonicalizeBytes(fields);
+}
+
 
 // RFC 9162 leaf/internal prefixes (second-preimage safe)
 const LEAF_PREFIX = new Uint8Array([0x00]);
@@ -139,20 +156,46 @@ export class TransparencyLog {
    * Sign a tree head. Operator MUST do this on a fixed cadence.
    * The STH is what the world uses to detect log rewrites.
    */
+  /**
+   * Verify an STH signature against a key supplied OUT OF BAND.
+   *
+   * The SDK previously shipped no way to check an STH at all: verifyInclusion
+   * and verifyConsistency both take `expectedRootHex` on trust, so the root of
+   * trust for the entire transparency log was the one thing a consumer could
+   * not verify. An unverified root makes every proof under it decorative.
+   */
+  static verifySth(sth: SignedTreeHead, opts: { publicKeys: Record<string, string> }): boolean {
+    if (sth?.signature?.alg !== "EdDSA") return false;
+    const pub = opts.publicKeys[sth.signature.kid];
+    if (!pub) return false;
+    const payload = sthSigningBytes({
+      tree_size: sth.tree_size,
+      root_hash: sth.root_hash,
+      timestamp: sth.timestamp,
+      log_id: sth.log_id,
+    });
+    try {
+      return verifySig(payload, sth.signature.sig, pub);
+    } catch {
+      return false;
+    }
+  }
+
   async publishSth(): Promise<SignedTreeHead> {
     const treeSize = this.entries.length;
     const rootHash = this.currentRoot();
     const timestamp = new Date().toISOString();
 
-    // Canonical payload signed: tree_size | root_hash | timestamp | log_id
-    const payload = new TextEncoder().encode(
-      JSON.stringify({
-        tree_size: treeSize,
-        root_hash: rootHash,
-        timestamp,
-        log_id: this.opts.log_id,
-      })
-    );
+    // RFC 8785, like every other signed structure in this SDK. This used to be
+    // a plain JSON.stringify, i.e. insertion order, so an independent verifier
+    // that canonicalized (which the docs instruct for receipts) computed
+    // different bytes and rejected genuine STHs.
+    const payload = sthSigningBytes({
+      tree_size: treeSize,
+      root_hash: rootHash,
+      timestamp,
+      log_id: this.opts.log_id,
+    });
     const sig = await this.opts.signer.sign(payload);
 
     const sth: SignedTreeHead = {
@@ -251,6 +294,22 @@ export class TransparencyLog {
   ): boolean {
     const leaf = hexToBytes(leafHashHex);
     if (leaf.length !== 32) return false;
+
+    // log_index MUST be inside the tree. proveInclusion() checks this but the
+    // VERIFIER did not, and climb() only compares `target - start < k`, so every
+    // out-of-range index collapses onto the last leaf's path (or the first, when
+    // negative) and verifies against the genuine root. log_index is the log's
+    // ordering claim, the only positional binding the proof carries, so a
+    // genuine proof could be re-presented as any entry number.
+    if (
+      !Number.isInteger(proof.log_index) ||
+      !Number.isInteger(proof.tree_size) ||
+      proof.tree_size < 1 ||
+      proof.log_index < 0 ||
+      proof.log_index >= proof.tree_size
+    ) {
+      return false;
+    }
 
     function climb(
       start: number,

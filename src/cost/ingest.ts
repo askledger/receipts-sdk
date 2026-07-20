@@ -6,22 +6,75 @@
 // log flattened to the same fields).
 import type { SignedReceipt } from "../types.js";
 
+// Only a DATED or VERSIONED tail may follow a recognized tier name. Digits,
+// dots, dashes and underscores are version noise; letters are a different
+// product.
+// Plain character scan, not a regex. Model ids come from a customer's billing
+// export, so they are attacker-influenced input, and CodeQL flagged the regex
+// form as polynomial ReDoS (js/polynomial-redos). A scan is O(n) with no
+// backtracking and is easier to read besides.
+function isVersionTail(s: string): boolean {
+  for (let i = 0; i < s.length; i++) {
+    const c = s.charCodeAt(i);
+    const isDigit = c >= 48 && c <= 57;
+    const isSep = c === 46 /* . */ || c === 95 /* _ */ || c === 45 /* - */;
+    if (!isDigit && !isSep) return false;
+  }
+  return true;
+}
+
+// True when `s` contains `base` AND everything after it is version noise.
+//
+// The tests used to be unanchored substring matches, which quietly collapsed
+// PREMIUM variants onto the base tier's price: "gpt-5-pro" was billed as
+// "openai:gpt-5" and "claude-opus-4-6-thinking" as "anthropic:claude-opus-4-6",
+// under-billing every downstream figure (spend, blended rate, savings) on
+// exactly the workloads that cost the most. The module comment always claimed
+// the collapse was for "dated snapshots and versioned names" only; this makes
+// the behavior match the claim. An unrecognized variant now falls through to
+// vendor "unknown", where it is reported as unpriced rather than mispriced.
+function tierMatch(s: string, base: string): boolean {
+  // indexOf, not a regex. Passing a RegExp here meant patterns like
+  // /gemini[\w.-]*flash/ (an ambiguous quantifier followed by a literal that
+  // overlaps its own character class) were run against attacker-influenced
+  // model ids from a billing export, which CodeQL flagged as polynomial ReDoS.
+  // Every base we match on is a plain literal, so a substring search is both
+  // linear and exactly what was meant.
+  const i = s.indexOf(base);
+  return i === -1 ? false : isVersionTail(s.slice(i + base.length));
+}
+
+/**
+ * Google puts the tier word AFTER the version ("gemini-2.5-flash"), so the
+ * tier is not a version tail. Match the family and the tier separately, still
+ * without a regex.
+ */
+function geminiTier(s: string, tier: string): boolean {
+  const i = s.indexOf("gemini");
+  if (i === -1) return false;
+  const j = s.indexOf(tier, i + "gemini".length);
+  return j === -1 ? false : isVersionTail(s.slice(j + tier.length));
+}
+
 // Map a provider's model / snapshot id onto a "vendor:model" the pricing table
-// knows. Dated snapshots (gpt-5-2025-08-01) and versioned names all collapse to
-// the base model so the counterfactual cost is real. Order matters: the most
-// specific patterns (…-mini) are tested first.
+// knows. Dated snapshots (gpt-5-2025-08-01) and versioned names collapse to the
+// base model so the counterfactual cost is real; premium variants do not.
+// Order matters: the most specific patterns (…-mini) are tested first.
 export function normalizeModel(raw: string): { vendor: string; model: string } {
   const s = String(raw ?? "").toLowerCase();
-  if (/gpt-5-nano/.test(s)) return { vendor: "openai", model: "gpt-5-nano" };
-  if (/gpt-5-mini/.test(s)) return { vendor: "openai", model: "gpt-5-mini" };
-  if (/gpt-5/.test(s)) return { vendor: "openai", model: "gpt-5" };
-  if (/gpt-4o-mini/.test(s)) return { vendor: "openai", model: "gpt-4o-mini" };
-  if (/gpt-4o/.test(s)) return { vendor: "openai", model: "gpt-4o" };
-  if (/opus/.test(s)) return { vendor: "anthropic", model: "claude-opus-4-6" };
-  if (/sonnet/.test(s)) return { vendor: "anthropic", model: "claude-sonnet-4-6" };
-  if (/haiku/.test(s)) return { vendor: "anthropic", model: "claude-haiku-4-5" };
-  if (/gemini.*flash/.test(s)) return { vendor: "google", model: "gemini-2-5-flash" };
-  if (/gemini/.test(s)) return { vendor: "google", model: "gemini-2-5-pro" };
+  if (tierMatch(s, "gpt-5-nano")) return { vendor: "openai", model: "gpt-5-nano" };
+  if (tierMatch(s, "gpt-5-mini")) return { vendor: "openai", model: "gpt-5-mini" };
+  if (tierMatch(s, "gpt-5")) return { vendor: "openai", model: "gpt-5" };
+  if (tierMatch(s, "gpt-4o-mini")) return { vendor: "openai", model: "gpt-4o-mini" };
+  if (tierMatch(s, "gpt-4o")) return { vendor: "openai", model: "gpt-4o" };
+  if (tierMatch(s, "opus")) return { vendor: "anthropic", model: "claude-opus-4-6" };
+  if (tierMatch(s, "sonnet")) return { vendor: "anthropic", model: "claude-sonnet-4-6" };
+  if (tierMatch(s, "haiku")) return { vendor: "anthropic", model: "claude-haiku-4-5" };
+  // Google's tier word trails the version ("gemini-2.5-flash"), so the tier
+  // word itself is part of the match rather than tail noise.
+  if (geminiTier(s, "flash")) return { vendor: "google", model: "gemini-2-5-flash" };
+  if (geminiTier(s, "pro")) return { vendor: "google", model: "gemini-2-5-pro" };
+  if (tierMatch(s, "gemini")) return { vendor: "google", model: "gemini-2-5-pro" };
   return { vendor: "unknown", model: s.replace(/[^a-z0-9._-]/g, "") || "unknown" };
 }
 
@@ -117,6 +170,34 @@ export interface IngestResult {
   receipts: SignedReceipt[];
   totalRequests: number; // real request count from the export
   scale: number; // multiply displayed $ / counts by this to undo downsampling (>= 1)
+  /** true when the bill exceeded the cap and had to be downsampled */
+  sampled: boolean;
+  /**
+   * Residual distortion this expansion still carries, as a fraction (0 = exact).
+   *
+   * Token totals are now split EXACTLY across the emitted receipts, so an
+   * un-downsampled bill is exact and this is 0. When downsampling, the
+   * max(1, …) floor keeps tiny rows alive and so over-weights them relative to
+   * the single global `scale`; this reports how far the scaled request count
+   * can drift, rather than leaving it silent.
+   */
+  requestCountResidual: number;
+}
+
+/**
+ * Split `total` tokens across `n` receipts so the parts sum to EXACTLY `total`.
+ *
+ * The old code gave every receipt Math.round(total / requests). A row of 1,000
+ * requests / 1,500 input / 1,500 output rounded 1.5 up to 2 on both classes and
+ * reported 4,000 tokens and $0.0400 where the truth was 3,000 and $0.0300, a
+ * 33% overstatement, and the error was one-directional for any row averaging
+ * just above a half-token. Cumulative-floor differencing carries no residual at
+ * all while keeping the per-receipt values within one token of the true mean,
+ * so the over-tiering gate still sees the row's real shape.
+ */
+function splitEvenly(total: number, n: number, i: number): number {
+  if (n <= 0) return 0;
+  return Math.floor(((i + 1) * total) / n) - Math.floor((i * total) / n);
 }
 
 // Expand normalized workloads into per-request receipts (unsigned, imported
@@ -130,25 +211,45 @@ export function receiptsFromWorkloads(
   opts: { maxReceipts?: number } = {}
 ): IngestResult {
   const cap = opts.maxReceipts ?? 200_000;
-  const totalRequests = workloads.reduce((s, w) => s + w.requests, 0);
-  const targetScale = totalRequests > cap ? totalRequests / cap : 1;
-  const receipts: SignedReceipt[] = [];
-  let idx = 0;
-  for (const w of workloads) {
-    if (w.requests <= 0) continue;
-    const inAvg = Math.round(w.inputTotal / w.requests);
-    const outAvg = Math.round(w.outputTotal / w.requests);
-    const n = Math.max(1, Math.round(w.requests / targetScale));
-    for (let i = 0; i < n; i++) {
-      receipts.push(mkReceipt(w, inAvg, outAvg, idx++));
-    }
-  }
+  const live = workloads.filter((w) => w.requests > 0);
+  const totalRequests = live.reduce((s, w) => s + w.requests, 0);
+  const sampled = totalRequests > cap;
+  const targetScale = sampled ? totalRequests / cap : 1;
+
+  // Pass 1: how many receipts each row emits, and the scale that recovers real
+  // totals from them. The max(1, …) floor keeps a tiny row from vanishing.
+  const counts = live.map((w) => Math.max(1, Math.round(w.requests / targetScale)));
+  const emitted = counts.reduce((s, n) => s + n, 0);
   // Recovery factor = real requests / receipts ACTUALLY emitted. The max(1, …)
   // floor means a "wide" bill (many tiny rows) emits ~every row, so a fixed
   // totalRequests/cap would over-inflate scaled totals in a signed artifact.
-  // Deriving scale from the real emitted count keeps request-count scaling exact.
-  const scale = receipts.length > 0 ? totalRequests / receipts.length : 1;
-  return { receipts, totalRequests, scale };
+  // Deriving scale from the real emitted count keeps total request scaling exact.
+  const scale = emitted > 0 ? totalRequests / emitted : 1;
+
+  // Pass 2: emit. Each row's token totals are divided down by `scale` and then
+  // split exactly across its receipts, so summarize(receipts) * scale recovers
+  // the row's real tokens and dollars regardless of the floor above. Only the
+  // per-row REQUEST count can still drift, and that drift is reported.
+  const receipts: SignedReceipt[] = [];
+  let idx = 0;
+  let requestDrift = 0;
+  for (let k = 0; k < live.length; k++) {
+    const w = live[k];
+    const n = counts[k];
+    const inShare = Math.round(w.inputTotal / scale);
+    const outShare = Math.round(w.outputTotal / scale);
+    requestDrift += Math.abs(n * scale - w.requests);
+    for (let i = 0; i < n; i++) {
+      receipts.push(mkReceipt(w, splitEvenly(inShare, n, i), splitEvenly(outShare, n, i), idx++));
+    }
+  }
+  return {
+    receipts,
+    totalRequests,
+    scale,
+    sampled,
+    requestCountResidual: totalRequests > 0 ? requestDrift / (2 * totalRequests) : 0,
+  };
 }
 
 export function receiptsFromExport(

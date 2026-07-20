@@ -18,6 +18,7 @@
  */
 
 import type { SignedReceipt, PolicyContext, VerificationBlock } from "./types.js";
+import { verifyReceipt } from "./verify.js";
 
 export type AssuranceLevel = "L0" | "L1" | "L2" | "L3";
 
@@ -51,21 +52,50 @@ const LEVEL_NAME: Record<AssuranceLevel, AssuranceName> = {
  */
 export function assuranceLevel(
   signed: SignedReceipt,
-  opts: { attestedKids?: string[] } = {}
+  opts: { attestedKids?: string[]; publicKeys?: Record<string, string>; verifiedAnchor?: boolean } = {}
 ): AssuranceAssessment {
   const r = signed.receipt;
   const sigs = Array.isArray(signed.signatures) ? signed.signatures : [];
   const chained = !!r?.integrity?.receipt_hash && typeof r?.integrity?.chain_height === "number";
-  const isSigned = sigs.length > 0 && chained;
-  const attestedSet = new Set(opts.attestedKids ?? []);
-  const attested = isSigned && sigs.some((s) => attestedSet.has(s.kid));
-  const anchored = Array.isArray(signed.timestamps) && signed.timestamps.length > 0;
 
   const reasons: string[] = [];
+
+  // L1 requires a signature that VERIFIES, not merely a signatures array with
+  // something in it. This used to be `sigs.length > 0 && chained`, so an
+  // all-zero signature over a tampered body, or a kid nobody has ever heard of,
+  // was reported as "a known signer signed the chained record". The ladder was
+  // describing field presence, not evidence.
+  let isSigned = false;
+  if (sigs.length > 0 && chained) {
+    if (opts.publicKeys) {
+      isSigned = verifyReceipt(signed, { publicKeys: opts.publicKeys }).valid;
+      if (!isSigned) reasons.push("signature did not verify against the supplied keys");
+    } else {
+      reasons.push("signatures were NOT checked: pass publicKeys to establish L1 or above");
+    }
+  }
+
+  const attestedSet = new Set(opts.attestedKids ?? []);
+  const attested = isSigned && sigs.some((s) => attestedSet.has(s.kid));
+
+  // L3 requires an anchor that was actually verified. It used to be
+  // `timestamps.length > 0`, and `timestamps` sits OUTSIDE the signed bytes, so
+  // appending a few bytes of base64 to an untouched receipt promoted L2 to L3
+  // with no key access and no re-signing. The SDK cannot check an RFC 3161 TSA
+  // signature itself, and a "local" token carries no authority signature at
+  // all, so the caller must confirm an anchor was independently verified.
+  const hasAnchor = Array.isArray(signed.timestamps) && signed.timestamps.length > 0;
+  const anchored = hasAnchor && opts.verifiedAnchor === true;
+  if (hasAnchor && !anchored) {
+    reasons.push(
+      "a timestamp is attached but was not independently verified; verify the TSA signature (or transparency-log inclusion) and pass verifiedAnchor"
+    );
+  }
+
   let level: AssuranceLevel = "L0";
 
   if (!isSigned) {
-    reasons.push("L0 Declared: no signature over a chained record");
+    reasons.push("L0 Declared: no verified signature over a chained record");
   } else {
     level = "L1";
     reasons.push("L1 Signed: a known signer signed the chained record");

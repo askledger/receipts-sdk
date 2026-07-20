@@ -47,10 +47,27 @@ function workflowIdOf(sr: SignedReceipt): string | null {
  */
 export function reconstructWorkflow(
   receipts: SignedReceipt[],
-  opts: { workflowId?: string } = {}
+  opts: { workflowId?: string; tenantId?: string } = {}
 ): WorkflowGraph {
   const targetWf = opts.workflowId ?? (receipts.length ? workflowIdOf(receipts[0]) : null);
-  const inRun = receipts.filter((r) => workflowIdOf(r) === targetWf);
+
+  // Membership is scoped by TENANT as well as workflow id. `workflow_id` is an
+  // attacker-chosen free-form string, so without this a second tenant signs a
+  // receipt under its own perfectly valid key, reuses another tenant's
+  // workflow_id, and points parent_receipt_ids at their receipt. In a
+  // multi-tenant verifier (which must load the full key set) the injected step
+  // became the LEAF, i.e. the authoritative final output of the victim's
+  // workflow, and verifyWorkflow reported valid:true with single_workflow:true
+  // and no errors. Tenant isolation cannot depend on a caller-supplied label.
+  const targetTenant =
+    opts.tenantId ??
+    (receipts.length
+      ? receipts.find((r) => workflowIdOf(r) === targetWf)?.receipt.tenant_id ?? null
+      : null);
+
+  const inRun = receipts.filter(
+    (r) => workflowIdOf(r) === targetWf && (targetTenant === null || r.receipt.tenant_id === targetTenant)
+  );
 
   const byId = new Map<string, SignedReceipt>();
   for (const r of inRun) byId.set(r.receipt.receipt_id, r);
@@ -142,11 +159,34 @@ export interface WorkflowVerifyResult {
  */
 export function verifyWorkflow(
   receipts: SignedReceipt[],
-  opts: { publicKeys: Record<string, string>; workflowId?: string }
+  opts: { publicKeys: Record<string, string>; workflowId?: string; tenantId?: string }
 ): WorkflowVerifyResult {
   const errors: string[] = [];
-  const g = reconstructWorkflow(receipts, { workflowId: opts.workflowId });
-  const inRun = receipts.filter((r) => workflowIdOf(r) === g.workflowId);
+  const g = reconstructWorkflow(receipts, { workflowId: opts.workflowId, tenantId: opts.tenantId });
+
+  // Scope by tenant here too, or the two functions disagree about membership
+  // and the graft slips back in through this path.
+  const runTenant =
+    opts.tenantId ??
+    receipts.find((r) => workflowIdOf(r) === g.workflowId)?.receipt.tenant_id ??
+    null;
+  const inRun = receipts.filter(
+    (r) => workflowIdOf(r) === g.workflowId && (runTenant === null || r.receipt.tenant_id === runTenant)
+  );
+
+  // A receipt claiming this workflow_id from a DIFFERENT tenant is not a
+  // harmless extra: it is an attempt to graft a step onto someone else's run.
+  // Report it loudly rather than silently dropping it.
+  const foreign = receipts.filter(
+    (r) => workflowIdOf(r) === g.workflowId && runTenant !== null && r.receipt.tenant_id !== runTenant
+  );
+  if (foreign.length > 0) {
+    errors.push(
+      `${foreign.length} receipt(s) claim workflow ${g.workflowId} from a different tenant (${[
+        ...new Set(foreign.map((r) => r.receipt.tenant_id)),
+      ].join(", ")}); excluded from the run`
+    );
+  }
 
   let allVerified = true;
   for (const r of inRun) {
@@ -166,7 +206,10 @@ export function verifyWorkflow(
   const single_workflow = receipts.every((r) => workflowIdOf(r) === g.workflowId);
   if (!single_workflow) errors.push("receipts span more than one workflow_id");
 
-  const valid = allVerified && graph_complete && g.acyclic && single_workflow;
+  // A cross-tenant graft must make the whole verification fail, not merely add
+  // a note. The victim's run reported valid:true with the intruder as its
+  // authoritative final output.
+  const valid = allVerified && graph_complete && g.acyclic && single_workflow && foreign.length === 0;
   return {
     valid,
     workflowId: g.workflowId,
