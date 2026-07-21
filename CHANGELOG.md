@@ -4,6 +4,46 @@ All notable changes to the AskLedger Receipts SDK will be documented in this fil
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (with the caveat that until v1.0, breaking changes may occur between minor versions).
 
+## [0.13.0] - 2026-07-21
+
+Security-hardening release. Several verification, guardian, and cost paths that previously
+accepted unsafe input or produced unearned results are now strict. These changes are
+intentionally breaking — output that used to pass may now correctly fail, and reported savings
+numbers may change. The minor bump (pre-1.0) signals that honestly.
+
+### Breaking
+
+- **Evidence pack verification requires out-of-band keys.** Signature checking was opt-in, so a
+  pack signed with a key shipped inside itself could print `✓ BUNDLE VALID`. `verifyEvidencePack()`
+  now requires externally supplied keys and the CLI **exits non-zero** when signatures were not
+  verified.
+- **Guardian self-approval closed.** N-of-M approvals are counted by distinct signing key, so a
+  single key can no longer satisfy a multi-party quorum, and a guardian can no longer approve its
+  own action.
+- **Cost / savings math splits input and output tokens.** The blended rate pooled input and output
+  though output costs several times more, so an input-heavy shift could show a saving it had not
+  earned. Input and output are now priced separately; previously reported savings may change.
+- **Unknown cost is no longer treated as $0**, and shadow-AI detection now **fails closed** instead
+  of open.
+
+### Fixed (security)
+
+- Assurance ladder no longer grades on field presence (0-of-0 no longer passes).
+- Cross-tenant workflow grafting is rejected.
+- Unsigned timestamps are no longer accepted as proof of time.
+- Dataset attestations are bound to the files they describe.
+- Verifiers reject invalid input instead of throwing.
+- Removed private-key and HSM-PIN leakage paths.
+- Removed ReDoS-prone regexes (linear `indexOf` scans / unambiguous character classes); timing is
+  flat across large input growth.
+
+### Changed (honesty of self-reported claims)
+
+- Conformance badge no longer awards CL3 to an implementation that cannot sign (CL2/CL3 vectors and
+  the associated claims corrected).
+- Scorecard no longer claims cosign, SLSA L3, or a checked-in SBOM that were not present.
+- Hardening badge no longer implies assurance for checks that do not execute the control they certify.
+
 ## [0.12.5] - 2026-07-11
 
 ### Changed (packaging, no API or type changes)
