@@ -2,7 +2,7 @@
 
 Open-source, vendor-neutral cryptographic trust substrate for enterprise AI. Every AI invocation produces a signed, hash-chained, tamper-evident receipt that auditors, regulators, and insurers verify independently with only the public key. No platform dependency.
 
-**[Open spec · PL-RFC-001…010](spec/README.md)** · **[Conformance](conformance/README.md)** · **[Architecture](docs/ARCHITECTURE.md)** · **[Policy mapping](docs/POLICY_MAPPING.md)** · **[Security](SECURITY.md)** · **[Contributing](CONTRIBUTING.md)**
+**[Open spec · PL-RFC-001…010](spec/README.md)** · **[Conformance](conformance/README.md)** · **[Architecture](docs/ARCHITECTURE.md)** · **[Integrations](docs/INTEGRATIONS.md)** · **[Policy mapping](docs/POLICY_MAPPING.md)** · **[Security](SECURITY.md)** · **[Contributing](CONTRIBUTING.md)**
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org)
@@ -13,30 +13,26 @@ Open-source, vendor-neutral cryptographic trust substrate for enterprise AI. Eve
 
 ---
 
-## See your wasted AI spend in 60 seconds
+## The problem
 
-No instrumentation, no signup, nothing leaves your machine, point it at a usage
-export you already have:
+AI now makes consequential decisions: approving a loan, denying a claim, taking an autonomous action. When an auditor, regulator, or court later asks *what your AI did and why*, an ordinary application log is not an answer. Logs are editable, they live inside your own systems, and they prove nothing to someone who does not already trust you.
 
-```bash
-# 1. Export your usage as JSON:
-#      OpenAI    → platform.openai.com/usage → Export
-#      Anthropic → console.anthropic.com/settings/usage → Export
-# 2. Scan it:
-npx @askledger/receipts-sdk scan ~/Downloads/usage.json
-```
+Regulation is catching up. The EU AI Act (Article 12, from 2 August 2026), NIST AI RMF, ISO 42001, India's RBI and the UAE's CBUAE increasingly require a **tamper-evident** record of what a high-risk AI system decided. That record is exactly what this SDK produces.
 
-You get a per-model spend breakdown and an over-tiering savings estimate, split
-into **confident** (safe, same-family swaps) and **review** (heavy-context or
-cross-family, test a sample first). The confident number is the one we'd stake
-our name on. Then instrument your app to make the tracking continuous and the
-savings **signed and verifiable**: that is the paid tier.
+## What it does
+
+AskLedger wraps any AI call and emits a **signed, hash-chained, tamper-evident receipt** for every decision: the model, the inputs (as hashes), the rule that governed it, the timestamp, and the signing key. Canonicalized (RFC 8785), signed (Ed25519), timestamped (RFC 3161), and verifiable by anyone with only the public key. Nothing confidential leaves your environment, a receipt records hashes and metadata, never raw prompts.
+
+- **For risk, compliance and audit teams:** portable evidence that maps to the frameworks you answer to and holds up independently, without trusting the vendor.
+- **For engineers:** one wrapper around the client you already use, application code unchanged. Five language SDKs, an open specification, Apache-2.0.
+
+Sign and verify your first receipt in under a minute (below), or jump to [how it works](#how-it-works), [performance](#performance), or [examples](examples/).
 
 ---
 
 ## Project status
 
-**v0.12 · live on npm.** The cryptographic core is hardened and
+**v0.13 · live on npm.** The cryptographic core is hardened and
 independently verifiable, shared conformance vectors enforce
 byte-identical RFC 8785 canonicalization and SHA-256 across the
 TypeScript, Python, Go, Rust and Java SDKs, and a documented hardening
@@ -68,6 +64,45 @@ AskLedger is a five-layer model. Layers 1 to 4 are the cryptographic proof engin
 | **L5 · Govern** | Governance & ROI: turn the evidence chain into verified savings against a signed baseline, plus compliance-ready reporting. | `buildBaseline`, `proveSavings`, `verifyBaseline` |
 
 Layers 1 to 4 are cryptographically verifiable and open source here; layer 5's hosted governance, regulator portal, and evidence packs are the commercial layer (open-core).
+
+---
+
+## How it works
+
+The SDK sits beside your AI call. It signs and hash-chains each decision into a receipt, which anyone can later verify with the public key alone, without trusting you or reaching into your systems.
+
+```mermaid
+sequenceDiagram
+    participant App as Your app
+    participant SDK as AskLedger SDK
+    participant Store as Your ledger (append-only)
+    participant V as Verifier (auditor / regulator)
+    App->>SDK: AI decision (event)
+    SDK->>SDK: canonicalize (RFC 8785) + hash (SHA-256)
+    SDK->>SDK: link previous_receipt_hash (hash chain)
+    SDK->>SDK: sign (Ed25519) + timestamp (RFC 3161)
+    SDK-->>App: signed receipt
+    App->>Store: append receipt
+    Note over V,Store: later, independently
+    V->>Store: fetch receipt(s)
+    V->>V: verify signature with public key only
+    V->>V: recompute hash, check chain link
+    V-->>V: VALID or TAMPERED — no trust in the vendor required
+```
+
+The receipt is the atomic signed unit. Every other layer links to it by hash rather than nesting inside the signature:
+
+```mermaid
+flowchart LR
+    A[AI action] --> L1[L1 Prevent<br/>guardian verdict]
+    L1 --> L2[L2 Prove<br/>signed receipt]
+    L2 --> L3[L3 Trace<br/>workflow + Merkle bundle]
+    L3 --> L4[L4 Assure<br/>assurance level + rules]
+    L4 --> L5[L5 Govern<br/>baseline, savings, reporting]
+    L2 -. verify with public key .-> V[(Independent<br/>verifier)]
+```
+
+Full detail in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and the [protocol spec](docs/RECEIPTS_PROTOCOL.md).
 
 ---
 
@@ -131,7 +166,44 @@ const resp = await client.chat.completions.create({ model: "gpt-5", messages });
 console.log(resp.x_ledger_receipt_id);   // cryptographic evidence id
 ```
 
-Adapters available today: `wrapOpenAI` · `wrapAnthropic` · `withReceipts(fetch)` (covers 11 vendors) · `ReceiptsCallbackHandler` for LangChain.
+**Adapters available today:**
+
+- `wrapOpenAI` — the OpenAI client
+- `wrapAnthropic` — the Anthropic client
+- `withReceipts(fetch)` — any HTTP-based vendor at the network layer (also captures **OpenAI Agents SDK** and other agent frameworks' model calls, since they go over HTTP)
+- `ReceiptsCallbackHandler` — LangChain, and by extension **LangGraph**, which propagates LangChain callbacks through its graph nodes
+
+```ts
+// LangChain / LangGraph: attach the handler to any model or graph node.
+import { ReceiptsCallbackHandler } from "@askledger/receipts-sdk/adapters/langchain";
+const handler = new ReceiptsCallbackHandler({ tenantId: "acme", keypair, onReceipt });
+const llm = new ChatAnthropic({ model, callbacks: [handler] }); // used directly or inside a LangGraph node
+```
+
+Also available (first-class, exported, tested):
+
+- `attachAgentReceipts(runner, ctx)` — **OpenAI Agents SDK**: a receipt per agent turn, tool call, and handoff via the `RunHooks` lifecycle. Ships with a **live integration test against `@openai/agents`**.
+- `plLlamaIndexHandler(ctx)` — **LlamaIndex**
+- `plMastraListener(ctx)` — **Mastra**
+- `plReceiptsMiddleware(ctx)` — **Vercel AI SDK** (`ai@4+` middleware)
+
+## Performance
+
+Measured on the reference TypeScript SDK (Node v22, Apple silicon, 5,000 iterations after 200 warmup). Reproduce with `npm run bench`.
+
+| Operation | mean | p50 | p95 | p99 |
+|---|---|---|---|---|
+| Canonicalize (RFC 8785) | 3.9 µs | 3.4 µs | 5.5 µs | 7.8 µs |
+| SHA-256 (canonical bytes) | 5.3 µs | 4.8 µs | 6.6 µs | 13.7 µs |
+| Ed25519 sign | 405 µs | 387 µs | 520 µs | 605 µs |
+| Ed25519 verify | 1.94 ms | 1.76 ms | 2.45 ms | 5.76 ms |
+| **`signReceipt`** (end to end) | **670 µs** | 603 µs | 960 µs | 1.43 ms |
+| **`verifyReceipt`** (end to end) | **1.76 ms** | 1.71 ms | 1.96 ms | 2.32 ms |
+
+- **Overhead is sub-millisecond CPU** and never blocks the wrapped AI call (typically hundreds of ms to seconds), so the receipt is noise against model latency.
+- **`signReceipt` end to end** includes file I/O for chain state in the reference SDK; production swaps the file backend for Postgres, and signing for an HSM/KMS.
+- **Receipt size ≈ 1.9 KB** of JSON (measured), *constant* regardless of prompt or response size, because only hashes and metadata are stored, never raw content.
+- Verify is heavier than sign (Ed25519 verification cost); it runs offline, out of the request path, by whoever audits.
 
 ## Try it without installing
 
@@ -516,7 +588,11 @@ The SDK ships drop-in capture adapters so every AI invocation in your stack emit
 | `wrapOpenAI(client, ctx)` | The official `openai` SDK and any OpenAI-compatible provider (LiteLLM, Groq, Together, Mistral OpenAI-compat, DeepSeek, Anyscale) | Wraps `chat.completions.create` + `embeddings.create` |
 | `wrapAnthropic(client, ctx)` | The official `@anthropic-ai/sdk` | Wraps `messages.create` |
 | `withReceipts(ctx)` | Any global `fetch` | Detects calls to OpenAI, Azure OpenAI, Anthropic, Google Gemini, Bedrock, Cohere, Hugging Face, Mistral, Groq, Together, Vercel AI Gateway. Custom endpoints via `extraPatterns`. |
-| `ReceiptsCallbackHandler` | LangChain.js | Implements `BaseCallbackHandler` surface; drop into any chain or agent |
+| `ReceiptsCallbackHandler` | LangChain.js **and LangGraph** | Implements `BaseCallbackHandler`; drop into any chain, agent, or graph node (LangGraph propagates LangChain callbacks) |
+| `attachAgentReceipts(runner, ctx)` | **OpenAI Agents SDK** (`@openai/agents`) | Subscribes to the `RunHooks` lifecycle; a receipt per agent turn, tool call, and handoff. Integration-tested against the live package |
+| `plLlamaIndexHandler(ctx)` | **LlamaIndex** | Callback for `llm-end`; a receipt per LLM completion |
+| `plMastraListener(ctx)` | **Mastra** | Telemetry listener; a receipt per agent step |
+| `plReceiptsMiddleware(ctx)` | **Vercel AI SDK** (`ai@4+`) | `wrapGenerate` middleware for `generateText` / `streamText` |
 
 Pattern:
 
