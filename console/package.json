@@ -15,7 +15,7 @@
     "test:e2e:install": "playwright install --with-deps"
   },
   "dependencies": {
-    "next": "15.5.20",
+    "next": "15.5.21",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "@askledger/receipts-sdk": "file:..",
@@ -25,12 +25,12 @@
     "@types/node": "^20.0.0",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
-    "autoprefixer": "^10.4.20",
+    "autoprefixer": "^10.5.4",
     "postcss": "^8.5.10",
     "tailwindcss": "^3.4.10",
     "typescript": "^5.5.0",
-    "eslint": "^9.9.0",
-    "eslint-config-next": "15.5.20",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "15.5.21",
     "@playwright/test": "^1.47.0",
     "@axe-core/playwright": "^4.10.0"
   },
