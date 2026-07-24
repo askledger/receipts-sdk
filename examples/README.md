@@ -16,7 +16,7 @@ Concrete usage patterns showing how to integrate the Receipts SDK into real syst
 | `07-government-eligibility.ts` | An eligibility determination, receipted |
 | `08-five-layers-end-to-end.ts` | **All five layers in one run:** the guardian (L1) blocks a bad wire, every step is hash-chained (L2) and traced as a DAG (L3), the decision is rule-checked and graded (L4), and it all rolls up into governance and verified ROI (L5) |
 | `09-prove-the-savings.ts` | **Prove the savings, don't claim them:** sign a baseline, prove an efficiency-normalized saving against it, verify independently, and watch a forged number get rejected |
-| `10-nextjs-route.ts` | Next.js (App Router) route handler that receipts an AI decision — same shape works in the Pages API |
+| `10-nextjs-route.ts` | Next.js (App Router) route handler that receipts an AI decision, same shape works in the Pages API |
 | `11-fastapi.py` | FastAPI endpoint using the wire-compatible Python SDK; receipts cross-verify with the TypeScript SDK |
 
 ## Running an example

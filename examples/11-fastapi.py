@@ -1,5 +1,5 @@
 """
-Example 11 — FastAPI endpoint (Python)
+Example 11, FastAPI endpoint (Python)
 
 Emit a signed, verifiable receipt for an AI decision served from FastAPI, using
 the wire-compatible Python SDK. Receipts produced here verify with the
@@ -35,7 +35,7 @@ class AskRequest(BaseModel):
 
 @app.post("/ai")
 async def ask(body: AskRequest):
-    # 1) Your AI call — any vendor, any model.
+    # 1) Your AI call, any vendor, any model.
     answer = await call_your_model(body.prompt)
 
     # 2) Sign a receipt for the decision. Only hashes and metadata are stored,

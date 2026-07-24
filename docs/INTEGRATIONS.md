@@ -1,7 +1,7 @@
 # Integrations
 
 Everything AskLedger connects to today. This list is deliberately limited to what
-actually ships in this repository — each row maps to real, exported code or a
+actually ships in this repository, each row maps to real, exported code or a
 documented connector. Where something is planned rather than shipping, it says so.
 
 ## AI model vendors and gateways
@@ -87,7 +87,7 @@ Ship receipts to the systems your security and audit teams already run.
 
 RFC 8785 (JCS canonicalization) · Ed25519 · RFC 3161 (trusted timestamps) ·
 RFC 9162 (Merkle tree / transparency log). Maps to EU AI Act (Article 12),
-NIST AI RMF, ISO/IEC 42001, India RBI, UAE CBUAE — see
+NIST AI RMF, ISO/IEC 42001, India RBI, UAE CBUAE, see
 [docs/POLICY_MAPPING.md](POLICY_MAPPING.md).
 
 ---

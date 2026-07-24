@@ -8,7 +8,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 Security-hardening release. Several verification, guardian, and cost paths that previously
 accepted unsafe input or produced unearned results are now strict. These changes are
-intentionally breaking — output that used to pass may now correctly fail, and reported savings
+intentionally breaking, output that used to pass may now correctly fail, and reported savings
 numbers may change. The minor bump (pre-1.0) signals that honestly.
 
 ### Breaking
@@ -81,7 +81,7 @@ numbers may change. The minor bump (pre-1.0) signals that honestly.
   rewrote the roadmap, which had listed already-shipped work (all five SDKs, RFC 3161
   timestamping, Merkle commitments, HSM/KMS signing) as "next".
 - Removed em-dashes from the README, CHANGELOG, and all CLI/console output strings for a
-  consistent house style. The `"—"` empty-value markers in CLI tables are unchanged.
+  consistent house style. The `" - "` empty-value markers in CLI tables are unchanged.
 - CI reliability: the security-scan hardening checklist now generates the CycloneDX SBOM its
   G.1 check looks for (via the existing generator), so it passes 66/66 instead of failing.
   Raised the vitest timeout to 20s so heavy receipt-generation tests no longer flake under

@@ -1,5 +1,5 @@
 /**
- * Example 10 — Next.js (App Router) route handler
+ * Example 10, Next.js (App Router) route handler
  *
  * Emit a signed, verifiable receipt for an AI decision made inside a Next.js
  * API route. The receipt logic is framework-agnostic, so the same shape works
@@ -14,13 +14,13 @@
 import { signReceipt, generateKeyPair, type RawEvent } from "../src/index.js";
 
 // Load the signing key once at module init. In production this is backed by
-// your KMS/HSM (see src/hsm) — never a fresh in-memory key per request.
+// your KMS/HSM (see src/hsm), never a fresh in-memory key per request.
 const keypair = generateKeyPair();
 
 export async function POST(req: Request): Promise<Response> {
   const { prompt } = await req.json();
 
-  // 1) Your AI call — any vendor, any model.
+  // 1) Your AI call, any vendor, any model.
   const answer = await callYourModel(prompt);
 
   // 2) Describe the decision and sign a receipt for it. Only hashes and

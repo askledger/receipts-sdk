@@ -87,7 +87,7 @@ sequenceDiagram
     V->>Store: fetch receipt(s)
     V->>V: verify signature with public key only
     V->>V: recompute hash, check chain link
-    V-->>V: VALID or TAMPERED — no trust in the vendor required
+    V-->>V: VALID or TAMPERED, no trust in the vendor required
 ```
 
 The receipt is the atomic signed unit. Every other layer links to it by hash rather than nesting inside the signature:
@@ -168,10 +168,10 @@ console.log(resp.x_ledger_receipt_id);   // cryptographic evidence id
 
 **Adapters available today:**
 
-- `wrapOpenAI` — the OpenAI client
-- `wrapAnthropic` — the Anthropic client
-- `withReceipts(fetch)` — any HTTP-based vendor at the network layer (also captures **OpenAI Agents SDK** and other agent frameworks' model calls, since they go over HTTP)
-- `ReceiptsCallbackHandler` — LangChain, and by extension **LangGraph**, which propagates LangChain callbacks through its graph nodes
+- `wrapOpenAI`, the OpenAI client
+- `wrapAnthropic`, the Anthropic client
+- `withReceipts(fetch)`, any HTTP-based vendor at the network layer (also captures **OpenAI Agents SDK** and other agent frameworks' model calls, since they go over HTTP)
+- `ReceiptsCallbackHandler`, LangChain, and by extension **LangGraph**, which propagates LangChain callbacks through its graph nodes
 
 ```ts
 // LangChain / LangGraph: attach the handler to any model or graph node.
@@ -182,10 +182,10 @@ const llm = new ChatAnthropic({ model, callbacks: [handler] }); // used directly
 
 Also available (first-class, exported, tested):
 
-- `attachAgentReceipts(runner, ctx)` — **OpenAI Agents SDK**: a receipt per agent turn, tool call, and handoff via the `RunHooks` lifecycle. Ships with a **live integration test against `@openai/agents`**.
-- `plLlamaIndexHandler(ctx)` — **LlamaIndex**
-- `plMastraListener(ctx)` — **Mastra**
-- `plReceiptsMiddleware(ctx)` — **Vercel AI SDK** (`ai@4+` middleware)
+- `attachAgentReceipts(runner, ctx)`, **OpenAI Agents SDK**: a receipt per agent turn, tool call, and handoff via the `RunHooks` lifecycle. Ships with a **live integration test against `@openai/agents`**.
+- `plLlamaIndexHandler(ctx)`, **LlamaIndex**
+- `plMastraListener(ctx)`, **Mastra**
+- `plReceiptsMiddleware(ctx)`, **Vercel AI SDK** (`ai@4+` middleware)
 
 ## Performance
 

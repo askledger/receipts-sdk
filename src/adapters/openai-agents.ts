@@ -18,7 +18,7 @@
  * specific version. We receipt the *completion* events (agent_end,
  * agent_tool_end, agent_handoff), which carry the outcome.
  *
- * Usage (run level — recommended):
+ * Usage (run level, recommended):
  *
  *   import { Runner } from "@openai/agents";
  *   import { attachAgentReceipts } from "@askledger/receipts-sdk/adapters/openai-agents";
@@ -82,7 +82,7 @@ export function attachAgentReceipts(emitter: AgentsEmitter, ctx: AdapterContext)
     } as RawEvent);
   };
 
-  // agent_end — RunHooks: (context, agent, output). AgentHooks: (context, output).
+  // agent_end, RunHooks: (context, agent, output). AgentHooks: (context, output).
   emitter.on("agent_end", (_context: unknown, a: any, b?: unknown) => {
     const hasAgent = looksLikeAgent(a);
     const agent = hasAgent ? a : undefined;
@@ -99,7 +99,7 @@ export function attachAgentReceipts(emitter: AgentsEmitter, ctx: AdapterContext)
     });
   });
 
-  // agent_tool_end — RunHooks: (context, agent, tool, result, details).
+  // agent_tool_end, RunHooks: (context, agent, tool, result, details).
   //                   AgentHooks: (context, tool, result, details).
   emitter.on("agent_tool_end", (_context: unknown, ...rest: any[]) => {
     let agent: any, tool: any, result: unknown;
@@ -117,7 +117,7 @@ export function attachAgentReceipts(emitter: AgentsEmitter, ctx: AdapterContext)
     });
   });
 
-  // agent_handoff — RunHooks: (context, fromAgent, toAgent). AgentHooks: (context, nextAgent).
+  // agent_handoff, RunHooks: (context, fromAgent, toAgent). AgentHooks: (context, nextAgent).
   emitter.on("agent_handoff", (_context: unknown, a: any, b?: any) => {
     const from = b === undefined ? undefined : a;
     const to = b === undefined ? a : b;
