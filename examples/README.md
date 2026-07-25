@@ -18,6 +18,7 @@ Concrete usage patterns showing how to integrate the Receipts SDK into real syst
 | `09-prove-the-savings.ts` | **Prove the savings, don't claim them:** sign a baseline, prove an efficiency-normalized saving against it, verify independently, and watch a forged number get rejected |
 | `10-nextjs-route.ts` | Next.js (App Router) route handler that receipts an AI decision, same shape works in the Pages API |
 | `11-fastapi.py` | FastAPI endpoint using the wire-compatible Python SDK; receipts cross-verify with the TypeScript SDK |
+| `12-evidence-pack.ts` | Bundle N receipts into one signed evidence pack, then verify the whole pack as a unit; writes `sample-evidence-pack.json` (`npm run demo:pack`) |
 
 ## Running an example
 

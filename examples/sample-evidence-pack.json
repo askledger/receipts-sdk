@@ -1,0 +1,261 @@
+{
+  "@context": "https://github.com/askledger/receipts-sdk/schema/evidence-pack-v1.jsonld",
+  "@type": "EvidencePack",
+  "meta": {
+    "title": "Loan underwriting decisions, sample",
+    "tenantId": "acme-bank",
+    "purpose": "demo evidence pack",
+    "period": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "builtBy": "example-12",
+    "builtAt": "2026-07-25T08:06:51.943Z"
+  },
+  "trusted_keys": [
+    {
+      "kid": "dev-343f1cb7ebef",
+      "public_key": "R7Q+2ts1476oYMBceRM6S1V0qp7NJ5q3FYBaaaiTXAI=",
+      "algorithm": "EdDSA",
+      "curve": "ed25519",
+      "status": "active",
+      "issued_at": "2026-07-25T08:06:51.943Z"
+    }
+  ],
+  "merkle": {
+    "root": "005e7125376f115d3076c57fcf57d8328fd29d9f0b451a94392952c465a2e390",
+    "tree_size": 5,
+    "proofs": {
+      "019f9850-111a-712b-81ba-b6d42ac1674d": {
+        "leaf_index": 0,
+        "tree_size": 5,
+        "audit_path": [
+          "0e41c9262da3df0946aa34105f34d87fd47ac3e9a1088b463ced5d86efbf71e2",
+          "3c91acb04d707217715ad6cf404ea94bb62cb4dd7cadbe5054df538e5b94ddf4",
+          "de0e2c8334a12028590d9957de99afe8281ffff26b9ebec0e6a46891ede38c0b"
+        ]
+      },
+      "019f9850-111e-773e-bf50-2d6c90641c08": {
+        "leaf_index": 1,
+        "tree_size": 5,
+        "audit_path": [
+          "015415657995c0782d084e2f717a74d1f0e04b098a52b66afdf4da8dd5ed9160",
+          "3c91acb04d707217715ad6cf404ea94bb62cb4dd7cadbe5054df538e5b94ddf4",
+          "de0e2c8334a12028590d9957de99afe8281ffff26b9ebec0e6a46891ede38c0b"
+        ]
+      },
+      "019f9850-1120-779d-89af-f716e2a09b71": {
+        "leaf_index": 2,
+        "tree_size": 5,
+        "audit_path": [
+          "c289339ecabd7d42401a97572bd5dc667f7b21e33ab02c6a7b759097a7fce72e",
+          "1150bf8d43504f3a28815576bab82c485ad89ef981e1ee6d4df97ba56958d9d0",
+          "de0e2c8334a12028590d9957de99afe8281ffff26b9ebec0e6a46891ede38c0b"
+        ]
+      },
+      "019f9850-1123-708f-8621-e2a9b027182f": {
+        "leaf_index": 3,
+        "tree_size": 5,
+        "audit_path": [
+          "57e3bad814dc65aeb69b20aca795cfe7aaf6e771c0797178feea5ceb7ceedebc",
+          "1150bf8d43504f3a28815576bab82c485ad89ef981e1ee6d4df97ba56958d9d0",
+          "de0e2c8334a12028590d9957de99afe8281ffff26b9ebec0e6a46891ede38c0b"
+        ]
+      },
+      "019f9850-1125-769c-b24a-5802888bc329": {
+        "leaf_index": 4,
+        "tree_size": 5,
+        "audit_path": [
+          "7ae9ebeef0609d94b93893583b4b5693dbd64afa4401e963e1bbfbeaf6316666"
+        ]
+      }
+    }
+  },
+  "receipts": [
+    {
+      "receipt": {
+        "schema_version": "1.0",
+        "receipt_id": "019f9850-111a-712b-81ba-b6d42ac1674d",
+        "tenant_id": "acme-bank",
+        "issued_at": "2026-07-25T08:06:51.931Z",
+        "event": {
+          "schema_version": "1.0",
+          "tenant_id": "acme-bank",
+          "event_type": "gateway.request",
+          "source_system": "loan-underwriting",
+          "event_id": "decision-1",
+          "captured_at": "2026-07-25T08:06:51.928Z",
+          "subject": {
+            "ai_vendor": "anthropic",
+            "ai_model": "claude-sonnet-4-6"
+          },
+          "payload": {
+            "input_classification": "internal",
+            "output_classification": "internal"
+          }
+        },
+        "integrity": {
+          "previous_receipt_hash": "fb151a0281049117f9e5a359172c5fa6aef8c9dcb5e11742d249bfb1ac71e06e",
+          "receipt_hash": "9f9556126f9cb6452b7f26a1aca535a9e52711c19d1b77e28c5439f1b42064c1",
+          "chain_height": 235
+        }
+      },
+      "signatures": [
+        {
+          "alg": "EdDSA",
+          "kid": "dev-343f1cb7ebef",
+          "sig": "TT6V5lfYmaJXb+czHb1Za10duY8z6iwau3B0FIJ1/D1f5srBJY7NBvEic4VRDdtVntbebUET2ekUDcOnruCeDg=="
+        }
+      ]
+    },
+    {
+      "receipt": {
+        "schema_version": "1.0",
+        "receipt_id": "019f9850-111e-773e-bf50-2d6c90641c08",
+        "tenant_id": "acme-bank",
+        "issued_at": "2026-07-25T08:06:51.934Z",
+        "event": {
+          "schema_version": "1.0",
+          "tenant_id": "acme-bank",
+          "event_type": "gateway.request",
+          "source_system": "loan-underwriting",
+          "event_id": "decision-2",
+          "captured_at": "2026-07-25T08:06:51.934Z",
+          "subject": {
+            "ai_vendor": "anthropic",
+            "ai_model": "claude-sonnet-4-6"
+          },
+          "payload": {
+            "input_classification": "internal",
+            "output_classification": "internal"
+          }
+        },
+        "integrity": {
+          "previous_receipt_hash": "9f9556126f9cb6452b7f26a1aca535a9e52711c19d1b77e28c5439f1b42064c1",
+          "receipt_hash": "1b12926de9e01e047a6d8c4c44e1ce97b3f110709bf14fbfb56941477b9e79df",
+          "chain_height": 236
+        }
+      },
+      "signatures": [
+        {
+          "alg": "EdDSA",
+          "kid": "dev-343f1cb7ebef",
+          "sig": "cvSJzfhb5OE+WYMz+gbyhtxGclSZwp8f7+r3z+PcTphz+swM/CTCjxWm1QCxAUmCF0oCms4YACZbxv4EWegnAg=="
+        }
+      ]
+    },
+    {
+      "receipt": {
+        "schema_version": "1.0",
+        "receipt_id": "019f9850-1120-779d-89af-f716e2a09b71",
+        "tenant_id": "acme-bank",
+        "issued_at": "2026-07-25T08:06:51.936Z",
+        "event": {
+          "schema_version": "1.0",
+          "tenant_id": "acme-bank",
+          "event_type": "gateway.request",
+          "source_system": "loan-underwriting",
+          "event_id": "decision-3",
+          "captured_at": "2026-07-25T08:06:51.936Z",
+          "subject": {
+            "ai_vendor": "anthropic",
+            "ai_model": "claude-sonnet-4-6"
+          },
+          "payload": {
+            "input_classification": "internal",
+            "output_classification": "internal"
+          }
+        },
+        "integrity": {
+          "previous_receipt_hash": "1b12926de9e01e047a6d8c4c44e1ce97b3f110709bf14fbfb56941477b9e79df",
+          "receipt_hash": "2e5d749158bf8587de1a2984411afd8afa02261f2e7aadd0d2ebde3bdec36347",
+          "chain_height": 237
+        }
+      },
+      "signatures": [
+        {
+          "alg": "EdDSA",
+          "kid": "dev-343f1cb7ebef",
+          "sig": "3lOYBDO5sjHBA7FHpYBAaUGm3BTP8fkDsWgDZ5AlF5gD++2rzQLSEIfTgFu98IdemEOQa2HQMnU7s2ufCzHTBA=="
+        }
+      ]
+    },
+    {
+      "receipt": {
+        "schema_version": "1.0",
+        "receipt_id": "019f9850-1123-708f-8621-e2a9b027182f",
+        "tenant_id": "acme-bank",
+        "issued_at": "2026-07-25T08:06:51.939Z",
+        "event": {
+          "schema_version": "1.0",
+          "tenant_id": "acme-bank",
+          "event_type": "gateway.request",
+          "source_system": "loan-underwriting",
+          "event_id": "decision-4",
+          "captured_at": "2026-07-25T08:06:51.939Z",
+          "subject": {
+            "ai_vendor": "anthropic",
+            "ai_model": "claude-sonnet-4-6"
+          },
+          "payload": {
+            "input_classification": "internal",
+            "output_classification": "internal"
+          }
+        },
+        "integrity": {
+          "previous_receipt_hash": "2e5d749158bf8587de1a2984411afd8afa02261f2e7aadd0d2ebde3bdec36347",
+          "receipt_hash": "c307af62410feade5cc6175825e46b9fdcf70101bd9da1e7604b6a737f58d98d",
+          "chain_height": 238
+        }
+      },
+      "signatures": [
+        {
+          "alg": "EdDSA",
+          "kid": "dev-343f1cb7ebef",
+          "sig": "CqwREWUFO01tcIh49Nn4BGy7KwoT5Ipn8d4bHyjdLcTaMl63uyU3hM7qMUIIkw7oGqBlfESE5XkjzfvY8rRUDw=="
+        }
+      ]
+    },
+    {
+      "receipt": {
+        "schema_version": "1.0",
+        "receipt_id": "019f9850-1125-769c-b24a-5802888bc329",
+        "tenant_id": "acme-bank",
+        "issued_at": "2026-07-25T08:06:51.941Z",
+        "event": {
+          "schema_version": "1.0",
+          "tenant_id": "acme-bank",
+          "event_type": "gateway.request",
+          "source_system": "loan-underwriting",
+          "event_id": "decision-5",
+          "captured_at": "2026-07-25T08:06:51.941Z",
+          "subject": {
+            "ai_vendor": "anthropic",
+            "ai_model": "claude-sonnet-4-6"
+          },
+          "payload": {
+            "input_classification": "internal",
+            "output_classification": "internal"
+          }
+        },
+        "integrity": {
+          "previous_receipt_hash": "c307af62410feade5cc6175825e46b9fdcf70101bd9da1e7604b6a737f58d98d",
+          "receipt_hash": "c6f18f3af2475953a3df6cc867ab1519906898d0fcf147dd3e36c81a0fd13288",
+          "chain_height": 239
+        }
+      },
+      "signatures": [
+        {
+          "alg": "EdDSA",
+          "kid": "dev-343f1cb7ebef",
+          "sig": "tv83nVtodo02HD+LKMZ9Qi0c4yene8T2oGXtm5tvAPdCa6kAOKmPAZEjMe9IiPH7O6Cbh05rQoAzi+DrHgoEAA=="
+        }
+      ]
+    }
+  ],
+  "verification_instructions": "HOW TO VERIFY THIS EVIDENCE PACK\n\nREAD THIS FIRST. THE KEYS IN THIS FILE PROVE NOTHING.\n\n  `trusted_keys` travels INSIDE this pack. Anyone who can write this file can\n  put their own key there, re-sign every receipt with it, rebuild the Merkle\n  root and recompute `pack_hash`, and the result is internally consistent.\n  Every integrity mechanism in this document is computed over data supplied by\n  whoever produced the document.\n\n  So `trusted_keys` is a HINT about which key ids to go and look up. It is\n  NOT a trust root. You MUST obtain the signer's public key for each `kid`\n  from somewhere else: the issuer's published key, your own key registry, a\n  certificate, or a channel independent of this file. If you cannot, you have\n  not verified this pack, whatever the tooling prints.\n\nPrerequisites:\n  - The AskLedger Receipts verifier (any language SDK passing the\n    cross-language conformance vectors at test/conformance/).\n  - The signer's public key for each `kid`, obtained OUT OF BAND (see above).\n\nSteps:\n  1. For each receipt in `receipts`:\n     a. Recompute its `integrity.receipt_hash`:\n        - Replace `integrity.receipt_hash` with the empty string.\n        - Canonicalize the receipt body per RFC 8785.\n        - Compute SHA-256 hex of the canonical bytes.\n        - Compare to the original `integrity.receipt_hash`. MUST match.\n     b. Verify the Ed25519 signature in `signatures[0].sig` against the\n        canonical receipt body and the OUT-OF-BAND public key whose `kid`\n        matches `signatures[0].kid`. MUST verify. Do NOT use the key material\n        carried in `trusted_keys` for this step.\n     c. For receipts i and i-1 in the same tenant, verify that\n        `receipts[i].integrity.previous_receipt_hash` equals\n        `receipts[i-1].integrity.receipt_hash`.\n\n  2. Verify the Merkle root in `merkle.root` covers every receipt:\n     For each receipt, use `merkle.proofs[receipt_id]` to reconstruct\n     the root and compare. MUST match `merkle.root`.\n\n  3. (Optional) Verify the RFC 3161 timestamp in each receipt's\n     `timestamps[]` against the TSA's published certificate.\n\n  4. Verify the pack integrity:\n     Compute the pack_hash and compare to `integrity.pack_hash`.\n\nAny failure means the pack has been tampered with or assembled\nincorrectly. Each failure is a structured error from the verifier.",
+  "integrity": {
+    "receipts_count": 5,
+    "pack_hash": "2c40c462033f173c18c7405f1dc2724762900909d7dd46e872f453cb6b89dd54"
+  }
+}
