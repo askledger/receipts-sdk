@@ -17,7 +17,7 @@ Open-source, vendor-neutral cryptographic trust substrate for enterprise AI. Eve
 
 AI now makes consequential decisions: approving a loan, denying a claim, taking an autonomous action. When an auditor, regulator, or court later asks *what your AI did and why*, an ordinary application log is not an answer. Logs are editable, they live inside your own systems, and they prove nothing to someone who does not already trust you.
 
-Regulation is catching up. The EU AI Act (Article 12, from 2 August 2026), NIST AI RMF, ISO 42001, India's RBI and the UAE's CBUAE increasingly require a **tamper-evident** record of what a high-risk AI system decided. That record is exactly what this SDK produces.
+Regulation is catching up. The EU AI Act (Article 12 tamper-evident logging for high-risk AI, from 2 December 2027; Article 50 transparency from 2 August 2026), NIST AI RMF, ISO 42001, India's RBI and the UAE's CBUAE increasingly require a **tamper-evident** record of what a high-risk AI system decided. That record is exactly what this SDK produces.
 
 ## What it does
 

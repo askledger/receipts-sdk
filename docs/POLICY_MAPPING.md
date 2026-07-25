@@ -25,7 +25,7 @@ Source: Central Bank of the UAE Principles for Responsible AI (Feb 2026). Federa
 
 ## EU AI Act · Regulation 2024/1689
 
-Source: Regulation (EU) 2024/1689. High-risk obligations applicable: **2 August 2026**. Maximum fine: EUR 35M or 7% global annual turnover.
+Source: Regulation (EU) 2024/1689 (as amended by the 2026 Digital Omnibus). High-risk obligations applicable: **2 December 2027** (deferred from 2026); Article 50 transparency obligations: **2 August 2026**. Maximum fine: EUR 35M or 7% global annual turnover.
 
 | Article | Title | Receipt fields that satisfy |
 |---|---|---|

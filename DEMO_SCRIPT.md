@@ -134,7 +134,7 @@ Click **Audit Log**.
 >
 > Two — the platform around the substrate is the commercial layer. Evidence packs, regulator portals, BFSI framework mappings (CBUAE, SAMA, EU AI Act, ISO 42001), workflows, the Zero Trust architecture, the audit-ready threat model and SOC 2 control framework. That's what enterprises pay for.
 >
-> Three — we're built for the MENA + EU BFSI moment. September 16, 2026 — CBUAE. August 2, 2026 — EU AI Act. Saudi 2026 Year of AI — 9.1 billion in AI investment, 20 billion committed. We've focused our enterprise sales motion on the customers who must buy something like this in the next 12 weeks.
+> Three — we're built for the MENA + EU BFSI moment. September 16, 2026 — CBUAE. December 2, 2027 — EU AI Act high-risk (Article 50 transparency, August 2, 2026). Saudi 2026 Year of AI — 9.1 billion in AI investment, 20 billion committed. We've focused our enterprise sales motion on the customers who must buy something like this in the next 12 weeks.
 >
 > The cryptography is the public good. Sell the platform."
 
@@ -177,6 +177,6 @@ For a regulator:
 | Sign latency p50 | < 2 ms (in-browser), ~5 ms (in-process Node) |
 | Verify latency p50 | < 2 ms |
 | CBUAE deadline | September 16, 2026 |
-| EU AI Act high-risk obligations | August 2, 2026 |
+| EU AI Act high-risk obligations | 2 December 2027 |
 | Saudi AI investment 2025 | $9.1 B raised, $20 B+ committed |
 | IBM 2026 finding | 97% of AI-breached orgs lacked proper access controls |

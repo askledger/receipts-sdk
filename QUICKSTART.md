@@ -172,6 +172,6 @@ For a 5-minute demo, use this exact sequence:
 2. **30 s — show site/verify.html** · click "Load valid sample" → Verify (all green) → click "Load tampered" → Verify (all red). "This page is what we'd give a regulator."
 3. **60 s — show terminal `npm run demo`** · "Every SDK we ship in 5 languages does this. Identical bytes. Anyone can re-implement the spec and our receipts still verify."
 4. **60 s — show the console (`/`)** · "And this is what a tenant admin sees. KPI dashboard, receipts explorer, key management, evidence pack builder, audit log. Every admin action is itself a receipt on a meta-chain."
-5. **60 s — talk regulators** · CBUAE Sep 16 2026 · EU AI Act Aug 2 2026 · SAMA · ISO 42001. "Five language SDKs, four HSM drivers, full Zero Trust architecture, audit-ready threat model and SOC 2 control framework — all open source today."
+5. **60 s — talk regulators** · CBUAE Sep 16 2026 · EU AI Act high-risk Dec 2 2027 · SAMA · ISO 42001. "Five language SDKs, four HSM drivers, full Zero Trust architecture, audit-ready threat model and SOC 2 control framework — all open source today."
 
 Closing: **"Cryptography is open and verifiable by anyone. The moat is the platform — evidence packs, regulator portals, BFSI framework mappings, the production SaaS. Ship the substrate. Sell the platform."**
