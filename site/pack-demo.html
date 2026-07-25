@@ -8,92 +8,82 @@
   :root{--navy:#0a1b3d;--blue:#1e6bff;--line:#e3e8f0;--muted:#5c6b7f;--wash:#f5f8fc;--ok:#12924a;--okbg:#e7f5ec;--bad:#d23b3b;--badbg:#fdeceb}
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:-apple-system,"Helvetica Neue",Arial,sans-serif;color:var(--navy);background:#fff;line-height:1.55}
-  .wrap{max-width:900px;margin:0 auto;padding:44px 20px 90px}
+  .wrap{max-width:760px;margin:0 auto;padding:44px 20px 90px}
   .eyebrow{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue)}
-  h1{font-size:36px;line-height:1.12;margin:8px 0 12px}
-  .lead{color:var(--muted);font-size:17px;max-width:680px}
+  h1{font-size:34px;line-height:1.12;margin:8px 0 10px}
+  .lead{color:var(--muted);font-size:16.5px}
 
-  /* visual flow */
-  .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:30px 0 8px}
-  .fstep{background:var(--wash);border:1px solid var(--line);border-radius:14px;padding:16px 14px;text-align:center;position:relative}
-  .fstep .ic{font-size:26px;line-height:1}
-  .fstep h4{font-size:14px;margin:8px 0 4px}
-  .fstep p{font-size:12.5px;color:var(--muted);line-height:1.4}
-  .fstep .arw{position:absolute;right:-13px;top:50%;transform:translateY(-50%);color:#b8c4d8;font-size:18px;z-index:2}
-  .fstep:last-child .arw{display:none}
+  /* progress dots */
+  .prog{display:flex;gap:8px;margin:26px 0 6px}
+  .prog .d{flex:1;height:5px;border-radius:99px;background:#e6 ebf3;background:#e6ebf3}
+  .prog .d.on{background:var(--blue)}
 
-  .steps{display:flex;gap:10px;flex-wrap:wrap;margin:26px 0 6px}
-  button{font:inherit;font-weight:700;font-size:15px;padding:13px 20px;border-radius:10px;border:1px solid var(--blue);background:var(--blue);color:#fff;cursor:pointer}
-  button.ghost{background:#fff;color:var(--navy);border-color:var(--line)}
-  button.bad{background:#fff;color:var(--bad);border-color:#f3c4c1}
-  button:disabled{opacity:.4;cursor:not-allowed}
+  /* narration */
+  .narr{background:var(--wash);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin-top:18px}
+  .narr .stepn{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--blue)}
+  .narr h2{font-size:21px;margin:6px 0 8px;line-height:1.25}
+  .narr p{font-size:15.5px;color:#33425c}
+  .narr .banner{margin-top:14px;border-radius:12px;padding:12px 16px;font-weight:700;font-size:16px;display:none;align-items:center;gap:10px}
+  .narr .banner.ok{display:flex;background:var(--okbg);color:var(--ok)}
+  .narr .banner.bad{display:flex;background:var(--badbg);color:var(--bad)}
 
-  .banner{margin-top:22px;border-radius:14px;padding:16px 20px;font-weight:700;font-size:18px;display:flex;align-items:center;gap:12px;border:1px solid var(--line);background:var(--wash);color:var(--muted)}
-  .banner.ok{background:var(--okbg);border-color:#bfe4cc;color:var(--ok)}
-  .banner.bad{background:var(--badbg);border-color:#f3c4c1;color:var(--bad)}
-  .banner .big{font-size:24px}
+  .btnrow{display:flex;gap:10px;margin-top:18px;align-items:center;flex-wrap:wrap}
+  button{font:inherit;font-weight:700;font-size:16px;padding:14px 24px;border-radius:10px;border:1px solid var(--blue);background:var(--blue);color:#fff;cursor:pointer}
+  button.ghost{background:#fff;color:var(--muted);border-color:var(--line);font-size:14px;padding:12px 16px}
+  button.danger{background:#fff;color:var(--bad);border-color:#f3c4c1}
 
-  .rows{margin-top:16px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
-  .row{display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid var(--line)}
+  .rows{margin-top:20px;border:1px solid var(--line);border-radius:14px;overflow:hidden;display:none}
+  .row{display:flex;align-items:center;gap:14px;padding:13px 18px;border-bottom:1px solid var(--line)}
   .row:last-child{border-bottom:none}
-  .row .num{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--muted);width:74px;flex:none}
+  .row .num{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11.5px;color:var(--muted);width:70px;flex:none}
   .row .body{flex:1;min-width:0}
-  .row .title{font-weight:600;font-size:15px}
-  .row .detail{color:var(--muted);font-size:13px}
-  .row .outcome{font-weight:700;font-size:14px;white-space:nowrap}
-  .row .chip{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:#eef2f8;color:var(--muted);white-space:nowrap}
+  .row .title{font-weight:600;font-size:14.5px}
+  .row .detail{color:var(--muted);font-size:12.5px}
+  .row .outcome{font-weight:700;font-size:13.5px;white-space:nowrap}
+  .row .chip{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;background:#eef2f8;color:var(--muted);white-space:nowrap;min-width:96px;text-align:center}
   .row.pass .chip{background:var(--okbg);color:var(--ok)}
   .row.fail{background:var(--badbg)}
   .row.fail .chip{background:#f7d5d2;color:var(--bad)}
   .row .was{color:var(--bad);text-decoration:line-through;opacity:.7;margin-right:6px}
   .row .now{color:var(--bad)}
 
-  .checks{margin-top:14px;display:grid;gap:8px}
-  .chk{display:flex;gap:10px;align-items:flex-start;font-size:14.5px}
-  .chk .dot{width:20px;height:20px;border-radius:50%;background:#e6ebf3;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px;margin-top:1px}
-  .chk.pass .dot{background:var(--ok)}.chk.fail .dot{background:var(--bad)}
-  .chk .k{color:var(--muted);font-size:13px}
-
-  .callout{margin-top:16px;background:var(--badbg);border:1px solid #f3c4c1;border-radius:12px;padding:14px 18px;font-size:14.5px;color:#7a2420}
-  details{margin-top:22px;border:1px solid var(--line);border-radius:12px;padding:0 16px}
-  summary{cursor:pointer;padding:14px 0;font-weight:600;font-size:14px;color:var(--muted)}
-  pre{margin:0 0 14px;padding:14px;background:#0a1b3d;color:#cdd9f2;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11.5px;line-height:1.5;max-height:280px;overflow:auto;border-radius:8px;white-space:pre-wrap;word-break:break-word}
-  .foot{margin-top:26px;color:var(--muted);font-size:13.5px}
+  .seal{display:none;margin-top:12px;font-size:12.5px;color:var(--muted);font-family:'JetBrains Mono',ui-monospace,monospace;background:var(--wash);border:1px solid var(--line);border-radius:10px;padding:12px 16px;word-break:break-all}
+  details{margin-top:18px;border:1px solid var(--line);border-radius:12px;padding:0 16px}
+  summary{cursor:pointer;padding:13px 0;font-weight:600;font-size:13.5px;color:var(--muted)}
+  pre{margin:0 0 14px;padding:14px;background:#0a1b3d;color:#cdd9f2;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;line-height:1.5;max-height:260px;overflow:auto;border-radius:8px;white-space:pre-wrap;word-break:break-word}
+  .foot{margin-top:26px;color:var(--muted);font-size:13px}
   a{color:var(--blue)}
-  @media(max-width:680px){.flow{grid-template-columns:1fr 1fr}.fstep .arw{display:none}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="eyebrow">Live demo · runs entirely in your browser</div>
   <h1>A log is a claim. A receipt is proof.</h1>
-  <p class="lead">Below, an AI makes five real decisions. Each is sealed into a receipt no one can fake or edit, and the five are bundled into one evidence pack. Anyone can verify the whole pack, with no account and no trust in us. Then change one decision and watch verification catch it instantly.</p>
+  <p class="lead">A 60-second walkthrough. Click the button to move through it, one step at a time.</p>
 
-  <div class="flow">
-    <div class="fstep"><div class="ic">🧠</div><h4>An AI decides</h4><p>Approves a loan, denies a claim, flags a payment.</p><span class="arw">→</span></div>
-    <div class="fstep"><div class="ic">🧾</div><h4>A receipt is sealed</h4><p>Signed and locked. It cannot be faked or edited.</p><span class="arw">→</span></div>
-    <div class="fstep"><div class="ic">📦</div><h4>Bundled into a pack</h4><p>Many receipts, one sealed evidence pack.</p><span class="arw">→</span></div>
-    <div class="fstep"><div class="ic">✅</div><h4>Anyone verifies</h4><p>Or catches a change. No account, no trust needed.</p></div>
+  <div class="prog"><span class="d on"></span><span class="d"></span><span class="d"></span><span class="d"></span><span class="d"></span></div>
+
+  <div class="narr">
+    <div class="stepn" id="stepn">Step 1 of 5</div>
+    <h2 id="narrH">A bank's AI made five decisions today</h2>
+    <p id="narrP">A loan declined, a loan approved, a payment flagged for fraud, a claim approved, a case sent to a human. Right now they sit in an ordinary log. A log can be quietly edited by anyone with access, so months later nobody can prove what the AI actually decided. Watch how a receipt fixes that.</p>
+    <div class="banner" id="banner"></div>
   </div>
 
-  <div class="steps">
-    <button id="btnBuild">1 · Make 5 decisions &amp; seal them</button>
-    <button id="btnVerify" class="ghost" disabled>2 · Verify the pack</button>
-    <button id="btnTamper" class="bad" disabled>3 · Secretly change one</button>
+  <div class="btnrow">
+    <button id="next">Show the five decisions &rarr;</button>
+    <button id="restart" class="ghost" style="display:none">&#8635; Start over</button>
   </div>
 
-  <div id="banner" class="banner"><span class="big">📦</span><span id="bannerText">Click "Make 5 decisions" to start.</span></div>
-
-  <div id="rows" class="rows" style="display:none"></div>
-  <div id="checks" class="checks" style="display:none"></div>
-  <div id="callout" class="callout" style="display:none"></div>
+  <div id="seal" class="seal"></div>
+  <div id="rows" class="rows"></div>
 
   <details id="rawWrap" style="display:none">
     <summary>Show the raw evidence pack (JSON)</summary>
     <pre id="raw"></pre>
   </details>
 
-  <p class="foot">This is the real cryptography the SDK uses (Ed25519 signatures, RFC 8785 canonicalization, SHA-256 hash chaining), running client-side. In a real audit, the verifier gets the public key out of band. Run the full flow with <code>npm run demo:pack</code>. Source: <a href="https://github.com/askledger/receipts-sdk">github.com/askledger/receipts-sdk</a></p>
+  <p class="foot">Real cryptography, running client-side: Ed25519 signatures, RFC 8785 canonicalization, SHA-256 hash chaining, the same as the SDK. In a real audit the verifier gets the public key out of band. Run it yourself with <code>npm run demo:pack</code>. Source: <a href="https://github.com/askledger/receipts-sdk">github.com/askledger/receipts-sdk</a></p>
 </div>
 
 <script type="module">
@@ -101,111 +91,115 @@ import * as ed from 'https://esm.sh/@noble/ed25519@2.3.0';
 import { sha512, sha256 as sha256Fn } from 'https://esm.sh/@noble/hashes@1.4.0/sha2';
 import canonicalize from 'https://esm.sh/canonicalize@2.0.0';
 function concat(...a){let n=0;for(const x of a)n+=x.length;const o=new Uint8Array(n);let k=0;for(const x of a){o.set(x,k);k+=x.length;}return o;}
-ed.etc.sha512Sync = (...m) => sha512(concat(...m));
-
-const $ = id => document.getElementById(id);
-const enc = s => new TextEncoder().encode(s);
-const hex = b => Array.from(b).map(x=>x.toString(16).padStart(2,'0')).join('');
-const sha256 = s => hex(sha256Fn(enc(s)));
-const b64e = b => btoa(String.fromCharCode(...b));
-const b64d = s => Uint8Array.from(atob(s), c=>c.charCodeAt(0));
+ed.etc.sha512Sync=(...m)=>sha512(concat(...m));
+const $=id=>document.getElementById(id);
+const enc=s=>new TextEncoder().encode(s);
+const hex=b=>Array.from(b).map(x=>x.toString(16).padStart(2,'0')).join('');
+const sha256=s=>hex(sha256Fn(enc(s)));
+const b64e=b=>btoa(String.fromCharCode(...b));const b64d=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 function uuid(){const r=crypto.getRandomValues(new Uint8Array(16));return hex(r.slice(0,4))+'-'+hex(r.slice(4,6))+'-7'+hex(r.slice(6,7)).slice(1)+hex(r.slice(7,8))+'-'+hex(r.slice(8,10))+'-'+hex(r.slice(10,16));}
 const ZERO='0'.repeat(64);
-let kp=null, pack=null;
+let kp=null,pack=null,step=0;
 
-const DECISIONS = [
-  {title:'Loan application #4471', outcome:'Declined', detail:'debt-to-income above policy'},
-  {title:'Loan application #4472', outcome:'Approved', detail:'within lending policy'},
-  {title:'Card transaction #88213', outcome:'Flagged for fraud', detail:'spending velocity anomaly'},
-  {title:'Insurance claim #C-9902', outcome:'Approved', detail:'documents complete'},
-  {title:'Underwriting case #U-551', outcome:'Referred to human', detail:'manual review required'},
+const DECISIONS=[
+  {title:'Loan application #4471',outcome:'Declined',detail:'debt-to-income above policy'},
+  {title:'Loan application #4472',outcome:'Approved',detail:'within lending policy'},
+  {title:'Card transaction #88213',outcome:'Flagged for fraud',detail:'spending velocity anomaly'},
+  {title:'Insurance claim #C-9902',outcome:'Approved',detail:'documents complete'},
+  {title:'Underwriting case #U-551',outcome:'Referred to human',detail:'manual review required'},
 ];
 
-function sign(event, prev, height){
-  const body={schema_version:'1.0',receipt_id:uuid(),tenant_id:'acme-bank',issued_at:new Date().toISOString(),event,
-    integrity:{previous_receipt_hash:prev,receipt_hash:'',chain_height:height}};
-  body.integrity.receipt_hash=sha256(canonicalize(body));
-  const sig=ed.sign(enc(canonicalize(body)),kp.priv);
-  return {receipt:body,signatures:[{alg:'EdDSA',kid:kp.kid,sig:b64e(sig)}]};
-}
-function merkleRoot(hs){if(!hs.length)return ZERO;let lv=hs.map(h=>sha256('leaf:'+h));while(lv.length>1){const nx=[];for(let i=0;i<lv.length;i+=2){nx.push(sha256('node:'+lv[i]+(lv[i+1]??lv[i])));}lv=nx;}return lv[0];}
-function packHash(p){return sha256(canonicalize({meta:p.meta,receipt_hashes:p.receipts.map(r=>r.receipt.integrity.receipt_hash),merkle_root:p.merkle_root}));}
-
-function renderRows(state){ // state: 'sealed' | 'valid' | verifyResult
-  $('rows').style.display='block';
-  $('rows').innerHTML = pack.receipts.map((r,i)=>{
-    const d = r.receipt.event.payload.decision;
-    const tampered = r._tampered;
-    let chip = '<span class="chip">sealed</span>', cls='';
-    if (state==='verify'){
-      const ok = r._ok;
-      cls = ok?'pass':'fail'; chip = ok?'<span class="chip">✓ genuine, unaltered</span>':'<span class="chip">✕ altered, fails</span>';
-    }
-    const outcome = tampered
-      ? `<span class="was">${d._was}</span><span class="now">${d.outcome}</span>`
-      : d.outcome;
-    return `<div class="row ${cls}"><span class="num">Receipt ${i+1}</span>
-      <span class="body"><span class="title">${d.title}</span><br><span class="detail">${d.detail}</span></span>
-      <span class="outcome">${outcome}</span>${chip}</div>`;
-  }).join('');
-  $('raw').textContent = JSON.stringify(pack,(k,v)=>k==='priv'||k==='_ok'||k==='_tampered'||k==='_was'?undefined:v,2);
-  $('rawWrap').style.display='block';
-}
-
-$('btnBuild').addEventListener('click',()=>{
+function build(){
   const priv=ed.utils.randomPrivateKey();
   kp={priv,pub:ed.getPublicKey(priv),kid:'dev-'+hex(crypto.getRandomValues(new Uint8Array(5)))};
-  const receipts=[]; let prev=ZERO;
+  const receipts=[];let prev=ZERO;
   DECISIONS.forEach((d,i)=>{
     const event={tenant_id:'acme-bank',event_type:'gateway.request',source_system:'loan-underwriting',
       subject:{ai_vendor:'anthropic',ai_model:'claude-sonnet-4-6'},payload:{decision:{...d}}};
-    const r=sign(event,prev,i+1); receipts.push(r); prev=r.receipt.integrity.receipt_hash;
+    const body={schema_version:'1.0',receipt_id:uuid(),tenant_id:'acme-bank',issued_at:new Date().toISOString(),event,
+      integrity:{previous_receipt_hash:prev,receipt_hash:'',chain_height:i+1}};
+    body.integrity.receipt_hash=sha256(canonicalize(body));
+    const sig=ed.sign(enc(canonicalize(body)),kp.priv);
+    receipts.push({receipt:body,signatures:[{alg:'EdDSA',kid:kp.kid,sig:b64e(sig)}]});
+    prev=body.integrity.receipt_hash;
   });
-  pack={meta:{title:'Bank AI decisions, sample',tenantId:'acme-bank',builtAt:new Date().toISOString()},receipts};
-  pack.merkle_root=merkleRoot(receipts.map(r=>r.receipt.integrity.receipt_hash));
-  pack.pack_hash=packHash(pack);
-  $('banner').className='banner'; $('banner').querySelector('.big').textContent='📦';
-  $('bannerText').textContent='5 decisions sealed into one evidence pack. Now verify it.';
-  $('checks').style.display='none'; $('callout').style.display='none';
-  renderRows('sealed');
-  $('btnVerify').disabled=false; $('btnTamper').disabled=true;
-});
-
-function runVerify(){
-  let prev=ZERO, chainOk=true, sigCount=0;
-  for(const r of pack.receipts){
-    const body=JSON.parse(JSON.stringify(r.receipt)); const stored=body.integrity.receipt_hash;
-    body.integrity.receipt_hash=''; const ok1=sha256(canonicalize(body))===stored; body.integrity.receipt_hash=stored;
-    let ok2=false; try{ok2=ed.verify(b64d(r.signatures[0].sig),enc(canonicalize(body)),kp.pub);}catch{}
-    r._ok = ok1 && ok2; if(r._ok)sigCount++;
-    if(r.receipt.integrity.previous_receipt_hash!==prev)chainOk=false; prev=stored;
-  }
-  const sealOk = merkleRoot(pack.receipts.map(r=>r.receipt.integrity.receipt_hash))===pack.merkle_root && packHash(pack)===pack.pack_hash;
-  const allSig = sigCount===pack.receipts.length;
-  const valid = allSig && chainOk && sealOk;
-  renderRows('verify');
-  const checks=[
-    ['Every receipt is genuine and unaltered', allSig, `${sigCount} of ${pack.receipts.length} match their signature`],
-    ['The receipts form an unbroken chain', chainOk, 'each links to the one before it'],
-    ["The pack's seal matches its contents", sealOk, 'Merkle root and pack hash check out'],
-  ];
-  $('checks').style.display='grid';
-  $('checks').innerHTML=checks.map(([k,ok,d])=>`<div class="chk ${ok?'pass':'fail'}"><span class="dot">${ok?'✓':'✕'}</span><span><b>${k}</b><br><span class="k">${d}</span></span></div>`).join('');
-  $('banner').className='banner '+(valid?'ok':'bad');
-  $('banner').querySelector('.big').textContent=valid?'✅':'⛔';
-  $('bannerText').textContent=valid?`VALID · all ${pack.receipts.length} receipts verified, nothing has been changed.`:'TAMPERED · verification failed. One receipt no longer matches its seal.';
-  return valid;
+  let lv=receipts.map(r=>sha256('leaf:'+r.receipt.integrity.receipt_hash));
+  while(lv.length>1){const nx=[];for(let i=0;i<lv.length;i+=2)nx.push(sha256('node:'+lv[i]+(lv[i+1]??lv[i])));lv=nx;}
+  pack={meta:{title:'Bank AI decisions, sample',builtAt:new Date().toISOString()},receipts,merkle_root:lv[0]};
+  pack.pack_hash=sha256(canonicalize({meta:pack.meta,roots:receipts.map(r=>r.receipt.integrity.receipt_hash),merkle_root:pack.merkle_root}));
 }
 
-$('btnVerify').addEventListener('click',()=>{ $('callout').style.display='none'; runVerify(); $('btnTamper').disabled=false; });
+function verify(){
+  let prev=ZERO,chainOk=true,sig=0;
+  for(const r of pack.receipts){
+    const b=JSON.parse(JSON.stringify(r.receipt));const stored=b.integrity.receipt_hash;
+    b.integrity.receipt_hash='';const h=sha256(canonicalize(b))===stored;b.integrity.receipt_hash=stored;
+    let s=false;try{s=ed.verify(b64d(r.signatures[0].sig),enc(canonicalize(b)),kp.pub);}catch{}
+    r._ok=h&&s;if(r._ok)sig++;if(r.receipt.integrity.previous_receipt_hash!==prev)chainOk=false;prev=stored;
+  }
+  return {valid:sig===pack.receipts.length&&chainOk,sig};
+}
 
-$('btnTamper').addEventListener('click',()=>{
-  const d=pack.receipts[0].receipt.event.payload.decision;
-  if(!pack.receipts[0]._tampered){ d._was=d.outcome; d.outcome='Approved'; pack.receipts[0]._tampered=true; }
-  runVerify();
-  $('callout').style.display='block';
-  $('callout').innerHTML='<b>What just happened:</b> someone changed Receipt 1 from "Declined" to "Approved" after it was signed, the kind of edit a dishonest insider or an attacker would make. Its content no longer matches its cryptographic seal, so verification fails immediately and points to the exact receipt. No one, not even us, can alter a receipt without it showing.';
-});
+function renderRows(mode){ // 'log' | 'sealed' | 'verified'
+  $('rows').style.display='block';
+  $('rows').innerHTML=pack.receipts.map((r,i)=>{
+    const d=r.receipt.event.payload.decision;
+    let chip='<span class="chip">log entry</span>',cls='';
+    if(mode==='sealed')chip='<span class="chip">&#128274; sealed</span>';
+    if(mode==='verified'){cls=r._ok?'pass':'fail';chip=r._ok?'<span class="chip">&#10003; verified</span>':'<span class="chip">&#10007; altered</span>';}
+    const outcome=r._tampered?`<span class="was">${d._was}</span><span class="now">${d.outcome}</span>`:d.outcome;
+    return `<div class="row ${cls}"><span class="num">Decision ${i+1}</span><span class="body"><span class="title">${d.title}</span><br><span class="detail">${d.detail}</span></span><span class="outcome">${outcome}</span>${chip}</div>`;
+  }).join('');
+  $('raw').textContent=JSON.stringify(pack,(k,v)=>['priv','_ok','_tampered','_was'].includes(k)?undefined:v,2);
+  $('rawWrap').style.display='block';
+}
+function progress(n){document.querySelectorAll('.prog .d').forEach((d,i)=>d.classList.toggle('on',i<=n));}
+function banner(cls,txt){const b=$('banner');b.className='banner '+cls;b.innerHTML=txt;}
+
+const STEPS=[
+  { // 0 -> shown initially, button advances to 1
+    btn:'Show the five decisions &rarr;',
+    go(){ build(); renderRows('log');
+      $('stepn').textContent='Step 2 of 5'; progress(1);
+      $('narrH').textContent='These are just log entries, for now';
+      $('narrP').textContent='Five real decisions. As a plain log, any one of them could be changed later, a "Declined" quietly flipped to "Approved", and nothing in the log would reveal it. That is why a log is only a claim.';
+      $('next').innerHTML='Seal each into a receipt &rarr;';
+    }
+  },
+  { // 1 -> 2
+    go(){ renderRows('sealed');
+      $('seal').style.display='block';
+      $('seal').innerHTML='&#128274; Evidence pack sealed &middot; 5 receipts &middot; one tamper-proof seal (Merkle root '+pack.merkle_root.slice(0,20)+'&hellip;)';
+      $('stepn').textContent='Step 3 of 5'; progress(2);
+      $('narrH').textContent='Now each one is sealed into a receipt';
+      $('narrP').textContent='Every decision is cryptographically signed and locked, then all five are bundled into one evidence pack under a single seal. Change one character in any receipt and the seal no longer matches. Nothing about the decisions changed, they are just now impossible to alter unnoticed.';
+      $('next').innerHTML='Verify the whole pack &rarr;';
+    }
+  },
+  { // 2 -> 3
+    go(){ const r=verify(); renderRows('verified');
+      $('stepn').textContent='Step 4 of 5'; progress(3);
+      $('narrH').textContent='Anyone can verify it, without trusting the bank';
+      $('narrP').textContent='An auditor, a regulator, or a court checks the pack using only a public key. No account, no call back to us, no trust in the bank required. Every receipt matches its seal and the chain is unbroken.';
+      banner('ok','&#9989; VALID &middot; all 5 receipts verified, nothing has been changed');
+      $('next').innerHTML='Now try to cheat &rarr;';
+    }
+  },
+  { // 3 -> 4
+    go(){ const d=pack.receipts[0].receipt.event.payload.decision;
+      if(!pack.receipts[0]._tampered){d._was=d.outcome;d.outcome='Approved';pack.receipts[0]._tampered=true;}
+      verify(); renderRows('verified');
+      $('stepn').textContent='Step 5 of 5'; progress(4);
+      $('narrH').textContent='Someone changed a declined loan to approved';
+      $('narrP').textContent='After it was signed, Decision 1 was secretly edited, the kind of change a dishonest insider or an attacker would make. Verification catches it instantly and points to the exact receipt. That is the whole idea: a log is a claim; a receipt is proof.';
+      banner('bad','&#9940; TAMPERED &middot; Decision 1 no longer matches its seal');
+      $('next').style.display='none'; $('restart').style.display='inline-block';
+    }
+  },
+];
+
+$('next').addEventListener('click',()=>{ if(step<STEPS.length){ STEPS[step].go(); step++; } });
+$('restart').addEventListener('click',()=>{ location.reload(); });
 </script>
 </body>
 </html>
